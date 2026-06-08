@@ -1,0 +1,68 @@
+.box {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.button {
+  padding: 8px 14px;
+  background: #007aff;
+  color: white;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.openButton {
+  padding: 10px 16px;
+  background: #007aff;
+  color: white;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.input {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.btnRow {
+  display: flex;
+  gap: 8px;
+}
+
+.button {
+  padding: 8px 14px;
+  background: #007aff;
+  color: white;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.cancelButton {
+  padding: 8px 14px;
+  background: #ccc;
+  color: #333;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}

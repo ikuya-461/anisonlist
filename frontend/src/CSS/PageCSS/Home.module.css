@@ -1,0 +1,12 @@
+.outer {
+  min-height: 100vh;
+  padding: 20px;
+  background: #f7f7f7;
+}
+
+.title {
+  font-size: 2.4rem;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: bold;
+}

@@ -1,0 +1,89 @@
+.outer {
+  padding: 24px;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.8;
+}
+
+.loading {
+  padding: 20px;
+  text-align: center;
+}
+
+.backBtn {
+  margin-bottom: 20px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  background: #ddd;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.image {
+  width: 100%;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  object-fit: cover;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.typeBadge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.title {
+  font-size: 26px;
+  font-weight: bold;
+  margin: 0;
+  text-align: center;
+}
+
+
+.infoBox {
+  margin-top: 10px;
+}
+
+.songInfo {
+  margin-top: 10px;
+}
+
+
+
+.animeTitle {
+  margin-top: 10px;
+  font-size: 18px;
+  color: #4dabf7;
+  cursor: pointer;
+}
+
+.animeTitle:hover {
+  text-decoration: underline;
+}
+
+.artistLink {
+  color: #4dabf7;
+  cursor: pointer;
+}
+
+.artistLink:hover {
+  text-decoration: underline;
+}
+
+.songInfoText {
+  margin-top: 6px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}

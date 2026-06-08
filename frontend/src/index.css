@@ -1,0 +1,48 @@
+/* ------------------------------
+   グローバル設定（初期設定）
+------------------------------ */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+    'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  background: var(--color-bg);
+  color: var(--text-main);
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* ------------------------------
+   テーマカラー（あなたの配色）
+------------------------------ */
+:root {
+  /* メインカラー（ブランド） */
+  --color-main: #3DB3D0;
+
+  /* アクセント（警告・削除） */
+  --color-accent: #C24347;
+
+  /* サブアクセント（柔らかい強調） */
+  --color-sub: #AA5A9C;
+
+  /* ハイライト（明るい装飾） */
+  --color-highlight: #F7D967;
+
+  /* ベースカラー（背景・文字） */
+  --color-base-dark: #191338;
+  --color-bg: #f7f7f7;
+  --color-card: #ffffff;
+
+  /* テキスト */
+  --text-main: #222222;
+  --text-sub: #666666;
+
+  /* ボーダー */
+  --border: #e5e5e5;
+}

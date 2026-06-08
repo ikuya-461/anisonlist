@@ -1,0 +1,29 @@
+/* アプリ全体の背景 */
+.outer {
+  width: 100%;
+  min-height: 100vh;
+  background: #f7f7f7;
+  display: flex;
+  justify-content: center;
+}
+
+/* 内側のコンテンツ幅（スマホ基準） */
+.inner {
+  width: 100%;
+  max-width: 480px;
+  padding: 16px;
+}
+
+/* タブレット */
+@media (min-width: 768px) {
+  .inner {
+    max-width: 700px;  /* ★ タブレットでは広く */
+  }
+}
+
+/* PC */
+@media (min-width: 1024px) {
+  .inner {
+    max-width: 1200px; /* ★ PC ではさらに広く */
+  }
+}

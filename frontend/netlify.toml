@@ -1,0 +1,10 @@
+[build]
+  command = "npm run build"
+  publish = "build"
+
+# React Router (CRA) のクライアントサイドルーティングに対応するため、
+# 全パスを index.html にフォールバックさせる
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

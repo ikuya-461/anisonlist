@@ -1,0 +1,70 @@
+.container {
+  padding: 20px;
+}
+
+.heading {
+  margin-bottom: 10px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.tabBtn {
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  border-radius: 999px;
+  background: #fff;
+  color: #555;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.tabBtn:hover {
+  background: #f0f0f0;
+}
+
+.activeTab {
+  background: #4dabf7;
+  color: #fff;
+  border-color: #4dabf7;
+}
+
+.form {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.select {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+}
+
+.searchBtn {
+  margin-bottom: 20px;
+}
+
+.pagination {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.pageBtn {
+  width: auto;
+  padding: 6px 12px;
+  margin: 3px;
+}
+
+.activePage {
+  font-weight: bold;
+}
+
+.dots {
+  margin: 0 6px;
+}

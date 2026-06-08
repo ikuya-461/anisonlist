@@ -1,0 +1,25 @@
+.outer {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--color-bg);   /* ★ ここが最重要 */
+  display: flex;
+  justify-content: center;
+}
+
+.inner {
+  width: 100%;
+  max-width: 480px;
+  padding: 16px;
+}
+
+@media (min-width: 768px) {
+  .inner {
+    max-width: 700px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .inner {
+    max-width: 1100px;
+  }
+}

@@ -1,0 +1,74 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabaseClient";
+
+import Header from "../components/parts/Header";
+import Layout from "./Layout";
+
+import Home from "./Home/Home";
+import SongDetail from "./SongDetail/SongDetail";
+import Login from "./LoginRegister/Login";
+import Register from "./LoginRegister/Register";
+import MyPage from "./Mypage/MyPage";
+import ListPage from "./ListPage/ListPage";
+import ForgotPassword from "./LoginRegister/ForgotPassword";
+import AnimeDetail from "./AnimeDetail/AnimeDetail";
+import ArtistDetail from "./ArtistDetail/ArtistDetail";
+
+function App() {
+  // ★ JSX では型を書けないので boolean | null は削除
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
+
+  // ★ Supabase でログイン状態を取得
+  const updateLoginState = async () => {
+    const { data } = await supabase.auth.getUser();
+    setIsLoggedIn(!!data.user);
+  };
+
+  useEffect(() => {
+    updateLoginState();
+
+    // ★ セッション変化を監視（ログイン/ログアウトを自動反映）
+    const { data: listener } = supabase.auth.onAuthStateChange(() => {
+      updateLoginState();
+    });
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
+  // ★ 初期状態は null → ローディング扱い
+  if (isLoggedIn === null) return null;
+
+  return (
+    <BrowserRouter>
+      <Header isLoggedIn={isLoggedIn} updateLoginState={updateLoginState} />
+
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/songs/:id" element={<SongDetail />} />
+          <Route path="/anime/:id" element={<AnimeDetail />} />
+          <Route path="/artist/:id" element={<ArtistDetail />} />
+
+          <Route
+            path="/login"
+            element={<Login updateLoginState={updateLoginState} />}
+          />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+
+          <Route
+            path="/mypage"
+            element={<MyPage updateLoginState={updateLoginState} />}
+          />
+
+          <Route path="/list/:id" element={<ListPage />} />
+        </Routes>
+      </Layout>
+    </BrowserRouter>
+  );
+}
+
+export default App;

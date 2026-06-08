@@ -1,0 +1,61 @@
+                           ┌──────────────────────────┐
+                           │          anime           │
+                           │──────────────────────────│
+                           │ id (PK)                  │
+                           │ title_jp                 │
+                           │ title_en                 │
+                           │ release_year             │
+                           │ release_season           │
+                           │ release_date             │
+                           │ created_at               │
+                           └─────────────▲────────────┘
+                                         │ 1
+                                         │
+                                         │ 多
+┌──────────────────────────┐            │            ┌──────────────────────────┐
+│         artists          │◀───────────┘            │          songs           │
+│──────────────────────────│ 1                         │──────────────────────────│
+│ id (PK)                  │◀──────────────┐          │ id (PK)                  │
+│ name                     │               │          │ anime_id (FK)            │
+│ role                     │               │          │ artist_id (FK)           │
+│   - artist               │               │          │ lyricist_id (FK)         │
+│   - lyricist             │               │          │ composer_id (FK)         │
+│   - composer             │               │          │ arranger_id (FK)         │
+│   - arranger             │               │          │ song_title               │
+│ created_at               │               │          │ song_type                │
+└─────────────▲────────────┘               │          │ release_date             │
+              │ 1                           │          │ created_at               │
+              │                             │          └──────────────────────────┘
+              │ 多                           │
+              └─────────────── songs ───────┘
+
+
+| column | type |
+| --- | --- |
+| id | PK |
+| title_jp | text |
+| title_en | text |
+| release_year | int |
+| release_season | text |
+| release_date | date |
+| created_at | timestamptz |
+
+| column | type |
+| --- | --- |
+| id | PK |
+| name | text |
+| role | text（artist / lyricist / composer / arranger） |
+| created_at | timestamptz |
+
+| column | type |
+| --- | --- |
+| id | PK |
+| anime_id | FK → anime.id |
+| artist_id | FK → artists.id |
+| lyricist_id | FK → artists.id |
+| composer_id | FK → artists.id |
+| arranger_id | FK → artists.id |
+| song_title | text |
+| song_type | text（OP/ED/IN） |
+| release_date | date |
+| created_at | timestamptz |
