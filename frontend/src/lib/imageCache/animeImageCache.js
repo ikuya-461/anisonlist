@@ -33,13 +33,25 @@ export async function ensureAnimeImage(anime) {
 
 /* -------------------------------------------------------
    🚀 アニメ一覧の中で image_url が無いものをまとめてキャッシュ
+   ※ Jikan APIは 3 req/秒までのレート制限があるため、
+     並列実行ではなく一定間隔をあけて順番に呼び出す
 ------------------------------------------------------- */
+const JIKAN_REQUEST_INTERVAL_MS = 400;
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export async function ensureAnimeImages(animeList) {
-  return Promise.all(
-    animeList.map(async (anime) => {
-      if (anime.image_url) return anime;
-      const image_url = await ensureAnimeImage(anime);
-      return { ...anime, image_url };
-    })
-  );
+  const results = [];
+
+  for (const anime of animeList) {
+    if (anime.image_url) {
+      results.push(anime);
+      continue;
+    }
+
+    const image_url = await ensureAnimeImage(anime);
+    results.push({ ...anime, image_url });
+    await sleep(JIKAN_REQUEST_INTERVAL_MS);
+  }
+
+  return results;
 }
