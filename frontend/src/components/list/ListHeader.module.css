@@ -48,6 +48,44 @@
   cursor: pointer;
 }
 
+/* 公開アクション行 */
+.publicActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 4px;
+  flex-wrap: wrap;
+}
+
+.publicPageLink {
+  font-size: 13px;
+  color: #4dabf7;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.publicPageLink:hover {
+  text-decoration: underline;
+}
+
+.xShareBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: #000;
+  color: #fff;
+  font-size: 13px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.xShareBtn:hover {
+  opacity: 0.75;
+}
+
 /* リスト説明 */
 .descRow {
   margin-top: 6px;

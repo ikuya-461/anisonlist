@@ -59,6 +59,18 @@
   margin-top: 3px;
 }
 
+.publicLink {
+  display: inline-block;
+  font-size: 11px;
+  color: #4dabf7;
+  text-decoration: none;
+  margin-top: 3px;
+}
+
+.publicLink:hover {
+  text-decoration: underline;
+}
+
 .actions {
   display: flex;
   align-items: center;

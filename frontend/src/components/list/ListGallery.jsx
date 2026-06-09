@@ -111,6 +111,17 @@ function GalleryItem({ list, onDeleted, onTogglePublic, dragHandleProps }) {
         {typeof list.like_count === "number" && (
           <div className={styles.likeCount}>❤️ {list.like_count}</div>
         )}
+        {list.is_public && (
+          <a
+            href={`/public/${list.id}`}
+            target="_blank"
+            rel="noreferrer"
+            className={styles.publicLink}
+            onClick={(e) => e.stopPropagation()}
+          >
+            🌐 公開ページ
+          </a>
+        )}
       </div>
 
       <div className={styles.actions}>

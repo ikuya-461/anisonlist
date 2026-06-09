@@ -46,6 +46,28 @@ export default function ListHeader({ listId, listInfo, onUpdated }) {
         </div>
       )}
 
+      {/* 公開中のみ：公開ページリンク + X シェア */}
+      {listInfo?.is_public && (
+        <div className={styles.publicActions}>
+          <a
+            href={`/public/${listId}`}
+            target="_blank"
+            rel="noreferrer"
+            className={styles.publicPageLink}
+          >
+            🌐 公開ページを見る
+          </a>
+          <a
+            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`🎵 ${listInfo.name}\n#SONICLIST`)}&url=${encodeURIComponent(`${window.location.origin}/public/${listId}`)}`}
+            target="_blank"
+            rel="noreferrer"
+            className={styles.xShareBtn}
+          >
+            𝕏 シェア
+          </a>
+        </div>
+      )}
+
       {/* リスト説明 */}
       {editingDesc ? (
         <div className={styles.descEditRow}>
