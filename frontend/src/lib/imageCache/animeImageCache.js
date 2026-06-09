@@ -1,5 +1,6 @@
 import { supabase } from "../supabaseClient";
 import { normalizeText } from "./normalize";
+import { JIKAN_API_BASE, JIKAN_REQUEST_INTERVAL_MS } from "../constants";
 
 /* -------------------------------------------------------
    🚀 アニメ画像を Jikan API で検索し、未キャッシュなら DB に保存
@@ -10,7 +11,7 @@ export async function ensureAnimeImage(anime) {
 
   try {
     const jikanRes = await fetch(
-      `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(normalizeText(anime.title_jp))}&limit=1`
+      `${JIKAN_API_BASE}/anime?q=${encodeURIComponent(normalizeText(anime.title_jp))}&limit=1`
     );
 
     const data = await jikanRes.json();
@@ -36,7 +37,6 @@ export async function ensureAnimeImage(anime) {
    ※ Jikan APIは 3 req/秒までのレート制限があるため、
      並列実行ではなく一定間隔をあけて順番に呼び出す
 ------------------------------------------------------- */
-const JIKAN_REQUEST_INTERVAL_MS = 400;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function ensureAnimeImages(animeList) {

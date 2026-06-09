@@ -27,9 +27,7 @@ export default function MyPage({ updateLoginState }) {
   const [editBio, setEditBio] = useState("");
   const [editIcon, setEditIcon] = useState("");
 
-  // -----------------------------
   // ① ログインユーザー取得
-  // -----------------------------
   useEffect(() => {
     const load = async () => {
       const { data: authData } = await supabase.auth.getUser();
@@ -43,9 +41,7 @@ export default function MyPage({ updateLoginState }) {
       const uid = user.id;
       setUserId(uid);
 
-      // -----------------------------
       // ② プロフィール取得
-      // -----------------------------
       const { data: profile } = await supabase
         .from("users")
         .select("user_name, bio, icon_url")
@@ -62,9 +58,7 @@ export default function MyPage({ updateLoginState }) {
         setEditIcon(profile.icon_url || "");
       }
 
-      // -----------------------------
       // ③ リスト一覧取得
-      // -----------------------------
       setLists(await fetchLists());
       setLoading(false);
     };
@@ -72,9 +66,7 @@ export default function MyPage({ updateLoginState }) {
     load();
   }, [navigate]);
 
-  // -----------------------------
   // ④ プロフィール更新
-  // -----------------------------
   const saveProfile = async () => {
     const { data, error } = await supabase
       .from("users")
@@ -99,9 +91,7 @@ export default function MyPage({ updateLoginState }) {
     setEditing(false);
   };
 
-  // -----------------------------
   // ⑤ ログアウト
-  // -----------------------------
   const handleLogout = async () => {
     await supabase.auth.signOut();
     await updateLoginState();
@@ -201,7 +191,6 @@ export default function MyPage({ updateLoginState }) {
 
             setLists(fixedLists);
 
-            // ★ upsert をやめて update を使う
             for (const l of fixedLists) {
               await supabase
                 .from("lists")
@@ -213,7 +202,6 @@ export default function MyPage({ updateLoginState }) {
         />
 
         <CreateListButton
-          userId={userId}
           onCreated={async () => {
             setLists(await fetchLists());
           }}

@@ -16,10 +16,9 @@ import AnimeDetail from "./AnimeDetail/AnimeDetail";
 import ArtistDetail from "./ArtistDetail/ArtistDetail";
 
 function App() {
-  // ★ JSX では型を書けないので boolean | null は削除
+  // null = 初期確認中（ローディング扱い）、true/false = 確認済み
   const [isLoggedIn, setIsLoggedIn] = useState(null);
 
-  // ★ Supabase でログイン状態を取得
   const updateLoginState = async () => {
     const { data } = await supabase.auth.getUser();
     setIsLoggedIn(!!data.user);
@@ -28,7 +27,7 @@ function App() {
   useEffect(() => {
     updateLoginState();
 
-    // ★ セッション変化を監視（ログイン/ログアウトを自動反映）
+    // セッション変化（ログイン／ログアウト）を自動反映
     const { data: listener } = supabase.auth.onAuthStateChange(() => {
       updateLoginState();
     });
@@ -38,7 +37,6 @@ function App() {
     };
   }, []);
 
-  // ★ 初期状態は null → ローディング扱い
   if (isLoggedIn === null) return null;
 
   return (

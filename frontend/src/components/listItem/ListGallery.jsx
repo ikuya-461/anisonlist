@@ -16,11 +16,12 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import ListGalleryItem from "./ListGalleryItem";
 import styles from "../../CSS/ComponentCSS/ListGallery.module.css";
+import { DND_ACTIVATION_CONSTRAINT } from "../../lib/constants";
 
 export default function ListGallery({ lists, setLists, onDeleted, onReorder }) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: { delay: 120, tolerance: 4 }
+      activationConstraint: DND_ACTIVATION_CONSTRAINT
     })
   );
 

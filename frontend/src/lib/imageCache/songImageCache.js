@@ -1,5 +1,6 @@
 import { supabase } from "../supabaseClient";
 import { normalizeText } from "./normalize";
+import { ITUNES_SEARCH_API } from "../constants";
 
 /* -------------------------------------------------------
    🚀 曲画像を iTunes API で検索し、未キャッシュなら DB に保存
@@ -12,7 +13,7 @@ export async function ensureSongImage(song) {
   const artist = normalizeText(song.artist);
 
   const query = encodeURIComponent(`${title} ${artist}`);
-  const url = `https://itunes.apple.com/search?term=${query}&entity=song&limit=1`;
+  const url = `${ITUNES_SEARCH_API}?term=${query}&entity=song&limit=1`;
 
   try {
     const response = await fetch(url);

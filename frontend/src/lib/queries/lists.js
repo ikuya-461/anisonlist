@@ -3,11 +3,24 @@ import { supabase } from "../supabaseClient";
 /* -------------------------------------------------------
    ★ 新規リスト作成
 ------------------------------------------------------- */
-export async function createList(userId, name) {
+export async function createList(name) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  // 次の position = 現在の最大 + 1（先頭からソートされた並びを維持）
+  const { data: maxData } = await supabase
+    .from("lists")
+    .select("position")
+    .eq("user_id", user.id)
+    .order("position", { ascending: false })
+    .limit(1);
+
+  const nextPosition = maxData?.[0]?.position + 1 || 0;
+
   const { data, error } = await supabase
     .from("lists")
-    .insert({ user_id: userId, name })
-    .select("id, user_id, name, created_at")
+    .insert({ user_id: user.id, name, position: nextPosition })
+    .select("id, user_id, name, created_at, position")
     .single();
 
   if (error) {

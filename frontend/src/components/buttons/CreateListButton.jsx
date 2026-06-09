@@ -1,52 +1,23 @@
 import { useState } from "react";
-import { supabase } from "../../lib/supabaseClient";
+import { createList } from "../../lib/queries/lists";
 import styles from "../../CSS/ComponentCSS/CreateListButton.module.css";
 
-export default function CreateListButton({ userId, onCreated }) {
+export default function CreateListButton({ onCreated }) {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const createList = async () => {
-    if (!name.trim() || !userId) return;
+  const handleCreate = async () => {
+    if (!name.trim()) return;
 
     setLoading(true);
-
-    // ★ 1. 現在の最大 position を取得
-    const { data: maxData, error: maxError } = await supabase
-      .from("lists")
-      .select("position")
-      .eq("user_id", userId)
-      .order("position", { ascending: false })
-      .limit(1);
-
-    if (maxError) {
-      console.error("position 取得エラー:", maxError);
-      setLoading(false);
-      return;
-    }
-
-    const nextPosition = maxData?.[0]?.position + 1 || 0;
-
-    // ★ 2. 新しいリストを position 付きで作成
-    const { error } = await supabase
-      .from("lists")
-      .insert({
-        user_id: userId,
-        name,
-        position: nextPosition,
-      });
-
+    const result = await createList(name.trim());
     setLoading(false);
 
-    if (error) {
-      console.error("リスト作成エラー:", error);
-      return;
-    }
+    if (!result) return;
 
     setName("");
     setOpen(false);
-
     if (onCreated) onCreated();
   };
 
@@ -73,7 +44,7 @@ export default function CreateListButton({ userId, onCreated }) {
       <div className={styles.btnRow}>
         <button
           className={styles.button}
-          onClick={createList}
+          onClick={handleCreate}
           disabled={loading}
         >
           {loading ? "作成中..." : "作成"}

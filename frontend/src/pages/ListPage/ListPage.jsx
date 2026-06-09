@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import { getListDetail } from "../../lib/queries/lists";
@@ -25,21 +25,17 @@ export default function ListPage() {
 
   const navigate = useNavigate();
 
-  /* -------------------------------------------------------
-     ★ リスト情報取得
-  ------------------------------------------------------- */
-  const fetchListInfo = async () => {
+  // リスト情報を再取得する（リスト名変更後にも再利用）
+  const fetchListInfo = useCallback(async () => {
     const data = await getListDetail(listId);
     if (data) setListInfo(data);
-  };
+  }, [listId]);
 
-  /* -------------------------------------------------------
-     ★ list_songs 取得
-  ------------------------------------------------------- */
-  const fetchListSongs = async () => {
+  // list_songs を取得して整形する（曲追加・削除後にも再利用）
+  // useCallback で安定化させることで useEffect の deps に安全に追加できる
+  const fetchListSongs = useCallback(async () => {
     const data = await getListSongs(listId);
-
-    const formatted = data.map((row) => ({
+    setSongs(data.map((row) => ({
       id: row.id,
       song_id: row.song_id,
       title: row.song_title,
@@ -47,17 +43,15 @@ export default function ListPage() {
       anime_title: row.anime_title,
       type: row.song_type,
       image_url: row.image_url,
-      position: row.position
-    }));
+      position: row.position,
+    })));
+  }, [listId]);
 
-    setSongs(formatted);
-  };
-
+  // listId が変わったらリスト情報と曲一覧を再取得
   useEffect(() => {
     fetchListInfo();
     fetchListSongs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listId]);
+  }, [listId, fetchListInfo, fetchListSongs]);
 
   /* -------------------------------------------------------
      ★ 曲追加

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getSongDetail } from "../../lib/queries/songs";
+import { SONG_TYPE_COLORS } from "../../lib/constants";
 import styles from "../../CSS/PageCSS/SongDetail.module.css";
 
 export default function SongDetail() {
@@ -28,14 +29,7 @@ export default function SongDetail() {
   if (loading) return <div className={styles.loading}>読み込み中...</div>;
   if (!song) return <div className={styles.loading}>曲が見つかりませんでした。</div>;
 
-  const typeColor =
-    song.song_type === "OP"
-      ? "#ff6b6b"
-      : song.song_type === "ED"
-      ? "#4dabf7"
-      : song.song_type === "IN"
-      ? "#51cf66"
-      : "#adb5bd";
+  const typeColor = SONG_TYPE_COLORS[song.song_type] ?? SONG_TYPE_COLORS.default;
 
   const formattedDate = song.release_date
     ? new Date(song.release_date).toISOString().split("T")[0]
