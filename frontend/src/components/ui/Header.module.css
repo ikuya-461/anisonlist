@@ -2,22 +2,85 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 20px;
-  border-bottom: 1px solid #ddd;
+  padding: 12px 24px;
+  background: rgba(8, 8, 16, 0.92);
+  border-bottom: 1px solid rgba(1, 253, 254, 0.25);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 20px rgba(1, 253, 254, 0.08);
 }
 
+/* ロゴ */
 .logoLink {
   text-decoration: none;
-  color: black;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
 }
 
 .logoTitle {
   margin: 0;
-  font-size: 20px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  /* シアン→パープル グラデーション */
+  background: linear-gradient(90deg, #01FDFE 0%, #AA55FF 60%, #FFEF00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 6px rgba(1, 253, 254, 0.5));
+  position: relative;
 }
 
+/* グリッチ装飾 */
+.logoTitle::before {
+  content: "SONICLIST";
+  position: absolute;
+  left: 2px;
+  top: 0;
+  background: linear-gradient(90deg, #FF00FF, #01FDFE);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  opacity: 0;
+  animation: glitch 6s infinite;
+}
+
+@keyframes glitch {
+  0%, 92%, 100% { opacity: 0; transform: translate(0); }
+  93%  { opacity: 0.6; transform: translate(-2px, 1px); clip-path: inset(20% 0 60% 0); }
+  95%  { opacity: 0.4; transform: translate(2px, -1px); clip-path: inset(60% 0 10% 0); }
+  97%  { opacity: 0.5; transform: translate(-1px, 0); clip-path: inset(40% 0 40% 0); }
+}
+
+.logoTag {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  color: #FFEF00;
+  letter-spacing: 2px;
+  opacity: 0.8;
+}
+
+/* ユーザーアイコン */
 .userIcon {
-  font-size: 24px;
+  font-size: 22px;
   cursor: pointer;
   user-select: none;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1.5px solid rgba(1, 253, 254, 0.3);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.userIcon:hover {
+  border-color: #01FDFE;
+  box-shadow: 0 0 10px rgba(1, 253, 254, 0.4);
 }

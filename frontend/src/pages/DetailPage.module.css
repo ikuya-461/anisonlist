@@ -44,9 +44,11 @@
   margin-bottom: 12px;
   font-family: 'Orbitron', sans-serif;
   letter-spacing: 2px;
-  color: var(--cyan);
   text-transform: uppercase;
-  opacity: 0.7;
+  background: var(--grad-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .loading {

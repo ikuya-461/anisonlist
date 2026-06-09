@@ -1,48 +1,113 @@
 /* ------------------------------
-   グローバル設定（初期設定）
+   フォントインポート
 ------------------------------ */
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
-    'Helvetica Neue', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Noto+Sans+JP:wght@400;700&display=swap');
 
-  background: var(--color-bg);
-  color: var(--text-main);
-}
+/* ------------------------------
+   SONICLIST カラーパレット
+------------------------------ */
+:root {
+  --cyan:        #01FDFE;
+  --yellow:      #FFEF00;
+  --yellow-dark: #A28826;
+  --purple:      #6925CE;
+  --purple-light:#AA55FF;
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  /* テーマ変数 */
+  --color-main:      var(--cyan);
+  --color-accent:    var(--yellow);
+  --color-sub:       var(--purple-light);
+  --color-highlight: var(--yellow);
+
+  --color-bg:        #080810;
+  --color-bg-2:      #0d0d1a;
+  --color-card:      #111128;
+  --color-card-border: rgba(1, 253, 254, 0.18);
+
+  --color-base-dark: #080810;
+
+  --text-main: #e8e8ff;
+  --text-sub:  #8888aa;
+  --border:    rgba(1, 253, 254, 0.15);
+
+  /* グロー */
+  --glow-cyan:   0 0 8px rgba(1, 253, 254, 0.6), 0 0 24px rgba(1, 253, 254, 0.2);
+  --glow-yellow: 0 0 8px rgba(255, 239, 0, 0.6), 0 0 24px rgba(255, 239, 0, 0.2);
+  --glow-purple: 0 0 8px rgba(170, 85, 255, 0.5), 0 0 20px rgba(105, 37, 206, 0.3);
+
+  /* グラデーション */
+  --grad-main:   linear-gradient(90deg, #01FDFE 0%, #6925CE 60%, #AA55FF 100%);
+  --grad-text:   linear-gradient(90deg, #01FDFE 0%, #FFEF00 50%, #AA55FF 100%);
+  --grad-btn:    linear-gradient(135deg, #01FDFE 0%, #6925CE 100%);
+  --grad-border: linear-gradient(90deg, #01FDFE, #AA55FF);
 }
 
 /* ------------------------------
-   テーマカラー（あなたの配色）
+   グローバルリセット・ベース
 ------------------------------ */
-:root {
-  /* メインカラー（ブランド） */
-  --color-main: #3DB3D0;
+*, *::before, *::after {
+  box-sizing: border-box;
+}
 
-  /* アクセント（警告・削除） */
-  --color-accent: #C24347;
+body {
+  margin: 0;
+  font-family: 'Noto Sans JP', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: var(--color-bg);
+  color: var(--text-main);
+  /* ノイズテクスチャ */
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
 
-  /* サブアクセント（柔らかい強調） */
-  --color-sub: #AA5A9C;
+code {
+  font-family: 'Courier New', monospace;
+}
 
-  /* ハイライト（明るい装飾） */
-  --color-highlight: #F7D967;
+/* スクロールバー */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--color-bg-2); }
+::-webkit-scrollbar-thumb { background: var(--purple); border-radius: 3px; }
 
-  /* ベースカラー（背景・文字） */
-  --color-base-dark: #191338;
-  --color-bg: #f7f7f7;
-  --color-card: #ffffff;
+/* ユーティリティ：グラデーションテキスト */
+.grad-text {
+  background: var(--grad-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-  /* テキスト */
-  --text-main: #222222;
-  --text-sub: #666666;
+/* ユーティリティ：グラデーションボーダー（::before trick） */
+.grad-border {
+  position: relative;
+  border-radius: 6px;
+}
+.grad-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: var(--grad-border);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
 
-  /* ボーダー */
-  --border: #e5e5e5;
+/* スキャンライン（軽め） */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.04) 2px,
+    rgba(0, 0, 0, 0.04) 4px
+  );
 }

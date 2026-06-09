@@ -6,10 +6,13 @@
   font-family: 'Orbitron', sans-serif;
   font-size: 14px;
   letter-spacing: 2px;
-  color: var(--cyan);
   text-transform: uppercase;
   margin-bottom: 14px;
-  opacity: 0.8;
+  background: var(--grad-main);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline-block;
 }
 
 /* タブ */
@@ -40,10 +43,10 @@
 }
 
 .activeTab {
-  border-color: var(--cyan);
-  color: var(--cyan);
-  background: rgba(1,253,254,0.07);
-  box-shadow: var(--glow-cyan);
+  border-color: transparent;
+  color: #fff;
+  background: var(--grad-btn);
+  box-shadow: 0 0 10px rgba(1,253,254,0.4), 0 0 20px rgba(105,37,206,0.3);
 }
 
 /* フォーム */

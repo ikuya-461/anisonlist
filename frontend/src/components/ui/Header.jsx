@@ -15,7 +15,8 @@ export default function Header({ isLoggedIn, updateLoginState }) {
   return (
     <header className={styles.header}>
       <Link to="/" className={styles.logoLink}>
-        <h1 className={styles.logoTitle}>AnisonList</h1>
+        <h1 className={styles.logoTitle}>SONICLIST</h1>
+        <span className={styles.logoTag}>#1</span>
       </Link>
 
       <span onClick={handleIconClick} className={styles.userIcon}>
