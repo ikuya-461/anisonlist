@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { getMyLists } from "../../lib/queries/lists";
+import { getMyProfile, updateMyProfile } from "../../lib/queries/users";
 import styles from "../../CSS/PageCSS/MyPage.module.css";
 
 import ListGallery from "../../components/listItem/ListGallery";
@@ -27,39 +28,26 @@ export default function MyPage({ updateLoginState }) {
   const [editBio, setEditBio] = useState("");
   const [editIcon, setEditIcon] = useState("");
 
-  // ① ログインユーザー取得
+  // ① ログイン確認 + プロフィール取得 + リスト一覧取得
   useEffect(() => {
     const load = async () => {
-      const { data: authData } = await supabase.auth.getUser();
-      const user = authData.user;
+      const profile = await getMyProfile();
 
-      if (!user) {
+      if (!profile) {
         navigate("/login", { replace: true });
         return;
       }
 
-      const uid = user.id;
-      setUserId(uid);
+      setUserId(profile.id);
+      setUserName(profile.user_name);
+      setBio(profile.bio || "");
+      setIconUrl(profile.icon_url || "");
+      setEditName(profile.user_name);
+      setEditBio(profile.bio || "");
+      setEditIcon(profile.icon_url || "");
 
-      // ② プロフィール取得
-      const { data: profile } = await supabase
-        .from("users")
-        .select("user_name, bio, icon_url")
-        .eq("id", uid)
-        .single();
-
-      if (profile) {
-        setUserName(profile.user_name);
-        setBio(profile.bio || "");
-        setIconUrl(profile.icon_url || "");
-
-        setEditName(profile.user_name);
-        setEditBio(profile.bio || "");
-        setEditIcon(profile.icon_url || "");
-      }
-
-      // ③ リスト一覧取得
-      setLists(await fetchLists());
+      // ② リスト一覧取得
+      setLists(await getMyLists());
       setLoading(false);
     };
 
@@ -68,26 +56,17 @@ export default function MyPage({ updateLoginState }) {
 
   // ④ プロフィール更新
   const saveProfile = async () => {
-    const { data, error } = await supabase
-      .from("users")
-      .update({
-        user_name: editName,
-        bio: editBio,
-        icon_url: editIcon,
-      })
-      .eq("id", userId)
-      .select()
-      .single();
+    const updated = await updateMyProfile({
+      user_name: editName,
+      bio: editBio,
+      icon_url: editIcon,
+    });
 
-    if (error) {
-      console.error("プロフィール更新エラー:", error);
-      return;
-    }
+    if (!updated) return;
 
-    setUserName(data.user_name);
-    setBio(data.bio);
-    setIconUrl(data.icon_url);
-
+    setUserName(updated.user_name);
+    setBio(updated.bio || "");
+    setIconUrl(updated.icon_url || "");
     setEditing(false);
   };
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
 import { searchSongs } from "../../lib/queries/songs";
@@ -21,7 +21,7 @@ const TABS = [
   { key: "artist", label: "アーティスト" }
 ];
 
-export default function SearchSong({ onAdd }) {
+export default function SearchSong({ onAdd, heading = "アニソン検索（マイリスト用）" }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -127,11 +127,6 @@ export default function SearchSong({ onAdd }) {
     setLoading(false);
   };
 
-  useEffect(() => {
-    if (hasSearched) fetchByTab(page);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
-
   const updateURL = (newPage) => {
     if (tab === "anime") {
       setSearchParams({ tab, q: animeKeyword, page: newPage });
@@ -167,9 +162,11 @@ export default function SearchSong({ onAdd }) {
     fetchByTab(1);
   };
 
+  // URL 更新 + 直接 fetch（useEffect 経由ではなく同期的に呼ぶことでレース条件を防ぐ）
   const changePage = (newPage) => {
     setPage(newPage);
     updateURL(newPage);
+    fetchByTab(newPage);
   };
 
   const switchTab = (newTab) => {
@@ -185,7 +182,7 @@ export default function SearchSong({ onAdd }) {
 
   return (
     <div className={styles.container}>
-      <h3 className={styles.heading}>アニソン検索（マイリスト用）</h3>
+      <h3 className={styles.heading}>{heading}</h3>
 
       {/* タブ切り替え */}
       <div className={styles.tabs}>

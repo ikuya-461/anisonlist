@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabaseClient";
+import { createUserProfile } from "../../lib/queries/users";
 import { useNavigate } from "react-router-dom";
 import styles from "../../CSS/PageCSS/LoginRegister.module.css";
 
@@ -50,7 +51,7 @@ export default function Register() {
     }
 
     // Supabase でユーザー作成
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
     });
@@ -63,16 +64,8 @@ export default function Register() {
 
     setSuccessMessage("登録が完了しました。メールを確認してください。");
 
-    // ★ Supabase の users テーブルに直接 INSERT
-    const { error: insertError } = await supabase.from("users").insert({
-      id: data.user.id,       // Supabase Auth の UUID
-      user_name: userName,    // ← これが userName
-      bio: "",
-      icon_url: "",
-    });
-
-    if (insertError) {
-      console.error("Insert error:", insertError);
+    const ok = await createUserProfile({ user_name: userName });
+    if (!ok) {
       setErrorMessage("ユーザー情報の保存に失敗しました");
       return;
     }

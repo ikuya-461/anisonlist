@@ -1,8 +1,7 @@
 import { supabase } from "../supabaseClient";
 import { normalizeText } from "../imageCache/normalize";
 import { ensureSongImages } from "../imageCache/songImageCache";
-
-const PAGE_SIZE = 10;
+import { calcRange, calcTotalPages } from "../utils/pagination";
 
 const buildSearchSelect = ({ needArtistJoin, needAnimeJoin }) => `
   id,
@@ -36,8 +35,7 @@ export async function searchSongs({
   const artist = normalizeText(rawArtist);
   const anime = normalizeText(rawAnime);
 
-  const from = (page - 1) * PAGE_SIZE;
-  const to = from + PAGE_SIZE - 1;
+  const { from, to } = calcRange(page);
 
   const select = buildSearchSelect({
     needArtistJoin: Boolean(artist),
@@ -68,7 +66,7 @@ export async function searchSongs({
     songs,
     total: count ?? 0,
     page: Number(page),
-    totalPages: Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE))
+    totalPages: calcTotalPages(count),
   };
 }
 

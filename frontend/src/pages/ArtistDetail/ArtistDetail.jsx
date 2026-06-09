@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getArtistDetail } from "../../lib/queries/artists";
+import { useDetailPage } from "../../hooks/useDetailPage";
 import SongList from "../../components/listItem/SongList";
 import styles from "../../CSS/PageCSS/ArtistDetail.module.css";
 
@@ -8,30 +8,12 @@ export default function ArtistDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [artist, setArtist] = useState(null);
-  const [songs, setSongs] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchArtist = async () => {
-      try {
-        const data = await getArtistDetail(id);
-        if (!data) return;
-
-        setArtist(data.artist);
-        setSongs(data.songs || []);
-      } catch (err) {
-        console.error("ArtistDetail fetch error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchArtist();
-  }, [id]);
+  const { data, loading } = useDetailPage(getArtistDetail, id);
 
   if (loading) return <div className={styles.loading}>読み込み中...</div>;
-  if (!artist) return <div className={styles.loading}>アーティストが見つかりません。</div>;
+  if (!data) return <div className={styles.loading}>アーティストが見つかりません。</div>;
+
+  const { artist, songs } = data;
 
   return (
     <div className={styles.outer}>

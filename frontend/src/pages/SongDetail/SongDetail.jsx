@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getSongDetail } from "../../lib/queries/songs";
+import { useDetailPage } from "../../hooks/useDetailPage";
 import { SONG_TYPE_COLORS } from "../../lib/constants";
 import styles from "../../CSS/PageCSS/SongDetail.module.css";
 
@@ -8,23 +8,7 @@ export default function SongDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [song, setSong] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchSong = async () => {
-      try {
-        const data = await getSongDetail(id);
-        setSong(data);
-      } catch (err) {
-        console.error("SongDetail fetch error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSong();
-  }, [id]);
+  const { data: song, loading } = useDetailPage(getSongDetail, id);
 
   if (loading) return <div className={styles.loading}>読み込み中...</div>;
   if (!song) return <div className={styles.loading}>曲が見つかりませんでした。</div>;

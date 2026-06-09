@@ -1,44 +1,31 @@
-import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getAnimeDetail, getAnimeImage } from "../../lib/queries/anime";
+import { useDetailPage } from "../../hooks/useDetailPage";
 import SongList from "../../components/listItem/SongList";
 import styles from "../../CSS/PageCSS/AnimeDetail.module.css";
+
+// コンポーネント外で安定した関数参照を確保（useDetailPage の deps に影響しない）
+async function fetchAnimeDetail(id) {
+  const data = await getAnimeDetail(id);
+  if (!data) return null;
+
+  const image_url = await getAnimeImage(data.anime.title_jp);
+  return {
+    anime: { ...data.anime, image_url: image_url || data.anime.image_url },
+    songs: data.songs || [],
+  };
+}
 
 export default function AnimeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [anime, setAnime] = useState(null);
-  const [songs, setSongs] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAnime = async () => {
-      try {
-        const data = await getAnimeDetail(id);
-        if (!data) return;
-
-        setAnime(data.anime);
-        setSongs(data.songs || []);
-
-        const image_url = await getAnimeImage(data.anime.title_jp);
-
-        setAnime((prev) => ({
-          ...prev,
-          image_url
-        }));
-      } catch (err) {
-        console.error("AnimeDetail fetch error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAnime();
-  }, [id]);
+  const { data, loading } = useDetailPage(fetchAnimeDetail, id);
 
   if (loading) return <div className={styles.loading}>読み込み中...</div>;
-  if (!anime) return <div className={styles.loading}>アニメが見つかりません。</div>;
+  if (!data) return <div className={styles.loading}>アニメが見つかりません。</div>;
+
+  const { anime, songs } = data;
 
   return (
     <div className={styles.outer}>

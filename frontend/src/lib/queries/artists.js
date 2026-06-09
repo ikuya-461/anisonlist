@@ -1,8 +1,7 @@
 import { supabase } from "../supabaseClient";
 import { normalizeText } from "../imageCache/normalize";
 import { ensureSongImages } from "../imageCache/songImageCache";
-
-const PAGE_SIZE = 10;
+import { calcRange, calcTotalPages } from "../utils/pagination";
 
 /* -------------------------------------------------------
    ① アーティスト一覧（検索 + ページネーション）
@@ -10,8 +9,7 @@ const PAGE_SIZE = 10;
 export async function searchArtists({ keyword: rawKeyword = "", page = 1 } = {}) {
   const keyword = normalizeText(rawKeyword);
 
-  const from = (page - 1) * PAGE_SIZE;
-  const to = from + PAGE_SIZE - 1;
+  const { from, to } = calcRange(page);
 
   let query = supabase
     .from("artists")
@@ -32,7 +30,7 @@ export async function searchArtists({ keyword: rawKeyword = "", page = 1 } = {})
     artists: data ?? [],
     total: count ?? 0,
     page: Number(page),
-    totalPages: Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE))
+    totalPages: calcTotalPages(count),
   };
 }
 
