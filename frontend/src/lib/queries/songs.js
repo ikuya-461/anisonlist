@@ -82,6 +82,7 @@ export async function getSongDetail(id) {
       song_type,
       song_info,
       image_url,
+      youtube_id,
       anime_id,
       artist_id,
       lyricist_id,
@@ -111,4 +112,20 @@ export async function getSongDetail(id) {
     composer: data.composer?.name ?? null,
     arranger: data.arranger?.name ?? null
   };
+}
+
+/* -------------------------------------------------------
+   ③ YouTube ID 登録・更新
+------------------------------------------------------- */
+export async function updateYoutubeId(songId, youtubeId) {
+  const { error } = await supabase
+    .from("songs")
+    .update({ youtube_id: youtubeId || null })
+    .eq("id", songId);
+
+  if (error) {
+    console.error("updateYoutubeId error:", error);
+    return false;
+  }
+  return true;
 }

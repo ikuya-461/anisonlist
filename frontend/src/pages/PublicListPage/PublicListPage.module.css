@@ -1,10 +1,16 @@
-/* タイトル行（リスト名 + いいね） */
+/* タイトル行（リスト名 + いいね + X） */
 .titleRow {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 8px;
   margin-bottom: 8px;
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 /* 作成者行 */
@@ -26,6 +32,26 @@
 
 .authorLink:hover {
   text-decoration: underline;
+}
+
+/* X シェアボタン */
+.xShareBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: #000;
+  color: #fff;
+  font-weight: bold;
+  font-size: 14px;
+  text-decoration: none;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+
+.xShareBtn:hover {
+  opacity: 0.75;
 }
 
 /* リスト説明 */

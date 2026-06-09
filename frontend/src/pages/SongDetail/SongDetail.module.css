@@ -82,3 +82,118 @@
   line-height: 1.6;
   white-space: pre-wrap;
 }
+
+/* YouTube */
+.youtubeSection {
+  margin: 20px 0 8px;
+}
+
+.youtubeWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+}
+
+.youtubeFrame {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.ytSearchLink {
+  display: inline-block;
+  padding: 10px 18px;
+  border-radius: 8px;
+  background: #ff0000;
+  color: #fff;
+  font-weight: bold;
+  font-size: 14px;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.ytSearchLink:hover {
+  opacity: 0.85;
+}
+
+.ytEdit {
+  margin-top: 10px;
+}
+
+.ytEditBtn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.ytEditBtn:hover {
+  color: #555;
+}
+
+.ytInputRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.ytInput {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1.5px solid #ddd;
+  font-size: 14px;
+}
+
+.ytInput:focus {
+  outline: none;
+  border-color: #ff0000;
+}
+
+.ytSaveBtn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #ff0000;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.ytCancelBtn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1.5px solid #ddd;
+  background: #fff;
+  color: #888;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* X シェアボタン */
+.xShareBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  background: #000;
+  color: #fff;
+  font-weight: bold;
+  font-size: 14px;
+  text-decoration: none;
+  margin: 12px 0 20px;
+  transition: opacity 0.15s;
+}
+
+.xShareBtn:hover {
+  opacity: 0.8;
+}

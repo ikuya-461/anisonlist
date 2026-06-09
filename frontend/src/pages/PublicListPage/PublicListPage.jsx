@@ -81,12 +81,13 @@ export default function PublicListPage() {
         </div>
       )}
 
-      {/* リスト名 + いいね */}
+      {/* リスト名 + いいね + X シェア */}
       <div className={styles.titleRow}>
         <h1 className={pageStyles.title}>{listInfo.name}</h1>
         {listInfo.description && (
           <p className={styles.description}>{listInfo.description}</p>
         )}
+        <div className={styles.actionRow}>
         <button
           className={`${styles.likeBtn} ${liked ? styles.likeBtnActive : ""}`}
           onClick={handleLike}
@@ -94,6 +95,15 @@ export default function PublicListPage() {
         >
           {liked ? "❤️" : "🤍"} {likeCount}
         </button>
+        <a
+          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`🎵 ${listInfo.name}（${songs.length}曲）\n#SONICLIST`)}&url=${encodeURIComponent(window.location.href)}`}
+          target="_blank"
+          rel="noreferrer"
+          className={styles.xShareBtn}
+        >
+          𝕏 シェア
+        </a>
+        </div>
       </div>
 
       {/* 曲一覧（読み取り専用） */}

@@ -1,9 +1,23 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getSongDetail } from "../../lib/queries/songs";
+import { getSongDetail, updateYoutubeId } from "../../lib/queries/songs";
 import { useDetailPage } from "../../hooks/useDetailPage";
 import { SONG_TYPE_COLORS } from "../../lib/constants";
+import { supabase } from "../../lib/supabaseClient";
 import pageStyles from "../DetailPage.module.css";
 import styles from "./SongDetail.module.css";
+
+// YouTube URL から ID を抽出するヘルパー
+function extractYoutubeId(input) {
+  if (!input) return null;
+  // すでに ID 形式（11文字）ならそのまま
+  if (/^[A-Za-z0-9_-]{11}$/.test(input.trim())) return input.trim();
+  // URL から抽出
+  const match = input.match(
+    /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/
+  );
+  return match ? match[1] : null;
+}
 
 export default function SongDetail() {
   const { id } = useParams();
@@ -11,10 +25,46 @@ export default function SongDetail() {
 
   const { data: song, loading } = useDetailPage(getSongDetail, id);
 
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
+  const [ytInput, setYtInput] = useState("");
+  const [ytEditing, setYtEditing] = useState(false);
+  const [ytSaving, setYtSaving] = useState(false);
+  const [currentYtId, setCurrentYtId] = useState(null);
+
+  // ログイン状態を確認
+  useState(() => {
+    supabase.auth.getUser().then(({ data }) => setIsLoggedIn(!!data.user));
+  });
+
+  // song がロードされたら youtube_id を初期化
+  const [ytInitialized, setYtInitialized] = useState(false);
+  if (song && !ytInitialized) {
+    setCurrentYtId(song.youtube_id || null);
+    setYtInitialized(true);
+  }
+
+  const handleYtSave = async () => {
+    const extracted = extractYoutubeId(ytInput);
+    setYtSaving(true);
+    const ok = await updateYoutubeId(id, extracted);
+    if (ok) {
+      setCurrentYtId(extracted);
+      setYtEditing(false);
+      setYtInput("");
+    }
+    setYtSaving(false);
+  };
+
   if (loading) return <div className={pageStyles.loading}>読み込み中...</div>;
   if (!song) return <div className={pageStyles.loading}>曲が見つかりませんでした。</div>;
 
   const typeColor = SONG_TYPE_COLORS[song.song_type] ?? SONG_TYPE_COLORS.default;
+
+  const xShareUrl = (() => {
+    const text = `🎵 ${song.song_title}${song.artist ? ` / ${song.artist}` : ""}${song.anime_title ? `（${song.anime_title}）` : ""}\n#SONICLIST #アニソン`;
+    const url = window.location.href;
+    return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+  })();
 
   const formattedDate = song.release_date
     ? new Date(song.release_date).toISOString().split("T")[0]
@@ -67,6 +117,67 @@ export default function SongDetail() {
       >
         🎬 {song.anime_title}
       </div>
+
+      {/* YouTube 埋め込み */}
+      <div className={styles.youtubeSection}>
+        {currentYtId ? (
+          <div className={styles.youtubeWrapper}>
+            <iframe
+              src={`https://www.youtube-nocookie.com/embed/${currentYtId}`}
+              title="YouTube player"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className={styles.youtubeFrame}
+            />
+          </div>
+        ) : (
+          <a
+            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${song.song_title} ${song.artist ?? ""}`)}`}
+            target="_blank"
+            rel="noreferrer"
+            className={styles.ytSearchLink}
+          >
+            ▶ YouTubeで検索
+          </a>
+        )}
+
+        {/* YouTube ID 登録（ログイン済みのみ） */}
+        {isLoggedIn && (
+          <div className={styles.ytEdit}>
+            {ytEditing ? (
+              <div className={styles.ytInputRow}>
+                <input
+                  className={styles.ytInput}
+                  value={ytInput}
+                  onChange={(e) => setYtInput(e.target.value)}
+                  placeholder="YouTube URL または動画ID"
+                />
+                <button className={styles.ytSaveBtn} onClick={handleYtSave} disabled={ytSaving}>
+                  {ytSaving ? "保存中..." : "保存"}
+                </button>
+                <button className={styles.ytCancelBtn} onClick={() => { setYtEditing(false); setYtInput(""); }}>
+                  キャンセル
+                </button>
+              </div>
+            ) : (
+              <button className={styles.ytEditBtn} onClick={() => setYtEditing(true)}>
+                {currentYtId ? "▶ YouTube IDを変更" : "▶ YouTube IDを登録"}
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* X シェアボタン */}
+      <a
+        href={xShareUrl}
+        target="_blank"
+        rel="noreferrer"
+        className={styles.xShareBtn}
+      >
+        𝕏 この曲をシェア
+      </a>
 
       {/* 詳細情報 */}
       <div className={styles.infoBox}>
