@@ -1,12 +1,15 @@
 .outer {
   min-height: 100vh;
   padding: 20px;
-  background: #f7f7f7;
 }
 
 .title {
-  font-size: 2.4rem;
+  font-size: 2rem;
   margin-bottom: 20px;
   text-align: center;
   font-weight: bold;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 3px;
+  color: var(--cyan);
+  text-shadow: var(--glow-cyan);
 }

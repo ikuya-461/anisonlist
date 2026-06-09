@@ -2,7 +2,7 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.75);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -19,8 +19,10 @@
 .modal {
   width: 100%;
   max-width: 540px;
-  background: #fff;
-  border-radius: 20px 20px 0 0;
+  background: var(--color-card);
+  border: 1px solid var(--color-card-border);
+  border-top: 1px solid rgba(1,253,254,0.3);
+  border-radius: 12px 12px 0 0;
   padding: 24px 20px 36px;
   animation: slideUp 0.2s ease;
 }
@@ -34,7 +36,7 @@
 .songName {
   font-size: 16px;
   font-weight: bold;
-  color: #222;
+  color: var(--text-main);
   margin-bottom: 4px;
   white-space: nowrap;
   overflow: hidden;
@@ -43,7 +45,7 @@
 
 .sub {
   font-size: 13px;
-  color: #888;
+  color: var(--text-sub);
   margin: 0 0 20px;
 }
 
@@ -53,12 +55,13 @@
 }
 
 .sectionLabel {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: bold;
-  color: #aaa;
+  color: var(--cyan);
   margin-bottom: 8px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 2px;
+  opacity: 0.7;
 }
 
 /* タグ群 */
@@ -69,25 +72,27 @@
 }
 
 .tag {
-  padding: 7px 13px;
-  border-radius: 999px;
-  border: 1.5px solid #ddd;
-  background: #fff;
+  padding: 6px 13px;
+  border-radius: 3px;
+  border: 1.5px solid rgba(1,253,254,0.2);
+  background: transparent;
   font-size: 13px;
   cursor: pointer;
-  color: #555;
+  color: var(--text-sub);
   transition: border-color 0.15s, background 0.15s, color 0.15s;
 }
 
 .tag:hover {
-  border-color: #aaa;
+  border-color: rgba(1,253,254,0.5);
+  color: var(--text-main);
 }
 
 .tagSelected {
-  border-color: #4dabf7;
-  background: #e8f4ff;
-  color: #1c7ed6;
+  border-color: var(--cyan);
+  background: rgba(1,253,254,0.1);
+  color: var(--cyan);
   font-weight: bold;
+  box-shadow: var(--glow-cyan);
 }
 
 /* メモ */
@@ -98,16 +103,24 @@
 .memoInput {
   width: 100%;
   padding: 10px 48px 10px 12px;
-  border-radius: 10px;
-  border: 1.5px solid #ddd;
+  border-radius: 4px;
+  border: 1.5px solid rgba(1,253,254,0.2);
   font-size: 14px;
   box-sizing: border-box;
   outline: none;
+  background: rgba(1,253,254,0.04);
+  color: var(--text-main);
+  font-family: 'Noto Sans JP', sans-serif;
   transition: border-color 0.15s;
 }
 
+.memoInput::placeholder {
+  color: var(--text-sub);
+}
+
 .memoInput:focus {
-  border-color: #4dabf7;
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 2px rgba(1,253,254,0.12);
 }
 
 .memoCount {
@@ -116,7 +129,7 @@
   top: 50%;
   transform: translateY(-50%);
   font-size: 11px;
-  color: #bbb;
+  color: var(--text-sub);
 }
 
 .memoCountOver {
@@ -133,27 +146,36 @@
 .skipBtn {
   flex: 1;
   padding: 12px;
-  border-radius: 12px;
-  border: 1.5px solid #ddd;
-  background: #fff;
-  color: #888;
+  border-radius: 4px;
+  border: 1.5px solid rgba(1,253,254,0.2);
+  background: transparent;
+  color: var(--text-sub);
   font-size: 15px;
   cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.skipBtn:hover {
+  border-color: rgba(1,253,254,0.4);
+  color: var(--text-main);
 }
 
 .saveBtn {
   flex: 2;
   padding: 12px;
-  border-radius: 12px;
-  border: none;
-  background: #4dabf7;
-  color: #fff;
+  border-radius: 4px;
+  border: 1.5px solid var(--cyan);
+  background: rgba(1,253,254,0.1);
+  color: var(--cyan);
   font-size: 15px;
   font-weight: bold;
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background 0.15s, box-shadow 0.15s;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1px;
 }
 
 .saveBtn:hover {
-  background: #339af0;
+  background: rgba(1,253,254,0.18);
+  box-shadow: var(--glow-cyan);
 }

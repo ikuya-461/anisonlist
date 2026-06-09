@@ -8,25 +8,52 @@
 }
 
 .editInput {
-  padding: 6px;
+  padding: 8px 12px;
   font-size: 16px;
+  border-radius: 4px;
+  border: 1.5px solid rgba(1,253,254,0.3);
+  background: rgba(1,253,254,0.04);
+  color: var(--text-main);
+  outline: none;
+  font-family: 'Noto Sans JP', sans-serif;
+  flex: 1;
+}
+
+.editInput:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 2px rgba(1,253,254,0.12);
 }
 
 .saveBtn {
-  padding: 6px 12px;
-  background: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 6px;
+  padding: 6px 14px;
+  background: rgba(1,253,254,0.1);
+  color: var(--cyan);
+  border: 1.5px solid var(--cyan);
+  border-radius: 4px;
   cursor: pointer;
+  font-size: 13px;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1px;
+  transition: background 0.15s;
+}
+
+.saveBtn:hover {
+  background: rgba(1,253,254,0.18);
 }
 
 .cancelBtn {
-  padding: 6px 12px;
-  background: #ccc;
-  border: none;
-  border-radius: 6px;
+  padding: 6px 14px;
+  background: transparent;
+  border: 1.5px solid rgba(1,253,254,0.2);
+  border-radius: 4px;
   cursor: pointer;
+  color: var(--text-sub);
+  font-size: 13px;
+  transition: border-color 0.15s;
+}
+
+.cancelBtn:hover {
+  border-color: rgba(1,253,254,0.4);
 }
 
 .viewRow {
@@ -37,15 +64,25 @@
 
 .title {
   margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1px;
+  color: var(--text-main);
 }
 
 .renameBtn {
-  padding: 6px 12px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 6px;
+  padding: 5px 12px;
+  background: transparent;
+  color: var(--cyan);
+  border: 1.5px solid rgba(1,253,254,0.3);
+  border-radius: 4px;
   cursor: pointer;
+  font-size: 12px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.renameBtn:hover {
+  border-color: var(--cyan);
+  background: rgba(1,253,254,0.07);
 }
 
 /* 公開アクション行 */
@@ -59,12 +96,16 @@
 
 .publicPageLink {
   font-size: 13px;
-  color: #4dabf7;
+  color: var(--cyan);
   text-decoration: none;
   font-weight: bold;
+  letter-spacing: 0.5px;
+  opacity: 0.8;
+  transition: opacity 0.15s;
 }
 
 .publicPageLink:hover {
+  opacity: 1;
   text-decoration: underline;
 }
 
@@ -73,17 +114,19 @@
   align-items: center;
   gap: 4px;
   padding: 5px 14px;
-  border-radius: 999px;
-  background: #000;
-  color: #fff;
-  font-size: 13px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  color: var(--text-main);
+  font-size: 12px;
   font-weight: bold;
   text-decoration: none;
-  transition: opacity 0.15s;
+  transition: border-color 0.15s, background 0.15s;
 }
 
 .xShareBtn:hover {
-  opacity: 0.75;
+  border-color: rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.1);
 }
 
 /* リスト説明 */
@@ -95,14 +138,14 @@
 
 .desc {
   font-size: 14px;
-  color: #555;
+  color: var(--text-sub);
   margin: 0;
   line-height: 1.5;
 }
 
 .descEmpty {
   font-size: 13px;
-  color: #bbb;
+  color: rgba(1,253,254,0.25);
   margin: 0;
 }
 
@@ -116,18 +159,22 @@
 .descTextarea {
   width: 100%;
   padding: 8px 10px;
-  border-radius: 8px;
-  border: 1.5px solid #ddd;
+  border-radius: 4px;
+  border: 1.5px solid rgba(1,253,254,0.2);
+  background: rgba(1,253,254,0.04);
+  color: var(--text-main);
   font-size: 14px;
   resize: vertical;
   min-height: 72px;
   box-sizing: border-box;
   line-height: 1.5;
+  font-family: 'Noto Sans JP', sans-serif;
+  outline: none;
 }
 
 .descTextarea:focus {
-  outline: none;
-  border-color: #4dabf7;
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 2px rgba(1,253,254,0.12);
 }
 
 .descMeta {
@@ -139,6 +186,6 @@
 
 .descCount {
   font-size: 12px;
-  color: #bbb;
+  color: var(--text-sub);
   margin-right: auto;
 }

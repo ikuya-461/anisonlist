@@ -3,73 +3,109 @@
 }
 
 .heading {
-  margin-bottom: 10px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: var(--cyan);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  opacity: 0.8;
 }
 
+/* タブ */
 .tabs {
   display: flex;
-  gap: 8px;
-  margin-bottom: 14px;
+  gap: 6px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(1,253,254,0.1);
+  padding-bottom: 12px;
 }
 
 .tabBtn {
-  padding: 8px 16px;
-  border: 1px solid #ccc;
-  border-radius: 999px;
-  background: #fff;
-  color: #555;
+  padding: 7px 18px;
+  border: 1.5px solid rgba(1,253,254,0.2);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--text-sub);
   cursor: pointer;
-  font-size: 14px;
-  transition: 0.2s;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
 }
 
 .tabBtn:hover {
-  background: #f0f0f0;
+  border-color: var(--cyan);
+  color: var(--cyan);
 }
 
 .activeTab {
-  background: #4dabf7;
-  color: #fff;
-  border-color: #4dabf7;
+  border-color: var(--cyan);
+  color: var(--cyan);
+  background: rgba(1,253,254,0.07);
+  box-shadow: var(--glow-cyan);
 }
 
+/* フォーム */
 .form {
   display: grid;
   gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .select {
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 16px;
+  padding: 12px 14px;
+  border-radius: 4px;
+  border: 1.5px solid rgba(1,253,254,0.2);
+  font-size: 14px;
+  background: rgba(1,253,254,0.04);
+  color: var(--text-main);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.select:focus {
+  border-color: var(--cyan);
+}
+
+.select option {
+  background: var(--color-bg-2);
 }
 
 .searchBtn {
   margin-bottom: 20px;
 }
 
+/* ページネーション */
 .pagination {
   margin-top: 20px;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
 .pageBtn {
   width: auto;
   padding: 6px 12px;
-  margin: 3px;
+  font-size: 13px;
 }
 
 .activePage {
+  background: rgba(1,253,254,0.12) !important;
+  color: var(--cyan) !important;
+  border-color: var(--cyan) !important;
   font-weight: bold;
 }
 
 .dots {
-  margin: 0 6px;
+  margin: 0 4px;
+  color: var(--text-sub);
+  line-height: 2;
 }
 
-/* 曲ピッカー（アニメ/アーティスト選択後） */
+/* ピッカー */
 .picker {
   margin-top: 12px;
 }
@@ -77,28 +113,32 @@
 .pickerBack {
   background: none;
   border: none;
-  color: var(--color-main, #4dabf7);
-  font-size: 13px;
+  color: var(--cyan);
+  font-size: 12px;
   cursor: pointer;
   padding: 0;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   display: block;
+  letter-spacing: 1px;
+  opacity: 0.7;
+  transition: opacity 0.15s;
 }
 
 .pickerBack:hover {
-  text-decoration: underline;
+  opacity: 1;
 }
 
 .pickerTitle {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: bold;
-  color: #333;
+  color: var(--text-main);
   margin: 0 0 12px;
+  letter-spacing: 1px;
 }
 
 .pickerEmpty {
-  color: #aaa;
-  font-size: 14px;
+  color: var(--text-sub);
+  font-size: 13px;
   text-align: center;
   padding: 16px 0;
 }
