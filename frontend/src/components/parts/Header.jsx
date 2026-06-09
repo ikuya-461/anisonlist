@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-
+import styles from "../../CSS/ComponentCSS/Header.module.css";
 
 export default function Header({ isLoggedIn, updateLoginState }) {
   const navigate = useNavigate();
@@ -13,27 +13,12 @@ export default function Header({ isLoggedIn, updateLoginState }) {
   };
 
   return (
-    <header
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "10px 20px",
-        borderBottom: "1px solid #ddd",
-      }}
-    >
-      <Link to="/" style={{ textDecoration: "none", color: "black" }}>
-        <h1 style={{ margin: 0, fontSize: "20px" }}>AnisonList</h1>
+    <header className={styles.header}>
+      <Link to="/" className={styles.logoLink}>
+        <h1 className={styles.logoTitle}>AnisonList</h1>
       </Link>
 
-      <span
-        onClick={handleIconClick}
-        style={{
-          fontSize: "24px",
-          cursor: "pointer",
-          userSelect: "none",
-        }}
-      >
+      <span onClick={handleIconClick} className={styles.userIcon}>
         {isLoggedIn ? "👤" : "❔"}
       </span>
     </header>

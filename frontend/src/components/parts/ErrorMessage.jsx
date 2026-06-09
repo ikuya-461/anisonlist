@@ -1,8 +1,10 @@
+import styles from "../../CSS/ComponentCSS/ErrorMessage.module.css";
+
 export default function ErrorMessage({ children }) {
   if (!children) return null;
 
   return (
-    <div style={{ color: "red", marginBottom: 10, fontSize: 14 }}>
+    <div className={styles.error}>
       {children}
     </div>
   );

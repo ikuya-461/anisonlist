@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { renameList } from "../../lib/queries/lists";
+import styles from "../../CSS/ComponentCSS/ListHeader.module.css";
 
 export default function ListHeader({ listId, listInfo, onUpdated }) {
   const [editing, setEditing] = useState(false);
@@ -20,55 +21,25 @@ export default function ListHeader({ listId, listInfo, onUpdated }) {
   };
 
   return (
-    <div style={{ marginBottom: 20 }}>
+    <div className={styles.wrapper}>
       {editing ? (
-        <div style={{ display: "flex", gap: 8 }}>
+        <div className={styles.editRow}>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            style={{ padding: 6, fontSize: 16 }}
+            className={styles.editInput}
           />
-          <button
-            onClick={saveName}
-            style={{
-              padding: "6px 12px",
-              background: "#4caf50",
-              color: "white",
-              border: "none",
-              borderRadius: 6,
-              cursor: "pointer"
-            }}
-          >
+          <button onClick={saveName} className={styles.saveBtn}>
             保存
           </button>
-          <button
-            onClick={() => setEditing(false)}
-            style={{
-              padding: "6px 12px",
-              background: "#ccc",
-              border: "none",
-              borderRadius: 6,
-              cursor: "pointer"
-            }}
-          >
+          <button onClick={() => setEditing(false)} className={styles.cancelBtn}>
             キャンセル
           </button>
         </div>
       ) : (
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <h2 style={{ margin: 0 }}>{listInfo?.name}</h2>
-
-          <button
-            onClick={() => setEditing(true)}
-            style={{
-              padding: "6px 12px",
-              background: "#007bff",
-              color: "white",
-              border: "none",
-              borderRadius: 6,
-              cursor: "pointer"
-            }}
-          >
+        <div className={styles.viewRow}>
+          <h2 className={styles.title}>{listInfo?.name}</h2>
+          <button onClick={() => setEditing(true)} className={styles.renameBtn}>
             名前変更
           </button>
         </div>

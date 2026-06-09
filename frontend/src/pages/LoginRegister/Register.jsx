@@ -122,12 +122,14 @@ export default function Register() {
         <div className={styles.strengthBox}>
           <div className={styles.strengthBar}>
             <div
-              className={styles.strengthFill}
-              style={{
-                width: `${(strength / 5) * 100}%`,
-                background:
-                  strength <= 2 ? "red" : strength === 3 ? "orange" : "green",
-              }}
+              className={`${styles.strengthFill} ${
+                strength <= 2
+                  ? styles.strengthWeak
+                  : strength === 3
+                  ? styles.strengthMedium
+                  : styles.strengthStrong
+              }`}
+              style={{ width: `${(strength / 5) * 100}%` }}
             />
           </div>
           <div className={styles.strengthText}>

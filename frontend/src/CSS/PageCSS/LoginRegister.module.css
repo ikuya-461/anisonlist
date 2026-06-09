@@ -99,6 +99,10 @@
   transition: 0.3s;
 }
 
+.strengthWeak   { background: red; }
+.strengthMedium { background: orange; }
+.strengthStrong { background: green; }
+
 .strengthText {
   font-size: 12px;
   margin-top: 4px;

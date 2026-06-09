@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import { getMyLists } from "../../lib/queries/lists";
+import styles from "../../CSS/ComponentCSS/ListSelect.module.css";
 
 export default function ListSelect({ selectedList, onSelectList }) {
   const [lists, setLists] = useState([]);
 
-  /* -------------------------------------------------------
-     ★ リスト一覧取得（認証必須・RLSで本人のリストのみ取得）
-  ------------------------------------------------------- */
   const fetchLists = async () => {
     try {
       const data = await getMyLists();
@@ -30,13 +28,7 @@ export default function ListSelect({ selectedList, onSelectList }) {
           if (!value) return;
           onSelectList(value);
         }}
-        style={{
-          padding: "8px 12px",
-          borderRadius: 6,
-          border: "1px solid #ccc",
-          fontSize: 16,
-          marginBottom: 20
-        }}
+        className={styles.select}
       >
         {/* デフォルト表示（選択不可） */}
         <option value="" disabled>
