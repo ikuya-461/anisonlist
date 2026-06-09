@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
 import { searchSongs } from "../../lib/queries/songs";
-import { searchAnime } from "../../lib/queries/anime";
-import { searchArtists } from "../../lib/queries/artists";
+import { searchAnime, getAnimeDetail } from "../../lib/queries/anime";
+import { searchArtists, getArtistDetail } from "../../lib/queries/artists";
 
 import SongList from "../list/SongList";
 import MediaCard from "../cards/MediaCard";
@@ -40,6 +40,11 @@ export default function SearchSong({ onAdd, heading = "アニソン検索（マ�
   const [results, setResults] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
+
+  // アニメ/アーティストの曲ピッカー
+  const [pickerMedia, setPickerMedia]   = useState(null);  // { type, id, name }
+  const [pickerSongs, setPickerSongs]   = useState([]);
+  const [pickerLoading, setPickerLoading] = useState(false);
 
   const [hasSearched, setHasSearched] = useState(
     Boolean(
@@ -168,6 +173,50 @@ export default function SearchSong({ onAdd, heading = "アニソン検索（マ�
     fetchByTab(newPage);
   };
 
+  // アニメ/アーティストカードクリック（onAdd がある = ListPage）
+  const openPicker = async (type, id, name) => {
+    setPickerMedia({ type, id, name });
+    setPickerSongs([]);
+    setPickerLoading(true);
+
+    if (type === "anime") {
+      const detail = await getAnimeDetail(id);
+      setPickerSongs(
+        (detail?.songs ?? []).map((s) => ({
+          id: s.song_id,
+          song_id: s.song_id,
+          title: s.song_title,
+          song_title: s.song_title,
+          type: s.song_type,
+          image_url: s.image_url,
+          artist: s.artist,
+          anime_title: name,
+        }))
+      );
+    } else {
+      const detail = await getArtistDetail(id);
+      setPickerSongs(
+        (detail?.songs ?? []).map((s) => ({
+          id: s.song_id,
+          song_id: s.song_id,
+          title: s.song_title,
+          song_title: s.song_title,
+          type: s.song_type,
+          image_url: s.image_url,
+          artist: detail?.artist?.name ?? s.artist,
+          anime_title: s.anime_title,
+        }))
+      );
+    }
+
+    setPickerLoading(false);
+  };
+
+  const closePicker = () => {
+    setPickerMedia(null);
+    setPickerSongs([]);
+  };
+
   const switchTab = (newTab) => {
     if (newTab === tab) return;
 
@@ -176,6 +225,8 @@ export default function SearchSong({ onAdd, heading = "アニソン検索（マ�
     setHasSearched(false);
     setErrorMessage("");
     setPage(1);
+    setPickerMedia(null);
+    setPickerSongs([]);
     setSearchParams({ tab: newTab });
   };
 
@@ -249,18 +300,58 @@ export default function SearchSong({ onAdd, heading = "アニソン検索（マ�
         />
       )}
 
-      {hasSearched && tab === "anime" && (
+      {/* アニメ/アーティスト：曲ピッカーが開いているとき */}
+      {pickerMedia && (
+        <div className={styles.picker}>
+          <button className={styles.pickerBack} onClick={closePicker}>
+            ← {pickerMedia.name} の検索結果に戻る
+          </button>
+          <p className={styles.pickerTitle}>
+            {pickerMedia.type === "anime" ? "🎬" : "🎤"} {pickerMedia.name} の曲
+          </p>
+          {pickerLoading ? (
+            <p className={styles.pickerEmpty}>読み込み中...</p>
+          ) : pickerSongs.length === 0 ? (
+            <p className={styles.pickerEmpty}>曲が見つかりませんでした。</p>
+          ) : (
+            <SongList
+              songs={pickerSongs}
+              sortable={false}
+              onAdd={onAdd}
+              onClickSong={(id) => navigate(`/songs/${id}`)}
+            />
+          )}
+        </div>
+      )}
+
+      {hasSearched && !pickerMedia && tab === "anime" && (
         <div className={gridStyles.grid}>
           {results.map((a) => (
-            <MediaCard key={a.id} type="anime" data={a} onClick={(id) => navigate(`/anime/${id}`)} />
+            <MediaCard
+              key={a.id}
+              type="anime"
+              data={a}
+              onClick={(id) => onAdd
+                ? openPicker("anime", id, a.title_jp)
+                : navigate(`/anime/${id}`)
+              }
+            />
           ))}
         </div>
       )}
 
-      {hasSearched && tab === "artist" && (
+      {hasSearched && !pickerMedia && tab === "artist" && (
         <div className={gridStyles.grid}>
           {results.map((a) => (
-            <MediaCard key={a.id} type="artist" data={a} onClick={(id) => navigate(`/artist/${id}`)} />
+            <MediaCard
+              key={a.id}
+              type="artist"
+              data={a}
+              onClick={(id) => onAdd
+                ? openPicker("artist", id, a.name)
+                : navigate(`/artist/${id}`)
+              }
+            />
           ))}
         </div>
       )}

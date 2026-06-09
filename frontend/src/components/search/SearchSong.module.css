@@ -68,3 +68,37 @@
 .dots {
   margin: 0 6px;
 }
+
+/* 曲ピッカー（アニメ/アーティスト選択後） */
+.picker {
+  margin-top: 12px;
+}
+
+.pickerBack {
+  background: none;
+  border: none;
+  color: var(--color-main, #4dabf7);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.pickerBack:hover {
+  text-decoration: underline;
+}
+
+.pickerTitle {
+  font-size: 15px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 12px;
+}
+
+.pickerEmpty {
+  color: #aaa;
+  font-size: 14px;
+  text-align: center;
+  padding: 16px 0;
+}
