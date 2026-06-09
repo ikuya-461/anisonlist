@@ -1,6 +1,8 @@
+import { useState } from "react";
 import styles from "./MediaCard.module.css";
 
 export default function SongCard({ song, onAdd, onClick }) {
+  const [added, setAdded] = useState(false);
   return (
     <div
       className={styles.card}
@@ -44,13 +46,16 @@ export default function SongCard({ song, onAdd, onClick }) {
       {/* ログイン版だけ追加ボタンを表示 */}
       {onAdd && (
         <button
-          className={styles.addBtn}
+          className={`${styles.addBtn} ${added ? styles.addBtnAdded : ""}`}
           onClick={(e) => {
             e.stopPropagation();
+            if (added) return;
             onAdd(song);
+            setAdded(true);
+            setTimeout(() => setAdded(false), 1500);
           }}
         >
-          ＋
+          {added ? "✓" : "＋"}
         </button>
       )}
     </div>

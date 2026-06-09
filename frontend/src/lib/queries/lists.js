@@ -118,6 +118,60 @@ export async function renameList(listId, name) {
 }
 
 /* -------------------------------------------------------
+   ★ リストいいね：件数取得 + 自分がいいね済みか
+------------------------------------------------------- */
+export async function getListLikeStatus(listId) {
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { count } = await supabase
+    .from("list_likes")
+    .select("*", { count: "exact", head: true })
+    .eq("list_id", listId);
+
+  let liked = false;
+  if (user) {
+    const { data } = await supabase
+      .from("list_likes")
+      .select("list_id")
+      .eq("list_id", listId)
+      .eq("user_id", user.id)
+      .maybeSingle();
+    liked = !!data;
+  }
+
+  return { count: count ?? 0, liked };
+}
+
+/* -------------------------------------------------------
+   ★ リストいいね：トグル（いいね ↔ 解除）
+------------------------------------------------------- */
+export async function toggleListLike(listId) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data: existing } = await supabase
+    .from("list_likes")
+    .select("list_id")
+    .eq("list_id", listId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (existing) {
+    await supabase
+      .from("list_likes")
+      .delete()
+      .eq("list_id", listId)
+      .eq("user_id", user.id);
+    return false; // いいね解除
+  } else {
+    await supabase
+      .from("list_likes")
+      .insert({ list_id: listId, user_id: user.id });
+    return true; // いいね追加
+  }
+}
+
+/* -------------------------------------------------------
    ★ リスト削除（本人確認込み・list_songsもまとめて削除）
 ------------------------------------------------------- */
 export async function deleteList(listId) {

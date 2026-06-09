@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-import { getListDetail } from "../../lib/queries/lists";
+import { getListDetail, getListLikeStatus, toggleListLike } from "../../lib/queries/lists";
 import {
   getListSongs,
   addSongToList,
@@ -22,6 +22,9 @@ export default function ListPage() {
 
   const [songs, setSongs] = useState([]);
   const [listInfo, setListInfo] = useState(null);
+  const [likeCount, setLikeCount] = useState(0);
+  const [liked, setLiked] = useState(false);
+  const [likeLoading, setLikeLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -47,11 +50,29 @@ export default function ListPage() {
     })));
   }, [listId]);
 
-  // listId が変わったらリスト情報と曲一覧を再取得
+  // listId が変わったらリスト情報・曲一覧・いいね状態を再取得
   useEffect(() => {
     fetchListInfo();
     fetchListSongs();
+    getListLikeStatus(listId).then(({ count, liked }) => {
+      setLikeCount(count);
+      setLiked(liked);
+    });
   }, [listId, fetchListInfo, fetchListSongs]);
+
+  /* -------------------------------------------------------
+     ★ いいねトグル
+  ------------------------------------------------------- */
+  const handleLike = async () => {
+    if (likeLoading) return;
+    setLikeLoading(true);
+    const nowLiked = await toggleListLike(listId);
+    if (nowLiked !== null) {
+      setLiked(nowLiked);
+      setLikeCount((c) => c + (nowLiked ? 1 : -1));
+    }
+    setLikeLoading(false);
+  };
 
   /* -------------------------------------------------------
      ★ 曲追加
@@ -89,6 +110,15 @@ export default function ListPage() {
           listInfo={listInfo}
           onUpdated={fetchListInfo}
         />
+
+        {/* いいねボタン */}
+        <button
+          className={`${styles.likeBtn} ${liked ? styles.likeBtnActive : ""}`}
+          onClick={handleLike}
+          disabled={likeLoading}
+        >
+          {liked ? "❤️" : "🤍"} {likeCount}
+        </button>
 
         <ListSelect
           selectedList={listId}
