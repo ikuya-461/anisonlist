@@ -91,11 +91,17 @@
 }
 
 .listName {
-  padding: 8px 10px;
+  padding: 8px 10px 2px;
   font-size: 14px;
   font-weight: bold;
   color: #222;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.likeCount {
+  padding: 0 10px 8px;
+  font-size: 12px;
+  color: #e05a5a;
 }

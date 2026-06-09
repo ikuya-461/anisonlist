@@ -82,10 +82,16 @@ export async function getMyLists() {
 
       const preview = previewRows?.[0]?.song ?? null;
 
+      const { count: likeCount } = await supabase
+        .from("list_likes")
+        .select("*", { count: "exact", head: true })
+        .eq("list_id", list.id);
+
       return {
         ...list,
         image_url: preview?.image_url ?? null,
-        song_type: preview?.song_type ?? null
+        song_type: preview?.song_type ?? null,
+        like_count: likeCount ?? 0
       };
     })
   );
@@ -163,7 +169,17 @@ export async function getPublicListsByUser(userId) {
         .limit(1);
 
       const preview = previewRows?.[0]?.song ?? null;
-      return { ...list, image_url: preview?.image_url ?? null };
+
+      const { count: likeCount } = await supabase
+        .from("list_likes")
+        .select("*", { count: "exact", head: true })
+        .eq("list_id", list.id);
+
+      return {
+        ...list,
+        image_url: preview?.image_url ?? null,
+        like_count: likeCount ?? 0
+      };
     })
   );
 }

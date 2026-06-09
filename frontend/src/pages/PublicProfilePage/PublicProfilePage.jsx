@@ -72,6 +72,9 @@ export default function PublicProfilePage() {
                 }
               </div>
               <div className={styles.listName}>{list.name}</div>
+              {list.like_count > 0 && (
+                <div className={styles.likeCount}>❤️ {list.like_count}</div>
+              )}
             </div>
           ))}
         </div>

@@ -108,6 +108,9 @@ function GalleryItem({ list, onDeleted, onTogglePublic, dragHandleProps }) {
 
       <div className={styles.info} onClick={() => navigate(`/list/${list.id}`)}>
         <div className={styles.name}>{list.name}</div>
+        {typeof list.like_count === "number" && (
+          <div className={styles.likeCount}>❤️ {list.like_count}</div>
+        )}
       </div>
 
       <div className={styles.actions}>

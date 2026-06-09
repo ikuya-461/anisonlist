@@ -50,6 +50,13 @@
 
 .info {
   flex: 1;
+  overflow: hidden;
+}
+
+.likeCount {
+  font-size: 12px;
+  color: #e05a5a;
+  margin-top: 3px;
 }
 
 .actions {
