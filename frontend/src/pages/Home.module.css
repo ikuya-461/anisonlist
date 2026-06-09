@@ -3,6 +3,71 @@
   padding: 20px;
 }
 
+/* ===== ログイン誘導 ===== */
+.ctaWrap {
+  width: min(480px, 95%);
+  margin: 0 auto 28px;
+  padding: 20px 24px;
+  border: 1px solid rgba(1,253,254,0.2);
+  border-left: 3px solid var(--cyan);
+  border-radius: 4px;
+  background: rgba(1,253,254,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.ctaText {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-sub);
+  line-height: 1.7;
+}
+
+.ctaBtns {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.ctaPrimary {
+  padding: 9px 20px;
+  border-radius: 4px;
+  background: var(--grad-btn);
+  color: #fff;
+  font-weight: bold;
+  font-size: 13px;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.15s, box-shadow 0.15s;
+}
+
+.ctaPrimary:hover {
+  opacity: 0.85;
+  box-shadow: 0 0 12px rgba(1,253,254,0.4), 0 0 24px rgba(105,37,206,0.3);
+}
+
+.ctaSecondary {
+  padding: 9px 20px;
+  border-radius: 4px;
+  border: 1.5px solid rgba(1,253,254,0.3);
+  background: transparent;
+  color: var(--cyan);
+  font-size: 13px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.ctaSecondary:hover {
+  border-color: var(--cyan);
+  background: rgba(1,253,254,0.07);
+}
+
 /* ===== ヒーローエリア ===== */
 .heroWrap {
   position: relative;
