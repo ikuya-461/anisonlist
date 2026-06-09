@@ -14,7 +14,8 @@ import {
 } from "@dnd-kit/sortable";
 
 import { CSS } from "@dnd-kit/utilities";
-import ListGalleryItem from "./ListGalleryItem";
+import { useNavigate } from "react-router-dom";
+import DeleteListButton from "../buttons/DeleteListButton";
 import styles from "../../CSS/ComponentCSS/ListGallery.module.css";
 import { DND_ACTIVATION_CONSTRAINT } from "../../lib/constants";
 
@@ -45,14 +46,14 @@ export default function ListGallery({ lists, setLists, onDeleted, onReorder }) {
       onDragEnd={handleDragEnd}
     >
       <SortableContext
-        items={lists.map((l) => String(l.id))}  // ← ★ id を string に変換
+        items={lists.map((l) => String(l.id))}
         strategy={verticalListSortingStrategy}
       >
         <div className={styles.list}>
           {lists.map((list) => (
             <SortableItem key={list.id} list={list}>
               {(dragHandleProps) => (
-                <ListGalleryItem
+                <GalleryItem
                   list={list}
                   dragHandleProps={dragHandleProps}
                   onDeleted={onDeleted}
@@ -66,9 +67,12 @@ export default function ListGallery({ lists, setLists, onDeleted, onReorder }) {
   );
 }
 
+/* -------------------------------------------------------
+   ソート可能ラッパー（dnd-kit）
+------------------------------------------------------- */
 function SortableItem({ list, children }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: String(list.id) }); // ← ★ id を string に変換
+    useSortable({ id: String(list.id) });
 
   return (
     <div
@@ -78,10 +82,36 @@ function SortableItem({ list, children }) {
         transition,
       }}
     >
-      {children({
-        ...attributes,
-        ...listeners,
-      })}
+      {children({ ...attributes, ...listeners })}
+    </div>
+  );
+}
+
+/* -------------------------------------------------------
+   各リストのカード表示
+------------------------------------------------------- */
+function GalleryItem({ list, onDeleted, dragHandleProps }) {
+  const navigate = useNavigate();
+
+  return (
+    <div className={styles.item}>
+      <div className={styles.handle} {...dragHandleProps}>≡</div>
+
+      <div className={styles.thumb} onClick={() => navigate(`/list/${list.id}`)}>
+        {list.image_url ? (
+          <img src={list.image_url} alt="thumb" />
+        ) : (
+          <div className={styles.noSong}>NO SONG</div>
+        )}
+      </div>
+
+      <div className={styles.info} onClick={() => navigate(`/list/${list.id}`)}>
+        <div className={styles.name}>{list.name}</div>
+      </div>
+
+      <div className={styles.delete}>
+        <DeleteListButton listId={list.id} onDeleted={onDeleted} />
+      </div>
     </div>
   );
 }

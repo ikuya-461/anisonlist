@@ -5,13 +5,13 @@ import { supabase } from "../lib/supabaseClient";
 import Header from "../components/parts/Header";
 import Layout from "./Layout";
 
-import Home from "./Home/Home";
+import Home from "./Home";
 import SongDetail from "./SongDetail/SongDetail";
-import Login from "./LoginRegister/Login";
-import Register from "./LoginRegister/Register";
+import Login from "./auth/Login";
+import Register from "./auth/Register";
 import MyPage from "./Mypage/MyPage";
 import ListPage from "./ListPage/ListPage";
-import ForgotPassword from "./LoginRegister/ForgotPassword";
+import ForgotPassword from "./auth/ForgotPassword";
 import AnimeDetail from "./AnimeDetail/AnimeDetail";
 import ArtistDetail from "./ArtistDetail/ArtistDetail";
 
