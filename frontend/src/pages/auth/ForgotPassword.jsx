@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
-import styles from "../../CSS/PageCSS/LoginRegister.module.css";
+import styles from "./LoginRegister.module.css";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");

@@ -1,4 +1,4 @@
-import styles from "../../CSS/ComponentCSS/MediaCard.module.css";
+import styles from "./MediaCard.module.css";
 
 export default function SongCard({ song, onAdd, onClick }) {
   return (

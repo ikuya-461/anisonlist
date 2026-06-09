@@ -1,7 +1,7 @@
 import ListPageSongCard from "./ListPageSongCard";
-import SongCard from "./SongCard";
+import SongCard from "../cards/SongCard";
 
-import styles from "../../CSS/ComponentCSS/SongList.module.css";
+import styles from "./SongList.module.css";
 
 export default function SongList({
   songs,

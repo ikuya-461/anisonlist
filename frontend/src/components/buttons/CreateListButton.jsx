@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createList } from "../../lib/queries/lists";
-import styles from "../../CSS/ComponentCSS/CreateListButton.module.css";
+import styles from "./CreateListButton.module.css";
 
 export default function CreateListButton({ onCreated }) {
   const [name, setName] = useState("");

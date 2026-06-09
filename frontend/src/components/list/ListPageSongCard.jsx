@@ -1,4 +1,4 @@
-import styles from "../../CSS/ComponentCSS/ListPageSongCard.module.css";
+import styles from "./ListPageSongCard.module.css";
 
 export default function ListPageSongCard({
   song,

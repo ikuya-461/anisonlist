@@ -1,5 +1,5 @@
-import SearchSong from "../components/inputs/SearchSong";
-import styles from "../CSS/PageCSS/Home.module.css";
+import SearchSong from "../components/search/SearchSong";
+import styles from "./Home.module.css";
 
 export default function Home() {
   return (

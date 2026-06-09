@@ -3,9 +3,9 @@ import { supabase } from "../../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { getMyLists } from "../../lib/queries/lists";
 import { getMyProfile, updateMyProfile } from "../../lib/queries/users";
-import styles from "../../CSS/PageCSS/MyPage.module.css";
+import styles from "./MyPage.module.css";
 
-import ListGallery from "../../components/listItem/ListGallery";
+import ListGallery from "../../components/list/ListGallery";
 import CreateListButton from "../../components/buttons/CreateListButton";
 
 export default function MyPage({ updateLoginState }) {

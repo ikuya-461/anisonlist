@@ -1,9 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { getArtistDetail } from "../../lib/queries/artists";
 import { useDetailPage } from "../../hooks/useDetailPage";
-import SongList from "../../components/listItem/SongList";
-import pageStyles from "../../CSS/PageCSS/DetailPage.module.css";
-import styles from "../../CSS/PageCSS/ArtistDetail.module.css";
+import SongList from "../../components/list/SongList";
+import pageStyles from "../DetailPage.module.css";
+import styles from "./ArtistDetail.module.css";
 
 export default function ArtistDetail() {
   const { id } = useParams();

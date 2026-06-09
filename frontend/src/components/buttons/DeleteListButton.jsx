@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabaseClient";
-import styles from "../../CSS/ComponentCSS/DeleteListButton.module.css";
+import styles from "./DeleteListButton.module.css";
 
 export default function DeleteListButton({ listId, onDeleted }) {
   const [showModal, setShowModal] = useState(false);

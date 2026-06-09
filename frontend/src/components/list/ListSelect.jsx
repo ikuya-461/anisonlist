@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getMyLists } from "../../lib/queries/lists";
-import styles from "../../CSS/ComponentCSS/ListSelect.module.css";
+import styles from "./ListSelect.module.css";
 
 export default function ListSelect({ selectedList, onSelectList }) {
   const [lists, setLists] = useState([]);

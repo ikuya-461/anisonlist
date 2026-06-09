@@ -1,9 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { getAnimeDetail, getAnimeImage } from "../../lib/queries/anime";
 import { useDetailPage } from "../../hooks/useDetailPage";
-import SongList from "../../components/listItem/SongList";
-import pageStyles from "../../CSS/PageCSS/DetailPage.module.css";
-import styles from "../../CSS/PageCSS/AnimeDetail.module.css";
+import SongList from "../../components/list/SongList";
+import pageStyles from "../DetailPage.module.css";
+import styles from "./AnimeDetail.module.css";
 
 // コンポーネント外で安定した関数参照を確保（useDetailPage の deps に影響しない）
 async function fetchAnimeDetail(id) {

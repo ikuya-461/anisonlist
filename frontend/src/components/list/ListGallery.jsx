@@ -16,7 +16,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { useNavigate } from "react-router-dom";
 import DeleteListButton from "../buttons/DeleteListButton";
-import styles from "../../CSS/ComponentCSS/ListGallery.module.css";
+import styles from "./ListGallery.module.css";
 import { DND_ACTIVATION_CONSTRAINT } from "../../lib/constants";
 
 export default function ListGallery({ lists, setLists, onDeleted, onReorder }) {

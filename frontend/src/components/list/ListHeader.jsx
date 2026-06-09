@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { renameList } from "../../lib/queries/lists";
-import styles from "../../CSS/ComponentCSS/ListHeader.module.css";
+import styles from "./ListHeader.module.css";
 
 export default function ListHeader({ listId, listInfo, onUpdated }) {
   const [editing, setEditing] = useState(false);

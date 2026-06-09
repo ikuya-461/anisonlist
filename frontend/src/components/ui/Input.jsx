@@ -1,4 +1,4 @@
-import styles from "../../CSS/ComponentCSS/Input.module.css";
+import styles from "./Input.module.css";
 
 export default function Input({ className, ...props }) {
   return (

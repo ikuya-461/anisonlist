@@ -5,14 +5,14 @@ import { searchSongs } from "../../lib/queries/songs";
 import { searchAnime } from "../../lib/queries/anime";
 import { searchArtists } from "../../lib/queries/artists";
 
-import SongList from "../listItem/SongList";
-import MediaCard from "../listItem/MediaCard";
-import Input from "../parts/Input";
-import Button from "../parts/Button";
-import ErrorMessage from "../parts/ErrorMessage";
+import SongList from "../list/SongList";
+import MediaCard from "../cards/MediaCard";
+import Input from "../ui/Input";
+import Button from "../ui/Button";
+import ErrorMessage from "../ui/ErrorMessage";
 
-import styles from "../../CSS/ComponentCSS/SearchSong.module.css";
-import gridStyles from "../../CSS/ComponentCSS/SongList.module.css";
+import styles from "./SearchSong.module.css";
+import gridStyles from "../list/SongList.module.css";
 
 const TABS = [
   { key: "song", label: "曲" },

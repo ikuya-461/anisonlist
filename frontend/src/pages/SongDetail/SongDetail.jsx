@@ -2,8 +2,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getSongDetail } from "../../lib/queries/songs";
 import { useDetailPage } from "../../hooks/useDetailPage";
 import { SONG_TYPE_COLORS } from "../../lib/constants";
-import pageStyles from "../../CSS/PageCSS/DetailPage.module.css";
-import styles from "../../CSS/PageCSS/SongDetail.module.css";
+import pageStyles from "../DetailPage.module.css";
+import styles from "./SongDetail.module.css";
 
 export default function SongDetail() {
   const { id } = useParams();

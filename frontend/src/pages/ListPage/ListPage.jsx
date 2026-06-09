@@ -9,12 +9,12 @@ import {
   reorderListSongs
 } from "../../lib/queries/listSongs";
 
-import ListHeader from "../../components/parts/ListHeader";
-import ListSelect from "../../components/parts/ListSelect";
-import SearchSong from "../../components/inputs/SearchSong";
-import SongList from "../../components/listItem/SongList";
+import ListHeader from "../../components/list/ListHeader";
+import ListSelect from "../../components/list/ListSelect";
+import SearchSong from "../../components/search/SearchSong";
+import SongList from "../../components/list/SongList";
 
-import styles from "../../CSS/PageCSS/ListPage.module.css";
+import styles from "./ListPage.module.css";
 
 export default function ListPage() {
   const { id } = useParams();

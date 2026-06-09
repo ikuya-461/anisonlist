@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { createUserProfile } from "../../lib/queries/users";
 import { useNavigate } from "react-router-dom";
-import styles from "../../CSS/PageCSS/LoginRegister.module.css";
+import styles from "./LoginRegister.module.css";
 
 export default function Register() {
   const navigate = useNavigate();

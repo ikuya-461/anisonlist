@@ -1,4 +1,4 @@
-import styles from "../../CSS/ComponentCSS/ErrorMessage.module.css";
+import styles from "./ErrorMessage.module.css";
 
 export default function ErrorMessage({ children }) {
   if (!children) return null;

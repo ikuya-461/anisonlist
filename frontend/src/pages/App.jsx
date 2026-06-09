@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 
-import Header from "../components/parts/Header";
+import Header from "../components/ui/Header";
 import Layout from "./Layout";
 
 import Home from "./Home";
