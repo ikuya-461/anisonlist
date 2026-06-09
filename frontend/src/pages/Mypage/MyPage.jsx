@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
-import { getMyLists } from "../../lib/queries/lists";
-import { getMyProfile, updateMyProfile } from "../../lib/queries/users";
+import { getMyLists, toggleListPublic } from "../../lib/queries/lists";
+import { getMyProfile, updateMyProfile, toggleProfilePublic } from "../../lib/queries/users";
 import styles from "./MyPage.module.css";
 
 import ListGallery from "../../components/list/ListGallery";
@@ -22,6 +22,7 @@ export default function MyPage({ updateLoginState }) {
   const [userName, setUserName] = useState("");
   const [bio, setBio] = useState("");
   const [iconUrl, setIconUrl] = useState("");
+  const [isPublic, setIsPublic] = useState(false);
 
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState("");
@@ -42,6 +43,7 @@ export default function MyPage({ updateLoginState }) {
       setUserName(profile.user_name);
       setBio(profile.bio || "");
       setIconUrl(profile.icon_url || "");
+      setIsPublic(profile.is_public || false);
       setEditName(profile.user_name);
       setEditBio(profile.bio || "");
       setEditIcon(profile.icon_url || "");
@@ -70,7 +72,23 @@ export default function MyPage({ updateLoginState }) {
     setEditing(false);
   };
 
-  // ⑤ ログアウト
+  // ⑤ プロフィール公開トグル
+  const handleToggleProfilePublic = async () => {
+    const next = await toggleProfilePublic(isPublic);
+    if (next !== null) setIsPublic(next);
+  };
+
+  // ⑥ リスト公開トグル
+  const handleToggleListPublic = async (listId, currentValue) => {
+    const next = await toggleListPublic(listId, currentValue);
+    if (next !== null) {
+      setLists((prev) =>
+        prev.map((l) => (l.id === listId ? { ...l, is_public: next } : l))
+      );
+    }
+  };
+
+  // ⑦ ログアウト
   const handleLogout = async () => {
     await supabase.auth.signOut();
     await updateLoginState();
@@ -150,6 +168,25 @@ export default function MyPage({ updateLoginState }) {
             >
               プロフィールを編集
             </button>
+
+            <div className={styles.publicRow}>
+              <button
+                className={`${styles.toggleBtn} ${isPublic ? styles.toggleBtnOn : ""}`}
+                onClick={handleToggleProfilePublic}
+              >
+                {isPublic ? "🌐 公開中" : "🔒 非公開"}
+              </button>
+              {isPublic && (
+                <a
+                  href={`/user/${userId}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={styles.publicLink}
+                >
+                  公開ページを見る →
+                </a>
+              )}
+            </div>
           </div>
         )}
 
@@ -159,6 +196,7 @@ export default function MyPage({ updateLoginState }) {
         <ListGallery
           lists={lists}
           setLists={setLists}
+          onTogglePublic={handleToggleListPublic}
           onDeleted={async () => {
             setLists(await fetchLists());
           }}

@@ -12,7 +12,7 @@ export async function getMyProfile() {
 
   const { data, error } = await supabase
     .from("users")
-    .select("id, user_name, bio, icon_url")
+    .select("id, user_name, bio, icon_url, is_public")
     .eq("id", user.id)
     .single();
 
@@ -65,7 +65,7 @@ export async function updateMyProfile({ user_name, bio, icon_url }) {
     .from("users")
     .update(updates)
     .eq("id", user.id)
-    .select("id, user_name, bio, icon_url")
+    .select("id, user_name, bio, icon_url, is_public")
     .single();
 
   if (error) {
@@ -74,4 +74,48 @@ export async function updateMyProfile({ user_name, bio, icon_url }) {
   }
 
   return data;
+}
+
+/* -------------------------------------------------------
+   ★ 他人の公開プロフィール取得
+------------------------------------------------------- */
+export async function getPublicProfile(userId) {
+  const { data, error } = await supabase
+    .from("users")
+    .select("id, user_name, bio, icon_url")
+    .eq("id", userId)
+    .eq("is_public", true)
+    .maybeSingle();
+
+  if (error) {
+    console.error("getPublicProfile error:", error);
+    return null;
+  }
+
+  return data;
+}
+
+/* -------------------------------------------------------
+   ★ プロフィール公開 / 非公開 トグル
+------------------------------------------------------- */
+export async function toggleProfilePublic(currentValue) {
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) return null;
+
+  const { data, error } = await supabase
+    .from("users")
+    .update({ is_public: !currentValue })
+    .eq("id", user.id)
+    .select("is_public")
+    .single();
+
+  if (error) {
+    console.error("toggleProfilePublic error:", error);
+    return null;
+  }
+
+  return data.is_public;
 }

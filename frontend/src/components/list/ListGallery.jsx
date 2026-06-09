@@ -19,7 +19,7 @@ import DeleteListButton from "../buttons/DeleteListButton";
 import styles from "./ListGallery.module.css";
 import { DND_ACTIVATION_CONSTRAINT } from "../../lib/constants";
 
-export default function ListGallery({ lists, setLists, onDeleted, onReorder }) {
+export default function ListGallery({ lists, setLists, onDeleted, onReorder, onTogglePublic }) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: DND_ACTIVATION_CONSTRAINT
@@ -57,6 +57,7 @@ export default function ListGallery({ lists, setLists, onDeleted, onReorder }) {
                   list={list}
                   dragHandleProps={dragHandleProps}
                   onDeleted={onDeleted}
+                  onTogglePublic={onTogglePublic}
                 />
               )}
             </SortableItem>
@@ -90,7 +91,7 @@ function SortableItem({ list, children }) {
 /* -------------------------------------------------------
    各リストのカード表示
 ------------------------------------------------------- */
-function GalleryItem({ list, onDeleted, dragHandleProps }) {
+function GalleryItem({ list, onDeleted, onTogglePublic, dragHandleProps }) {
   const navigate = useNavigate();
 
   return (
@@ -109,7 +110,16 @@ function GalleryItem({ list, onDeleted, dragHandleProps }) {
         <div className={styles.name}>{list.name}</div>
       </div>
 
-      <div className={styles.delete}>
+      <div className={styles.actions}>
+        {onTogglePublic && (
+          <button
+            className={`${styles.publicToggle} ${list.is_public ? styles.publicToggleOn : ""}`}
+            onClick={(e) => { e.stopPropagation(); onTogglePublic(list.id, list.is_public); }}
+            title={list.is_public ? "公開中（クリックで非公開）" : "非公開（クリックで公開）"}
+          >
+            {list.is_public ? "🌐" : "🔒"}
+          </button>
+        )}
         <DeleteListButton listId={list.id} onDeleted={onDeleted} />
       </div>
     </div>

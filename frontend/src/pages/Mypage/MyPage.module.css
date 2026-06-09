@@ -122,6 +122,47 @@ span.icon {
   margin: 16px 0 8px;
 }
 
+/* --- 公開トグル行 --- */
+.publicRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.toggleBtn {
+  padding: 7px 16px;
+  border-radius: 999px;
+  border: 2px solid #ccc;
+  background: #fff;
+  color: #888;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.toggleBtn:hover {
+  border-color: #4dabf7;
+  color: #4dabf7;
+}
+
+.toggleBtnOn {
+  border-color: #4dabf7;
+  color: #4dabf7;
+}
+
+.publicLink {
+  font-size: 13px;
+  color: var(--color-main, #4dabf7);
+  text-decoration: none;
+}
+
+.publicLink:hover {
+  text-decoration: underline;
+}
+
 /* --- ログアウト --- */
 
 .logoutBtn {

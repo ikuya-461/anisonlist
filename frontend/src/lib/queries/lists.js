@@ -62,7 +62,7 @@ export async function getMyLists() {
 
   const { data: lists, error } = await supabase
     .from("lists")
-    .select("id, user_id, name, created_at, position")
+    .select("id, user_id, name, created_at, position, is_public")
     .eq("user_id", user.id)
     .order("position", { ascending: true });
 
@@ -115,6 +115,83 @@ export async function renameList(listId, name) {
   }
 
   return data;
+}
+
+/* -------------------------------------------------------
+   ★ 公開リスト1件取得（/public/:id 用）
+------------------------------------------------------- */
+export async function getPublicListDetail(listId) {
+  const { data, error } = await supabase
+    .from("lists")
+    .select("id, name, user_id, is_public")
+    .eq("id", listId)
+    .eq("is_public", true)
+    .maybeSingle();
+
+  if (error) {
+    console.error("getPublicListDetail error:", error);
+    return null;
+  }
+
+  return data;
+}
+
+/* -------------------------------------------------------
+   ★ ユーザーの公開リスト一覧（/user/:userId 用）
+------------------------------------------------------- */
+export async function getPublicListsByUser(userId) {
+  const { data, error } = await supabase
+    .from("lists")
+    .select("id, name, position")
+    .eq("user_id", userId)
+    .eq("is_public", true)
+    .order("position", { ascending: true });
+
+  if (error) {
+    console.error("getPublicListsByUser error:", error);
+    return [];
+  }
+
+  // 各リストの先頭曲サムネイルを取得
+  return Promise.all(
+    (data ?? []).map(async (list) => {
+      const { data: previewRows } = await supabase
+        .from("list_songs")
+        .select("song:songs!song_id ( image_url, song_type )")
+        .eq("list_id", list.id)
+        .order("position", { ascending: true })
+        .limit(1);
+
+      const preview = previewRows?.[0]?.song ?? null;
+      return { ...list, image_url: preview?.image_url ?? null };
+    })
+  );
+}
+
+/* -------------------------------------------------------
+   ★ リスト公開 / 非公開 トグル
+------------------------------------------------------- */
+export async function toggleListPublic(listId, currentValue) {
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) return null;
+
+  const { data, error } = await supabase
+    .from("lists")
+    .update({ is_public: !currentValue })
+    .eq("id", listId)
+    .eq("user_id", user.id)
+    .select("is_public")
+    .single();
+
+  if (error) {
+    console.error("toggleListPublic error:", error);
+    return null;
+  }
+
+  return data.is_public;
 }
 
 /* -------------------------------------------------------
