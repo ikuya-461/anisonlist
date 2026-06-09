@@ -13,6 +13,7 @@ import ListHeader from "../../components/list/ListHeader";
 import ListSelect from "../../components/list/ListSelect";
 import SearchSong from "../../components/search/SearchSong";
 import SongList from "../../components/list/SongList";
+import AddSongModal from "../../components/modals/AddSongModal";
 
 import styles from "./ListPage.module.css";
 
@@ -22,6 +23,7 @@ export default function ListPage() {
 
   const [songs, setSongs] = useState([]);
   const [listInfo, setListInfo] = useState(null);
+  const [pendingSong, setPendingSong] = useState(null); // モーダル用
 
   const navigate = useNavigate();
 
@@ -44,6 +46,9 @@ export default function ListPage() {
       type: row.song_type,
       image_url: row.image_url,
       position: row.position,
+      memo: row.memo,
+      emotion_tags: row.emotion_tags,
+      encounter_type: row.encounter_type,
     })));
   }, [listId]);
 
@@ -53,10 +58,23 @@ export default function ListPage() {
   }, [listId, fetchListInfo, fetchListSongs]);
 
   /* -------------------------------------------------------
-     ★ 曲追加
+     ★ 曲追加（SearchSong の ＋ボタン → モーダルを開く）
   ------------------------------------------------------- */
-  const handleAddSong = async (song) => {
-    await addSongToList(listId, song.song_id);
+  const handleAddSong = (song) => {
+    setPendingSong(song);
+  };
+
+  // モーダルで「保存する」
+  const handleModalSave = async ({ memo, emotion_tags, encounter_type }) => {
+    await addSongToList(listId, pendingSong.song_id, { memo, emotion_tags, encounter_type });
+    setPendingSong(null);
+    fetchListSongs();
+  };
+
+  // モーダルで「スキップ」
+  const handleModalSkip = async () => {
+    await addSongToList(listId, pendingSong.song_id);
+    setPendingSong(null);
     fetchListSongs();
   };
 
@@ -82,6 +100,13 @@ export default function ListPage() {
 
   return (
     <div className={styles.outer}>
+      {pendingSong && (
+        <AddSongModal
+          song={pendingSong}
+          onSave={handleModalSave}
+          onSkip={handleModalSkip}
+        />
+      )}
       <div className={styles.inner}>
         <ListHeader
           listId={listId}

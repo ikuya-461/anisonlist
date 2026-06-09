@@ -1,0 +1,159 @@
+/* オーバーレイ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* モーダル本体（下からスライド） */
+.modal {
+  width: 100%;
+  max-width: 540px;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  padding: 24px 20px 36px;
+  animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+/* 曲名 */
+.songName {
+  font-size: 16px;
+  font-weight: bold;
+  color: #222;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sub {
+  font-size: 13px;
+  color: #888;
+  margin: 0 0 20px;
+}
+
+/* セクション */
+.section {
+  margin-bottom: 18px;
+}
+
+.sectionLabel {
+  font-size: 12px;
+  font-weight: bold;
+  color: #aaa;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* タグ群 */
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  padding: 7px 13px;
+  border-radius: 999px;
+  border: 1.5px solid #ddd;
+  background: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  color: #555;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.tag:hover {
+  border-color: #aaa;
+}
+
+.tagSelected {
+  border-color: #4dabf7;
+  background: #e8f4ff;
+  color: #1c7ed6;
+  font-weight: bold;
+}
+
+/* メモ */
+.memoWrapper {
+  position: relative;
+}
+
+.memoInput {
+  width: 100%;
+  padding: 10px 48px 10px 12px;
+  border-radius: 10px;
+  border: 1.5px solid #ddd;
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.memoInput:focus {
+  border-color: #4dabf7;
+}
+
+.memoCount {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  color: #bbb;
+}
+
+.memoCountOver {
+  color: #e05a5a;
+}
+
+/* ボタン行 */
+.btnRow {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.skipBtn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1.5px solid #ddd;
+  background: #fff;
+  color: #888;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.saveBtn {
+  flex: 2;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: #4dabf7;
+  color: #fff;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.saveBtn:hover {
+  background: #339af0;
+}

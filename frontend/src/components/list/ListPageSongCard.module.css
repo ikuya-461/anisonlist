@@ -96,6 +96,29 @@
   color: #666;
 }
 
+.memo {
+  font-size: 12px;
+  color: #888;
+  margin-top: 3px;
+  font-style: italic;
+}
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.emotionTag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #e8f4ff;
+  color: #1c7ed6;
+  font-weight: bold;
+}
+
 /* 削除ボタン */
 .deleteBtn {
   width: 36px;

@@ -8,6 +8,14 @@ import { getPublicProfile } from "../../lib/queries/users";
 import pageStyles from "../DetailPage.module.css";
 import styles from "./PublicListPage.module.css";
 
+const EMOTION_LABELS = {
+  god:           "✨ 神曲",
+  cry:           "😭 泣ける",
+  hype:          "🔥 熱い",
+  nostalgic:     "🕰️ エモい",
+  life_changing: "💊 人生変わった",
+};
+
 export default function PublicListPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -76,6 +84,9 @@ export default function PublicListPage() {
       {/* リスト名 + いいね */}
       <div className={styles.titleRow}>
         <h1 className={pageStyles.title}>{listInfo.name}</h1>
+        {listInfo.description && (
+          <p className={styles.description}>{listInfo.description}</p>
+        )}
         <button
           className={`${styles.likeBtn} ${liked ? styles.likeBtnActive : ""}`}
           onClick={handleLike}
@@ -108,6 +119,16 @@ export default function PublicListPage() {
                   {song.artist || ""}
                   {song.anime_title ? ` ・ ${song.anime_title}` : ""}
                 </div>
+                {song.memo && (
+                  <div className={styles.memo}>💬 {song.memo}</div>
+                )}
+                {song.emotion_tags?.length > 0 && (
+                  <div className={styles.tagRow}>
+                    {song.emotion_tags.map((t) => (
+                      <span key={t} className={styles.emotionTag}>{EMOTION_LABELS[t] ?? t}</span>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           ))

@@ -1,5 +1,13 @@
 import styles from "./ListPageSongCard.module.css";
 
+const EMOTION_LABELS = {
+  god:           "✨ 神曲",
+  cry:           "😭 泣ける",
+  hype:          "🔥 熱い",
+  nostalgic:     "🕰️ エモい",
+  life_changing: "💊 人生変わった",
+};
+
 export default function ListPageSongCard({
   song,
   onDeleted,
@@ -46,6 +54,16 @@ export default function ListPageSongCard({
           {song.artist}
           {song.anime_title ? ` ・ ${song.anime_title}` : ""}
         </div>
+        {song.memo && (
+          <div className={styles.memo}>💬 {song.memo}</div>
+        )}
+        {song.emotion_tags?.length > 0 && (
+          <div className={styles.tagRow}>
+            {song.emotion_tags.map((t) => (
+              <span key={t} className={styles.emotionTag}>{EMOTION_LABELS[t] ?? t}</span>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 削除ボタン（list_songs の ID を使う） */}

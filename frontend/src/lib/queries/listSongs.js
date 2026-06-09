@@ -11,6 +11,9 @@ export async function getListSongs(listId) {
       id,
       song_id,
       position,
+      memo,
+      emotion_tags,
+      encounter_type,
       song:songs!song_id (
         song_title,
         song_type,
@@ -35,14 +38,17 @@ export async function getListSongs(listId) {
     song_type: row.song?.song_type ?? null,
     image_url: row.song?.image_url ?? null,
     artist: row.song?.artist?.name ?? null,
-    anime_title: row.song?.anime?.title_jp ?? null
+    anime_title: row.song?.anime?.title_jp ?? null,
+    memo: row.memo ?? null,
+    emotion_tags: row.emotion_tags ?? [],
+    encounter_type: row.encounter_type ?? null
   }));
 }
 
 /* -------------------------------------------------------
    ★ 曲をリストに追加（position を自動採番）
 ------------------------------------------------------- */
-export async function addSongToList(listId, songId) {
+export async function addSongToList(listId, songId, { memo, emotion_tags, encounter_type } = {}) {
   const { data: maxRow } = await supabase
     .from("list_songs")
     .select("position")
@@ -53,9 +59,14 @@ export async function addSongToList(listId, songId) {
 
   const newPosition = (maxRow?.position ?? 0) + 1;
 
+  const record = { list_id: listId, song_id: songId, position: newPosition };
+  if (memo)          record.memo           = memo.slice(0, 30);
+  if (emotion_tags?.length) record.emotion_tags  = emotion_tags;
+  if (encounter_type) record.encounter_type = encounter_type;
+
   const { data, error } = await supabase
     .from("list_songs")
-    .insert({ list_id: listId, song_id: songId, position: newPosition })
+    .insert(record)
     .select("*")
     .single();
 

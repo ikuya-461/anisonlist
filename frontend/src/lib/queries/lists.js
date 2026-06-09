@@ -37,7 +37,7 @@ export async function createList(name) {
 export async function getListDetail(listId) {
   const { data, error } = await supabase
     .from("lists")
-    .select("*")
+    .select("id, name, description, user_id, position, is_public, created_at")
     .eq("id", listId)
     .single();
 
@@ -124,12 +124,31 @@ export async function renameList(listId, name) {
 }
 
 /* -------------------------------------------------------
+   ★ リスト説明文更新
+------------------------------------------------------- */
+export async function updateListDescription(listId, description) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  const { data, error } = await supabase
+    .from("lists")
+    .update({ description })
+    .eq("id", listId)
+    .eq("user_id", user.id)
+    .select("description")
+    .single();
+
+  if (error) { console.error("updateListDescription error:", error); return null; }
+  return data;
+}
+
+/* -------------------------------------------------------
    ★ 公開リスト1件取得（/public/:id 用）
 ------------------------------------------------------- */
 export async function getPublicListDetail(listId) {
   const { data, error } = await supabase
     .from("lists")
-    .select("id, name, user_id, is_public")
+    .select("id, name, description, user_id, is_public")
     .eq("id", listId)
     .eq("is_public", true)
     .maybeSingle();
