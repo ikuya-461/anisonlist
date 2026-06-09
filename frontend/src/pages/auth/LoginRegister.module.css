@@ -2,70 +2,110 @@
   width: 100%;
   max-width: 420px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 40px 20px;
 }
 
 .title {
   text-align: center;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: bold;
-  margin-bottom: 20px;
+  margin-bottom: 28px;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 3px;
+  color: var(--cyan);
+  text-shadow: var(--glow-cyan);
+  text-transform: uppercase;
 }
 
 .input {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  padding: 12px 14px;
+  border: 1.5px solid rgba(1,253,254,0.2);
+  border-radius: 4px;
   margin-bottom: 14px;
-  font-size: 16px;
+  font-size: 15px;
+  box-sizing: border-box;
+  background: rgba(1,253,254,0.04);
+  color: var(--text-main);
+  outline: none;
+  font-family: 'Noto Sans JP', sans-serif;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input::placeholder {
+  color: var(--text-sub);
+}
+
+.input:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 2px rgba(1,253,254,0.15);
 }
 
 .button {
   width: 100%;
-  padding: 12px;
-  background: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 8px;
+  padding: 13px;
+  background: rgba(1,253,254,0.1);
+  color: var(--cyan);
+  border: 1.5px solid var(--cyan);
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 15px;
   margin-top: 10px;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: background 0.15s, box-shadow 0.15s;
 }
 
 .button:hover {
-  opacity: 0.9;
+  background: rgba(1,253,254,0.18);
+  box-shadow: var(--glow-cyan);
 }
 
 .subButton {
   width: 100%;
   padding: 12px;
-  background: #007bff;
-  color: white;
-  border: none;
-  border-radius: 8px;
+  background: transparent;
+  color: var(--text-sub);
+  border: 1.5px solid rgba(1,253,254,0.2);
+  border-radius: 4px;
   cursor: pointer;
   margin-top: 10px;
+  font-size: 14px;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.subButton:hover {
+  border-color: rgba(1,253,254,0.4);
+  color: var(--text-main);
 }
 
 .subText {
   text-align: center;
   margin-top: 20px;
   margin-bottom: 8px;
-  color: #444;
-}
-
-.link {
-  color: #007bff;
-  cursor: pointer;
-  text-decoration: underline;
+  color: var(--text-sub);
   font-size: 14px;
 }
 
+.link {
+  color: var(--cyan);
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 14px;
+  opacity: 0.8;
+  transition: opacity 0.15s;
+}
+
+.link:hover {
+  opacity: 1;
+}
+
 .error {
-  color: red;
+  color: #e05a5a;
   margin-bottom: 10px;
   text-align: center;
+  font-size: 14px;
 }
 
 /* パスワード可視化 */
@@ -80,6 +120,7 @@
   transform: translateY(-50%);
   cursor: pointer;
   font-size: 18px;
+  color: var(--text-sub);
 }
 
 /* パスワード強度 */
@@ -88,9 +129,9 @@
 }
 
 .strengthBar {
-  height: 6px;
-  border-radius: 4px;
-  background: #ddd;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.08);
   overflow: hidden;
 }
 
@@ -99,25 +140,12 @@
   transition: 0.3s;
 }
 
-.strengthWeak   { background: red; }
-.strengthMedium { background: orange; }
-.strengthStrong { background: green; }
+.strengthWeak   { background: #e05a5a; }
+.strengthMedium { background: var(--yellow); }
+.strengthStrong { background: var(--cyan); box-shadow: var(--glow-cyan); }
 
 .strengthText {
   font-size: 12px;
   margin-top: 4px;
-}
-
-/* パスワード可視化 */
-.passwordWrapper {
-  position: relative;
-}
-
-.eye {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  font-size: 18px;
+  color: var(--text-sub);
 }

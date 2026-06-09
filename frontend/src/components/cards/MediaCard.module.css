@@ -5,141 +5,153 @@
 
 /* カード本体 */
 .card {
-  background: linear-gradient(135deg, #ffffff 0%, #f7f9ff 100%);
-  border-radius: 16px;
-  padding: 14px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  background: var(--color-card);
+  border-radius: 6px;
+  padding: 12px;
+  border: 1px solid var(--color-card-border);
   display: flex;
   flex-direction: column;
   gap: 10px;
-  border: 1px solid #eef1ff;
   position: relative;
   overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s;
+  cursor: pointer;
+}
+
+/* 左上の光ライン */
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 1px;
+  background: linear-gradient(90deg, var(--cyan), transparent);
+  opacity: 0.6;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  transform: translateY(-3px);
+  border-color: rgba(1, 253, 254, 0.45);
+  box-shadow: 0 4px 20px rgba(1, 253, 254, 0.15);
 }
 
-/* 並び替えハンドル */
+/* ドラッグハンドル */
 .dragHandle {
   cursor: grab;
   font-size: 20px;
   user-select: none;
   align-self: flex-end;
-  opacity: 0.6;
+  opacity: 0.4;
+  color: var(--cyan);
 }
 
 /* 画像 */
+.imageWrapper {
+  position: relative;
+}
+
 .image {
   width: 100%;
-  height: 140px;
-  border-radius: 12px;
+  height: 130px;
+  border-radius: 4px;
   object-fit: cover;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  filter: brightness(0.9) contrast(1.05);
 }
 
 .noImage {
   width: 100%;
-  height: 140px;
-  border-radius: 12px;
+  height: 130px;
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e0e0e0;
-  color: #888;
-  font-size: 13px;
+  background: #0a0a1a;
+  color: var(--text-sub);
+  font-size: 11px;
   font-weight: bold;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  letter-spacing: 2px;
+  border: 1px solid rgba(1,253,254,0.1);
 }
 
 /* タイプバッジ */
 .typeBadge {
-  background: #adb5bd;
-  color: white;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 12px;
+  color: #000;
+  padding: 3px 10px;
+  border-radius: 2px;
+  font-size: 11px;
   font-weight: bold;
   align-self: flex-start;
-  margin-top: -6px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  letter-spacing: 1px;
+  font-family: 'Orbitron', sans-serif;
 }
 
 /* タイプ別カラー */
-.OP {
-  background: #ff6b6b;
-}
-
-.ED {
-  background: #4dabf7;
-}
-
-.IN {
-  background: #51cf66;
-}
-
-.OTHER {
-  background: #adb5bd;
-}
+.OP     { background: #FFEF00; color: #000; }
+.ED     { background: #01FDFE; color: #000; }
+.IN     { background: #AA55FF; color: #fff; }
+.OTHER  { background: #444; color: #fff; }
 
 /* タイトル */
 .title {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
-  line-height: 1.3;
-  color: #222;
+  line-height: 1.4;
+  color: var(--text-main);
+}
+
+/* メタ情報 */
+.meta {
+  font-size: 12px;
+  color: var(--text-sub);
 }
 
 /* アニメタグ */
 .animeTag {
-  background: #e8edff;
-  padding: 6px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  color: #3b4cca;
+  background: rgba(105, 37, 206, 0.25);
+  border: 1px solid rgba(170, 85, 255, 0.3);
+  padding: 4px 10px;
+  border-radius: 3px;
+  font-size: 11px;
+  color: var(--purple-light);
   font-weight: bold;
   width: fit-content;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* アーティスト */
 .artist {
-  font-size: 13px;
-  color: #666;
+  font-size: 12px;
+  color: var(--text-sub);
 }
 
-/* ボタン行 */
 .buttonRow {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 /* 追加ボタン */
 .addBtn {
-  padding: 6px 12px;
-  border-radius: 8px;
-  border: none;
-  background: #4dabf7;
-  color: white;
+  padding: 5px 14px;
+  border-radius: 3px;
+  border: 1.5px solid var(--cyan);
+  background: transparent;
+  color: var(--cyan);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: bold;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  transition: 0.2s;
+  transition: background 0.15s, box-shadow 0.15s;
 }
 
 .addBtn:hover {
-  background: #339af0;
+  background: rgba(1, 253, 254, 0.1);
+  box-shadow: var(--glow-cyan);
 }
 
 .addBtnAdded {
-  background: #51cf66;
-  transform: scale(1.15);
+  background: rgba(1, 253, 254, 0.15);
+  border-color: var(--cyan);
+  color: var(--cyan);
   pointer-events: none;
 }
 
@@ -151,6 +163,4 @@
 
 .addBtnAdded {
   animation: pop 0.2s ease forwards;
-  background: #51cf66;
-  pointer-events: none;
 }

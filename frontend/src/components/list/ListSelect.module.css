@@ -1,7 +1,22 @@
 .select {
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  font-size: 16px;
+  padding: 10px 14px;
+  border-radius: 4px;
+  border: 1.5px solid rgba(1,253,254,0.2);
+  background: rgba(1,253,254,0.04);
+  color: var(--text-main);
+  font-size: 15px;
   margin-bottom: 20px;
+  outline: none;
+  transition: border-color 0.15s;
+  font-family: 'Noto Sans JP', sans-serif;
+  width: 100%;
+}
+
+.select:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 2px rgba(1,253,254,0.12);
+}
+
+.select option {
+  background: var(--color-card);
 }

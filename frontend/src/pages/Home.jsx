@@ -4,8 +4,19 @@ import styles from "./Home.module.css";
 export default function Home() {
   return (
     <div className={styles.outer}>
-      <h1 className={styles.title}>アニソン検索アプリ</h1>
-      <SearchSong heading="アニソン検索（公開）" />
+      <div className={styles.heroWrap}>
+        {/* グリッチラインのノイズ背景 */}
+        <div className={styles.noiseBg} aria-hidden="true" />
+
+        {/* メインタイトル */}
+        <h1 className={styles.heroTitle}>
+          <span className={styles.heroText}>SONICLIST</span>
+          <span className={styles.heroHash}>#</span>
+          <span className={styles.heroNum}>1</span>
+        </h1>
+      </div>
+
+      <SearchSong heading="ANISON SEARCH" />
     </div>
   );
 }

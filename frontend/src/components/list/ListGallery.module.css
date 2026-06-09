@@ -1,38 +1,69 @@
-/* ギャラリー全体 */
 .list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
-/* 各リストアイテム */
 .item {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px;
-  border-radius: 10px;
-  background: #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  padding: 10px 12px;
+  border-radius: 4px;
+  background: var(--color-card);
+  border: 1px solid var(--color-card-border);
+  transition: border-color 0.15s;
+}
+
+.item:hover {
+  border-color: rgba(1, 253, 254, 0.35);
 }
 
 .handle {
   cursor: grab;
-  padding: 8px;
+  padding: 6px;
   user-select: none;
+  color: rgba(1, 253, 254, 0.3);
+  font-size: 18px;
+  transition: color 0.15s, text-shadow 0.15s;
+  position: relative;
+}
+
+.handle:hover {
+  color: var(--cyan);
+  text-shadow: 0 0 8px var(--cyan), 0 0 20px rgba(1,253,254,0.5);
+  animation: handleGlitch 0.4s steps(1) forwards;
+}
+
+.handle:active {
+  cursor: grabbing;
+  color: var(--cyan);
+  text-shadow: 0 0 12px var(--cyan), 0 0 28px rgba(1,253,254,0.6);
+}
+
+@keyframes handleGlitch {
+  0%   { transform: translate(0,    0);    opacity: 1;   }
+  20%  { transform: translate(-2px, 1px);  opacity: 0.7; }
+  40%  { transform: translate(2px,  -1px); opacity: 1;   }
+  60%  { transform: translate(-1px, 0);    opacity: 0.8; }
+  80%  { transform: translate(1px,  1px);  opacity: 1;   }
+  100% { transform: translate(0,    0);    opacity: 1;   }
 }
 
 .thumb {
-  width: 60px;
-  height: 60px;
-  border-radius: 8px;
+  width: 56px;
+  height: 56px;
+  border-radius: 4px;
   overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid rgba(1,253,254,0.1);
 }
 
 .thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  filter: brightness(0.9);
 }
 
 .noSong {
@@ -41,20 +72,31 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e0e0e0;
-  color: #888;
-  font-size: 10px;
+  background: #0a0a1a;
+  color: var(--text-sub);
+  font-size: 9px;
   font-weight: bold;
+  letter-spacing: 1px;
   text-align: center;
 }
 
 .info {
   flex: 1;
   overflow: hidden;
+  cursor: pointer;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .likeCount {
-  font-size: 12px;
+  font-size: 11px;
   color: #e05a5a;
   margin-top: 3px;
 }
@@ -62,13 +104,15 @@
 .publicLink {
   display: inline-block;
   font-size: 11px;
-  color: #4dabf7;
+  color: var(--cyan);
   text-decoration: none;
   margin-top: 3px;
+  opacity: 0.7;
+  transition: opacity 0.15s;
 }
 
 .publicLink:hover {
-  text-decoration: underline;
+  opacity: 1;
 }
 
 .actions {
@@ -76,24 +120,19 @@
   align-items: center;
   gap: 8px;
   margin-left: auto;
+  flex-shrink: 0;
 }
 
-/* 公開 / 非公開 トグル */
 .publicToggle {
   background: none;
   border: none;
-  font-size: 18px;
+  font-size: 16px;
   cursor: pointer;
   padding: 4px;
-  border-radius: 6px;
-  opacity: 0.5;
+  border-radius: 4px;
+  opacity: 0.35;
   transition: opacity 0.15s;
 }
 
-.publicToggle:hover {
-  opacity: 1;
-}
-
-.publicToggleOn {
-  opacity: 1;
-}
+.publicToggle:hover { opacity: 1; }
+.publicToggleOn      { opacity: 1; }

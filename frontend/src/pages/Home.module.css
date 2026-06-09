@@ -1,12 +1,195 @@
 .outer {
   min-height: 100vh;
   padding: 20px;
-  background: #f7f7f7;
 }
 
-.title {
-  font-size: 2.4rem;
-  margin-bottom: 20px;
-  text-align: center;
-  font-weight: bold;
+/* ===== ヒーローエリア ===== */
+.heroWrap {
+  position: relative;
+  width: min(560px, 95%);
+  margin: 12px auto 32px;
+  padding: 28px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-left: 3px solid var(--cyan);
+  border-right: 3px solid var(--yellow);
+}
+
+/* グリッチノイズライン背景 */
+.noiseBg {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 3px,
+      rgba(1,253,254,0.025) 3px,
+      rgba(1,253,254,0.025) 4px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 8px,
+      rgba(170,85,255,0.015) 8px,
+      rgba(170,85,255,0.015) 9px
+    );
+  animation: noiseDrift 8s linear infinite;
+  pointer-events: none;
+}
+
+/* ノイズが少しドリフトする */
+@keyframes noiseDrift {
+  0%   { background-position: 0 0, 0 0; }
+  100% { background-position: 200px 0, 0 200px; }
+}
+
+/* グリッチラインのフラッシュ */
+.heroWrap::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan), var(--yellow), transparent);
+  animation: scanH 3.5s ease-in-out infinite;
+  opacity: 0.6;
+}
+
+@keyframes scanH {
+  0%   { top: 0%;   opacity: 0; }
+  10%  { opacity: 0.8; }
+  90%  { opacity: 0.8; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* ===== タイトルテキスト ===== */
+.heroTitle {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  position: relative;
+  z-index: 1;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  line-height: 1;
+  user-select: none;
+}
+
+/* SONICLIST 部分 — 白抜き＋シアンネオン */
+.heroText {
+  font-size: clamp(28px, 7vw, 52px);
+  letter-spacing: 4px;
+  color: #fff;
+  text-shadow:
+    0 0 4px #fff,
+    0 0 12px var(--cyan),
+    0 0 28px var(--cyan),
+    0 0 56px rgba(1,253,254,0.4);
+  animation: neonCyan 2.8s ease-in-out infinite alternate;
+}
+
+@keyframes neonCyan {
+  from {
+    text-shadow:
+      0 0 4px #fff,
+      0 0 10px var(--cyan),
+      0 0 24px var(--cyan),
+      0 0 48px rgba(1,253,254,0.35);
+  }
+  to {
+    text-shadow:
+      0 0 6px #fff,
+      0 0 18px var(--cyan),
+      0 0 40px var(--cyan),
+      0 0 80px rgba(1,253,254,0.5);
+  }
+}
+
+/* # 部分 — パープル */
+.heroHash {
+  font-size: clamp(22px, 5vw, 40px);
+  color: var(--purple-light);
+  text-shadow:
+    0 0 6px var(--purple-light),
+    0 0 20px var(--purple),
+    0 0 40px rgba(105,37,206,0.5);
+  letter-spacing: 0;
+  margin-left: 6px;
+  animation: neonPurple 2.8s ease-in-out infinite alternate;
+  animation-delay: 0.4s;
+}
+
+@keyframes neonPurple {
+  from {
+    text-shadow:
+      0 0 5px var(--purple-light),
+      0 0 16px var(--purple),
+      0 0 32px rgba(105,37,206,0.4);
+  }
+  to {
+    text-shadow:
+      0 0 8px var(--purple-light),
+      0 0 28px var(--purple-light),
+      0 0 56px rgba(105,37,206,0.6);
+  }
+}
+
+/* 1 部分 — イエロー（斜体で目立つ） */
+.heroNum {
+  font-size: clamp(32px, 8.5vw, 64px);
+  color: var(--yellow);
+  font-style: italic;
+  text-shadow:
+    0 0 4px #fff,
+    0 0 12px var(--yellow),
+    0 0 28px var(--yellow),
+    0 0 56px rgba(255,239,0,0.45);
+  letter-spacing: -2px;
+  animation: neonYellow 2.4s ease-in-out infinite alternate;
+  animation-delay: 0.8s;
+}
+
+@keyframes neonYellow {
+  from {
+    text-shadow:
+      0 0 4px #fff,
+      0 0 10px var(--yellow),
+      0 0 24px var(--yellow),
+      0 0 48px rgba(255,239,0,0.35);
+  }
+  to {
+    text-shadow:
+      0 0 6px #fff,
+      0 0 18px var(--yellow),
+      0 0 42px var(--yellow),
+      0 0 80px rgba(255,239,0,0.55);
+  }
+}
+
+/* ランダムグリッチ（稀にフラッシュ） */
+.heroTitle::before {
+  content: "SONICLIST #1";
+  position: absolute;
+  top: 0; left: 0;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size: clamp(28px, 7vw, 52px);
+  letter-spacing: 4px;
+  color: var(--cyan);
+  opacity: 0;
+  animation: glitchFlash 6s infinite;
+  clip-path: inset(30% 0 50% 0);
+  transform: translateX(-3px);
+  pointer-events: none;
+}
+
+@keyframes glitchFlash {
+  0%, 88%, 100% { opacity: 0; }
+  89%  { opacity: 0.7; clip-path: inset(10% 0 70% 0); transform: translateX(3px); }
+  91%  { opacity: 0.4; clip-path: inset(60% 0 10% 0); transform: translateX(-3px); }
+  93%  { opacity: 0.6; clip-path: inset(35% 0 40% 0); transform: translateX(2px); }
+  95%  { opacity: 0; }
 }

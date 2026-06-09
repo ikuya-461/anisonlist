@@ -1,17 +1,46 @@
 .btn {
   width: 100%;
-  padding: 14px;
-  background: #007bff;
-  color: white;
+  padding: 13px;
+  background: var(--grad-btn);
+  color: #fff;
   border: none;
-  border-radius: 8px;
-  font-size: 16px;
+  border-radius: 6px;
+  font-size: 15px;
   font-weight: bold;
   cursor: pointer;
   box-sizing: border-box;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: opacity 0.15s, box-shadow 0.15s;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* グリッチ光沢ライン */
+.btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.35s ease;
+}
+
+.btn:hover::after {
+  left: 120%;
+}
+
+.btn:hover {
+  opacity: 0.88;
+  box-shadow: 0 0 12px rgba(1,253,254,0.5), 0 0 28px rgba(105,37,206,0.4);
 }
 
 .btn:disabled {
-  opacity: 0.6;
+  opacity: 0.3;
   cursor: not-allowed;
+  box-shadow: none;
 }
