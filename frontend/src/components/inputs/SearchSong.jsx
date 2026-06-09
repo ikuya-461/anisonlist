@@ -6,8 +6,7 @@ import { searchAnime } from "../../lib/queries/anime";
 import { searchArtists } from "../../lib/queries/artists";
 
 import SongList from "../listItem/SongList";
-import AnimeCard from "../listItem/AnimeCard";
-import ArtistCard from "../listItem/ArtistCard";
+import MediaCard from "../listItem/MediaCard";
 import Input from "../parts/Input";
 import Button from "../parts/Button";
 import ErrorMessage from "../parts/ErrorMessage";
@@ -253,7 +252,7 @@ export default function SearchSong({ onAdd, heading = "アニソン検索（マ�
       {hasSearched && tab === "anime" && (
         <div className={gridStyles.grid}>
           {results.map((a) => (
-            <AnimeCard key={a.id} anime={a} onClick={(id) => navigate(`/anime/${id}`)} />
+            <MediaCard key={a.id} type="anime" data={a} onClick={(id) => navigate(`/anime/${id}`)} />
           ))}
         </div>
       )}
@@ -261,7 +260,7 @@ export default function SearchSong({ onAdd, heading = "アニソン検索（マ�
       {hasSearched && tab === "artist" && (
         <div className={gridStyles.grid}>
           {results.map((a) => (
-            <ArtistCard key={a.id} artist={a} onClick={(id) => navigate(`/artist/${id}`)} />
+            <MediaCard key={a.id} type="artist" data={a} onClick={(id) => navigate(`/artist/${id}`)} />
           ))}
         </div>
       )}
