@@ -3,15 +3,9 @@
   padding: 20px;
 }
 
-.title {
-  font-size: 2rem;
-  margin-bottom: 20px;
-  text-align: center;
-  font-weight: bold;
-  font-family: 'Orbitron', sans-serif;
-  letter-spacing: 3px;
-  background: var(--grad-text);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.heroLogo {
+  display: block;
+  width: min(480px, 90%);
+  margin: 8px auto 24px;
+  filter: drop-shadow(0 0 16px rgba(1, 253, 254, 0.3));
 }

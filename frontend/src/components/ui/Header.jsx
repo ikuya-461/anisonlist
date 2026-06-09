@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Header.module.css";
+import logoHeader from "../../assets/logo-header.png";
 
 export default function Header({ isLoggedIn, updateLoginState }) {
   const navigate = useNavigate();
@@ -15,8 +16,7 @@ export default function Header({ isLoggedIn, updateLoginState }) {
   return (
     <header className={styles.header}>
       <Link to="/" className={styles.logoLink}>
-        <h1 className={styles.logoTitle}>SONICLIST</h1>
-        <span className={styles.logoTag}>#1</span>
+        <img src={logoHeader} alt="SONICLIST #1" className={styles.logoImg} />
       </Link>
 
       <span onClick={handleIconClick} className={styles.userIcon}>
