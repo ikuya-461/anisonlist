@@ -7,5 +7,6 @@
   display: block;
   width: min(480px, 90%);
   margin: 8px auto 24px;
-  filter: drop-shadow(0 0 16px rgba(1, 253, 254, 0.3));
+  mix-blend-mode: screen;
+  filter: drop-shadow(0 0 20px rgba(1, 253, 254, 0.25));
 }
