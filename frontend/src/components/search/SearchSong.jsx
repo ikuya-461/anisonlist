@@ -20,7 +20,7 @@ const TABS = [
   { key: "artist", label: "アーティスト" }
 ];
 
-export default function SearchSong({ onAdd, heading = "アニソン検索（マイリスト用）" }) {
+export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
