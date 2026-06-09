@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getSongDetail } from "../../lib/queries/songs";
 import { useDetailPage } from "../../hooks/useDetailPage";
 import { SONG_TYPE_COLORS } from "../../lib/constants";
+import pageStyles from "../../CSS/PageCSS/DetailPage.module.css";
 import styles from "../../CSS/PageCSS/SongDetail.module.css";
 
 export default function SongDetail() {
@@ -10,8 +11,8 @@ export default function SongDetail() {
 
   const { data: song, loading } = useDetailPage(getSongDetail, id);
 
-  if (loading) return <div className={styles.loading}>読み込み中...</div>;
-  if (!song) return <div className={styles.loading}>曲が見つかりませんでした。</div>;
+  if (loading) return <div className={pageStyles.loading}>読み込み中...</div>;
+  if (!song) return <div className={pageStyles.loading}>曲が見つかりませんでした。</div>;
 
   const typeColor = SONG_TYPE_COLORS[song.song_type] ?? SONG_TYPE_COLORS.default;
 

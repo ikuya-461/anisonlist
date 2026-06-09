@@ -54,19 +54,19 @@ span.icon {
 .name {
   font-size: 20px;
   font-weight: bold;
-  color: var(--color-base-dark); /* ★ ブランドカラー */
+  color: var(--color-base-dark);
 }
 
 .bio {
   margin-top: 6px;
-  color: var(--text-sub); /* ★ 統一 */
+  color: var(--text-sub);
 }
 
 .editBtn {
   margin-top: 10px;
   padding: 8px 16px;
   border-radius: 8px;
-  background: var(--color-main); /* ★ 青 */
+  background: var(--color-main);
   color: white;
   border: none;
   cursor: pointer;
@@ -86,8 +86,8 @@ span.icon {
   width: 100%;
   padding: 10px;
   border-radius: 8px;
-  border: 1px solid var(--border); /* ★ 統一 */
-  background: var(--color-card);   /* ★ 白カード */
+  border: 1px solid var(--border);
+  background: var(--color-card);
   color: var(--text-main);
 }
 
@@ -99,7 +99,7 @@ span.icon {
 .saveBtn {
   flex: 1;
   padding: 10px;
-  background: var(--color-main); /* ★ 青 */
+  background: var(--color-main);
   color: white;
   border: none;
   border-radius: 8px;
@@ -108,43 +108,18 @@ span.icon {
 .cancelBtn {
   flex: 1;
   padding: 10px;
-  background: var(--color-sub); /* ★ 紫 */
+  background: var(--color-sub);
   color: white;
   border: none;
   border-radius: 8px;
 }
 
-/* --- ギャラリー（Pinterest風） --- */
+/* --- リストギャラリー --- */
 
-.gallery {
-  column-count: 2;
-  column-gap: 12px;
-  padding-top: 12px;
-}
-
-@media (min-width: 768px) {
-  .gallery {
-    column-count: 3;
-  }
-}
-
-.galleryItem {
-  break-inside: avoid;
-  margin-bottom: 12px;
-  cursor: pointer;
-}
-
-.galleryImg {
-  width: 100%;
-  border-radius: 12px;
-  object-fit: cover;
-}
-
-.galleryName {
-  margin-top: 6px;
-  font-size: 14px;
-  font-weight: bold;
-  color: var(--text-main); /* ★ 統一 */
+.galleryTitle {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 16px 0 8px;
 }
 
 /* --- ログアウト --- */
@@ -154,7 +129,7 @@ span.icon {
   width: 100%;
   padding: 12px;
   border-radius: 8px;
-  background: var(--color-accent); /* ★ 赤 */
+  background: var(--color-accent);
   color: white;
   border: none;
   cursor: pointer;

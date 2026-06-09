@@ -1,0 +1,46 @@
+/* -------------------------------------------------------
+   詳細ページ共通レイアウト
+   AnimeDetail / ArtistDetail で使用
+------------------------------------------------------- */
+
+.outer {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #fafafa;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  color: #555;
+  transition: 0.2s;
+}
+
+.backBtn:hover {
+  color: #000;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #888;
+}

@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getAnimeDetail, getAnimeImage } from "../../lib/queries/anime";
 import { useDetailPage } from "../../hooks/useDetailPage";
 import SongList from "../../components/listItem/SongList";
+import pageStyles from "../../CSS/PageCSS/DetailPage.module.css";
 import styles from "../../CSS/PageCSS/AnimeDetail.module.css";
 
 // コンポーネント外で安定した関数参照を確保（useDetailPage の deps に影響しない）
@@ -22,15 +23,15 @@ export default function AnimeDetail() {
 
   const { data, loading } = useDetailPage(fetchAnimeDetail, id);
 
-  if (loading) return <div className={styles.loading}>読み込み中...</div>;
-  if (!data) return <div className={styles.loading}>アニメが見つかりません。</div>;
+  if (loading) return <div className={pageStyles.loading}>読み込み中...</div>;
+  if (!data) return <div className={pageStyles.loading}>アニメが見つかりません。</div>;
 
   const { anime, songs } = data;
 
   return (
-    <div className={styles.outer}>
+    <div className={pageStyles.outer}>
       {/* 戻る */}
-      <button className={styles.backBtn} onClick={() => navigate(-1)}>
+      <button className={pageStyles.backBtn} onClick={() => navigate(-1)}>
         ← 戻る
       </button>
 
@@ -42,7 +43,7 @@ export default function AnimeDetail() {
       />
 
       {/* タイトル */}
-      <h1 className={styles.title}>{anime.title_jp}</h1>
+      <h1 className={pageStyles.title}>{anime.title_jp}</h1>
       {anime.title_en && <div className={styles.titleEn}>{anime.title_en}</div>}
 
       {/* 基本情報 */}
@@ -62,7 +63,7 @@ export default function AnimeDetail() {
       </div>
 
       {/* 曲一覧 */}
-      <h2 className={styles.sectionTitle}>🎵 このアニメの曲</h2>
+      <h2 className={pageStyles.sectionTitle}>🎵 このアニメの曲</h2>
 
       <SongList
         songs={songs.map((s) => ({

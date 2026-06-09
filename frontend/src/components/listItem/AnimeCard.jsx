@@ -1,4 +1,4 @@
-import styles from "../../CSS/ComponentCSS/SongCard.module.css";
+import styles from "../../CSS/ComponentCSS/MediaCard.module.css";
 
 export default function AnimeCard({ anime, onClick }) {
   return (
