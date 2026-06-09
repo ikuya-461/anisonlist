@@ -85,6 +85,7 @@ export default function Register() {
         placeholder="ユーザー名"
         value={userName}
         onChange={(e) => setUserName(e.target.value)}
+        autoComplete="username"
       />
 
       <input
@@ -92,6 +93,7 @@ export default function Register() {
         placeholder="メールアドレス"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
+        autoComplete="email"
       />
 
       <div className={styles.passwordWrapper}>
@@ -101,6 +103,7 @@ export default function Register() {
           type={showPassword ? "text" : "password"}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          autoComplete="new-password"
         />
         <span
           className={styles.eye}
@@ -116,6 +119,7 @@ export default function Register() {
         type={showPassword ? "text" : "password"}
         value={passwordConfirm}
         onChange={(e) => setPasswordConfirm(e.target.value)}
+        autoComplete="new-password"
       />
 
       {password && (

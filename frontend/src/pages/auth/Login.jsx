@@ -38,6 +38,7 @@ export default function Login({ updateLoginState }) {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           style={styles.input}
+          autoComplete="email"
           required
         />
 
@@ -47,6 +48,7 @@ export default function Login({ updateLoginState }) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           style={styles.input}
+          autoComplete="current-password"
           required
         />
 
