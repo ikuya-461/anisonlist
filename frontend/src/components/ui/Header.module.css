@@ -24,12 +24,6 @@
   width: auto;
   display: block;
   mix-blend-mode: screen;
-  filter: drop-shadow(0 0 6px rgba(1, 253, 254, 0.4));
-  transition: filter 0.2s;
-}
-
-.logoLink:hover .logoImg {
-  filter: drop-shadow(0 0 12px rgba(1, 253, 254, 0.7));
 }
 
 /* ユーザーアイコン */
