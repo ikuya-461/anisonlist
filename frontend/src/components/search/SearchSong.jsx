@@ -30,6 +30,7 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
   const [artist, setArtist] = useState(searchParams.get("artist") || "");
   const [anime, setAnime] = useState(searchParams.get("anime") || "");
   const [type, setType] = useState(searchParams.get("type") || "");
+  const [category, setCategory] = useState(searchParams.get("category") || "");
 
   // タブ別の検索語（アニメ／アーティスト検索欄）
   const [animeKeyword, setAnimeKeyword] = useState(searchParams.get("q") || "");
@@ -78,7 +79,7 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
      🎯 楽曲検索（ログイン版）
   ------------------------------------------------------- */
   const fetchSongs = async (targetPage) => {
-    const data = await searchSongs({ keyword, artist, anime, type, page: targetPage });
+    const data = await searchSongs({ keyword, artist, anime, type, category, page: targetPage });
 
     const formatted = data.songs.map((row) => ({
       id: row.id,
@@ -137,7 +138,7 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
     } else if (tab === "artist") {
       setSearchParams({ tab, q: artistKeyword, page: newPage });
     } else {
-      setSearchParams({ tab, keyword, artist, anime, type, page: newPage });
+      setSearchParams({ tab, keyword, artist, anime, type, category, page: newPage });
     }
   };
 
@@ -154,7 +155,7 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
       return;
     }
 
-    if (tab === "song" && !keyword && !artist && !anime) {
+    if (tab === "song" && !keyword && !artist && !anime && !category) {
       setErrorMessage("曲名・歌手名・アニメタイトルのいずれかを入力してください");
       return;
     }
@@ -255,6 +256,16 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
           <Input value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="曲名" />
           <Input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="歌手名" />
           <Input value={anime} onChange={(e) => setAnime(e.target.value)} placeholder="アニメタイトル" />
+
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className={styles.select}
+          >
+            <option value="">すべて（アニソン+ボカロ）</option>
+            <option value="anime">アニソン</option>
+            <option value="vocaloid">ボカロ</option>
+          </select>
 
           <select value={type} onChange={(e) => setType(e.target.value)} className={styles.select}>
             <option value="">すべて</option>

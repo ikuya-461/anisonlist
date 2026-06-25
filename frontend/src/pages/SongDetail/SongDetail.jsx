@@ -60,8 +60,12 @@ export default function SongDetail() {
 
   const typeColor = SONG_TYPE_COLORS[song.song_type] ?? SONG_TYPE_COLORS.default;
 
+  // 表示用アーティスト名（ボカロはボーカルを連結）
+  const displayArtist =
+    song.artist || (song.vocalists ?? []).map((v) => v.name).join(", ") || "";
+
   const xShareUrl = (() => {
-    const text = `🎵 ${song.song_title}${song.artist ? ` / ${song.artist}` : ""}${song.anime_title ? `（${song.anime_title}）` : ""}\n#SONICLIST #アニソン`;
+    const text = `🎵 ${song.song_title}${displayArtist ? ` / ${displayArtist}` : ""}${song.anime_title ? `（${song.anime_title}）` : ""}\n#SONICLIST #アニソン`;
     const url = window.location.href;
     return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
   })();
@@ -83,6 +87,19 @@ export default function SongDetail() {
       </span>
     );
   };
+
+  // 複数人（ボカロのボーカル/プロデューサー）をリンク付きで並べる
+  const renderArtistList = (people) => {
+    if (!people || people.length === 0) return "不明";
+    return people.map((p, i) => (
+      <span key={p.id ?? p.name}>
+        {i > 0 && "、"}
+        {renderArtist(p.name, p.id)}
+      </span>
+    ));
+  };
+
+  const isVocaloid = song.category === "vocaloid";
 
   return (
     <div className={styles.outer}>
@@ -110,13 +127,15 @@ export default function SongDetail() {
         <h1 className={styles.title}>{song.song_title}</h1>
       </div>
 
-      {/* アニメタイトル（クリックで遷移） */}
-      <div
-        className={styles.animeTitle}
-        onClick={() => navigate(`/anime/${song.anime_id}`)}
-      >
-        🎬 {song.anime_title}
-      </div>
+      {/* アニメタイトル（クリックで遷移）。ボカロ曲は紐づくアニメが無いので非表示 */}
+      {!isVocaloid && song.anime_id && (
+        <div
+          className={styles.animeTitle}
+          onClick={() => navigate(`/anime/${song.anime_id}`)}
+        >
+          🎬 {song.anime_title}
+        </div>
+      )}
 
       {/* YouTube 埋め込み */}
       <div className={styles.youtubeSection}>
@@ -133,7 +152,7 @@ export default function SongDetail() {
           </div>
         ) : (
           <a
-            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${song.song_title} ${song.artist ?? ""}`)}`}
+            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${song.song_title} ${displayArtist}`)}`}
             target="_blank"
             rel="noreferrer"
             className={styles.ytSearchLink}
@@ -181,22 +200,37 @@ export default function SongDetail() {
 
       {/* 詳細情報 */}
       <div className={styles.infoBox}>
-        <div>
-          <strong>歌手：</strong>
-          {renderArtist(song.artist, song.artist_id)}
-        </div>
-        <div>
-          <strong>作詞：</strong>
-          {renderArtist(song.lyricist, song.lyricist_id)}
-        </div>
-        <div>
-          <strong>作曲：</strong>
-          {renderArtist(song.composer, song.composer_id)}
-        </div>
-        <div>
-          <strong>編曲：</strong>
-          {renderArtist(song.arranger, song.arranger_id)}
-        </div>
+        {isVocaloid ? (
+          <>
+            <div>
+              <strong>ボーカル：</strong>
+              {renderArtistList(song.vocalists)}
+            </div>
+            <div>
+              <strong>プロデューサー：</strong>
+              {renderArtistList(song.producers)}
+            </div>
+          </>
+        ) : (
+          <>
+            <div>
+              <strong>歌手：</strong>
+              {renderArtist(song.artist, song.artist_id)}
+            </div>
+            <div>
+              <strong>作詞：</strong>
+              {renderArtist(song.lyricist, song.lyricist_id)}
+            </div>
+            <div>
+              <strong>作曲：</strong>
+              {renderArtist(song.composer, song.composer_id)}
+            </div>
+            <div>
+              <strong>編曲：</strong>
+              {renderArtist(song.arranger, song.arranger_id)}
+            </div>
+          </>
+        )}
         <div><strong>公開日：</strong>{formattedDate}</div>
 
         {/* 曲情報 */}

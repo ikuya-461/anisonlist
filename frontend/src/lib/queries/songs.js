@@ -7,19 +7,40 @@ const buildSearchSelect = ({ needArtistJoin, needAnimeJoin }) => `
   id,
   song_title,
   song_type,
+  category,
   image_url,
   artist:artists!artist_id${needArtistJoin ? "!inner" : ""} ( name ),
-  anime:anime!anime_id${needAnimeJoin ? "!inner" : ""} ( title_jp )
+  anime:anime!anime_id${needAnimeJoin ? "!inner" : ""} ( title_jp ),
+  song_artists ( role, artist:artists!artist_id ( name ) )
 `;
 
-const formatSearchRow = (row) => ({
-  id: row.id,
-  song_title: row.song_title,
-  song_type: row.song_type,
-  image_url: row.image_url,
-  artist: row.artist?.name ?? null,
-  anime_title: row.anime?.title_jp ?? null
-});
+const formatSearchRow = (row) => {
+  const links = row.song_artists ?? [];
+  const vocalists = links
+    .filter((l) => l.role === "vocalist")
+    .map((l) => l.artist?.name)
+    .filter(Boolean);
+  const producers = links
+    .filter((l) => l.role === "producer")
+    .map((l) => l.artist?.name)
+    .filter(Boolean);
+
+  const isVocaloid = row.category === "vocaloid";
+
+  return {
+    id: row.id,
+    song_title: row.song_title,
+    song_type: row.song_type,
+    category: row.category,
+    image_url: row.image_url,
+    // ボカロ曲は artist_id を持たず song_artists に紐付くため、
+    // 表示はボーカル（artist枠）・プロデューサー（anime_title枠）に振り分ける
+    artist: isVocaloid ? (vocalists.join(", ") || null) : (row.artist?.name ?? null),
+    anime_title: isVocaloid ? (producers.join(", ") || null) : (row.anime?.title_jp ?? null),
+    vocalists,
+    producers
+  };
+};
 
 /* -------------------------------------------------------
    ① 曲一覧（複合検索 + ページネーション）
@@ -29,6 +50,7 @@ export async function searchSongs({
   artist: rawArtist = "",
   anime: rawAnime = "",
   type = "",
+  category = "",
   page = 1
 } = {}) {
   const keyword = normalizeText(rawKeyword);
@@ -52,6 +74,7 @@ export async function searchSongs({
   if (artist) query = query.ilike("artists.name", `%${artist}%`);
   if (anime) query = query.ilike("anime.title_jp", `%${anime}%`);
   if (type) query = query.eq("song_type", type);
+  if (category) query = query.eq("category", category);
 
   const { data, error, count } = await query;
 
@@ -60,7 +83,14 @@ export async function searchSongs({
     return { songs: [], total: 0, page: Number(page), totalPages: 1 };
   }
 
-  const songs = await ensureSongImages((data ?? []).map(formatSearchRow));
+  const rows = (data ?? []).map(formatSearchRow);
+
+  // ボカロ曲は iTunes に無関係な画像が付くため画像キャッシュをスキップ
+  const cached = await ensureSongImages(rows.filter((r) => r.category !== "vocaloid"));
+
+  // 元の並び順（id 昇順）を維持しつつ、キャッシュ済みの行で差し替え
+  const byId = new Map(cached.map((r) => [r.id, r]));
+  const songs = rows.map((r) => byId.get(r.id) ?? r);
 
   return {
     songs,
@@ -81,6 +111,8 @@ export async function getSongDetail(id) {
       song_title,
       song_type,
       song_info,
+      category,
+      release_date,
       image_url,
       youtube_id,
       anime_id,
@@ -93,7 +125,8 @@ export async function getSongDetail(id) {
       artist:artists!artist_id ( name ),
       lyricist:artists!lyricist_id ( name ),
       composer:artists!composer_id ( name ),
-      arranger:artists!arranger_id ( name )
+      arranger:artists!arranger_id ( name ),
+      song_artists ( role, artist:artists!artist_id ( id, name ) )
     `)
     .eq("id", id)
     .single();
@@ -103,14 +136,27 @@ export async function getSongDetail(id) {
     return null;
   }
 
+  const links = data.song_artists ?? [];
+  const vocalists = links
+    .filter((l) => l.role === "vocalist")
+    .map((l) => ({ id: l.artist?.id ?? null, name: l.artist?.name }))
+    .filter((a) => a.name);
+  const producers = links
+    .filter((l) => l.role === "producer")
+    .map((l) => ({ id: l.artist?.id ?? null, name: l.artist?.name }))
+    .filter((a) => a.name);
+
   return {
     ...data,
     anime_title: data.anime?.title_jp ?? null,
-    release_date: data.anime?.release_date ?? null,
+    // 曲自身の release_date を優先（ボカロ曲）、無ければ紐づくアニメの公開日
+    release_date: data.release_date ?? data.anime?.release_date ?? null,
     artist: data.artist?.name ?? null,
     lyricist: data.lyricist?.name ?? null,
     composer: data.composer?.name ?? null,
-    arranger: data.arranger?.name ?? null
+    arranger: data.arranger?.name ?? null,
+    vocalists,
+    producers
   };
 }
 
