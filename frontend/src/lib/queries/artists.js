@@ -3,9 +3,8 @@ import { normalizeText } from "../imageCache/normalize";
 import { ensureSongImages } from "../imageCache/songImageCache";
 import { calcRange, calcTotalPages } from "../utils/pagination";
 
-// 担当曲の取得上限（初音ミク等の多作ボーカルは数万曲ひも付くため、
-// 一度に全件取得＋画像APIを叩くと破綻する。先頭 N 件のみ表示する）
-const ARTIST_SONGS_LIMIT = 100;
+// 担当曲の1ページ表示件数（初音ミク等は数万曲ひも付くためページング必須）
+const ARTIST_SONGS_PAGE_SIZE = 30;
 
 /* -------------------------------------------------------
    ① アーティスト一覧（検索 + ページネーション）
@@ -60,7 +59,7 @@ export async function getArtistBasic(id) {
    ③ アーティスト詳細 + 担当曲一覧
    （歌手・作詞・作曲・編曲のいずれかで関わった曲をすべて取得）
 ------------------------------------------------------- */
-export async function getArtistDetail(id) {
+export async function getArtistDetail(id, page = 1) {
   const artist = await getArtistBasic(id);
   if (!artist) return null;
 
@@ -74,37 +73,41 @@ export async function getArtistDetail(id) {
     artist:artists!artist_id ( name )
   `;
 
-  // A) artist_id / lyricist / composer / arranger 経由（アニソン・VTuber：単一アーティスト列）
-  const { data: directData, error: e1 } = await supabase
-    .from("songs")
-    .select(songSelect)
-    .or(`artist_id.eq.${id},lyricist_id.eq.${id},composer_id.eq.${id},arranger_id.eq.${id}`)
-    .order("id", { ascending: true })
-    .limit(ARTIST_SONGS_LIMIT);
+  const p = Math.max(1, Number(page) || 1);
+  const from = (p - 1) * ARTIST_SONGS_PAGE_SIZE;
+  const to = from + ARTIST_SONGS_PAGE_SIZE - 1;
 
-  // B) song_artists 経由（ボカロのボーカル / プロデューサー：多対多）
-  const { data: linkData, error: e2 } = await supabase
-    .from("song_artists")
-    .select(`song:songs!song_id ( ${songSelect} )`)
-    .eq("artist_id", id)
-    .limit(ARTIST_SONGS_LIMIT);
+  // role でひも付け元が一意に決まる:
+  //   vocalist / producer … ボカロ曲（song_artists 中間テーブル経由）
+  //   それ以外(artist 等) … アニソン・VTuber（songs の直接列経由）
+  const viaSongArtists = artist.role === "vocalist" || artist.role === "producer";
 
-  if (e1) console.error("getArtistDetail songs error:", e1);
-  if (e2) console.error("getArtistDetail song_artists error:", e2);
+  let rows = [];
+  let total = 0;
 
-  const rowsA = directData ?? [];
-  const rowsB = (linkData ?? []).map((r) => r.song).filter(Boolean);
-
-  // song_id でマージ・重複排除（A/B はアーティストのロール上ほぼ排他だが念のため）
-  const byId = new Map();
-  for (const row of [...rowsA, ...rowsB]) {
-    if (row && !byId.has(row.song_id)) byId.set(row.song_id, row);
+  if (viaSongArtists) {
+    const { data, error, count } = await supabase
+      .from("song_artists")
+      .select(`song:songs!song_id ( ${songSelect} )`, { count: "exact" })
+      .eq("artist_id", id)
+      .order("song_id", { ascending: true })
+      .range(from, to);
+    if (error) console.error("getArtistDetail song_artists error:", error);
+    rows = (data ?? []).map((r) => r.song).filter(Boolean);
+    total = count ?? 0;
+  } else {
+    const { data, error, count } = await supabase
+      .from("songs")
+      .select(songSelect, { count: "exact" })
+      .or(`artist_id.eq.${id},lyricist_id.eq.${id},composer_id.eq.${id},arranger_id.eq.${id}`)
+      .order("id", { ascending: true })
+      .range(from, to);
+    if (error) console.error("getArtistDetail songs error:", error);
+    rows = data ?? [];
+    total = count ?? 0;
   }
-  const merged = [...byId.values()]
-    .sort((a, b) => a.song_id - b.song_id)
-    .slice(0, ARTIST_SONGS_LIMIT);
 
-  const formatted = merged.map((row) => ({
+  const formatted = rows.map((row) => ({
     song_id: row.song_id,
     song_title: row.song_title,
     song_type: row.song_type,
@@ -116,5 +119,11 @@ export async function getArtistDetail(id) {
 
   const songs = await ensureSongImages(formatted);
 
-  return { artist, songs };
+  return {
+    artist,
+    songs,
+    page: p,
+    total,
+    totalPages: Math.max(1, Math.ceil(total / ARTIST_SONGS_PAGE_SIZE))
+  };
 }

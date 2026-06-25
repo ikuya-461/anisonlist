@@ -11,3 +11,40 @@
   color: #666;
   margin-bottom: 20px;
 }
+
+/* 担当曲の件数表示 */
+.count {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-sub);
+  margin-bottom: 12px;
+}
+
+/* ページネーション */
+.pagination {
+  margin-top: 20px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.pageBtn {
+  width: auto;
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.activePage {
+  background: rgba(1,253,254,0.12) !important;
+  color: var(--cyan) !important;
+  border-color: var(--cyan) !important;
+  font-weight: bold;
+}
+
+.dots {
+  margin: 0 4px;
+  color: var(--text-sub);
+  line-height: 2;
+}
