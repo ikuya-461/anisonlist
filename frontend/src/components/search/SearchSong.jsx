@@ -270,9 +270,10 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
             onChange={(e) => setCategory(e.target.value)}
             className={styles.select}
           >
-            <option value="">すべて（アニソン+ボカロ）</option>
+            <option value="">すべて</option>
             <option value="anime">アニソン</option>
             <option value="vocaloid">ボカロ</option>
+            <option value="Vtuber">VTuber</option>
           </select>
 
           <select value={type} onChange={(e) => setType(e.target.value)} className={styles.select}>
