@@ -142,6 +142,14 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
     }
   };
 
+  // 各タブで必要なテキストが空なら検索不可
+  const searchDisabled =
+    tab === "anime"
+      ? !animeKeyword.trim()
+      : tab === "artist"
+      ? !artistKeyword.trim()
+      : !keyword.trim() && !artist.trim() && !anime.trim();
+
   const handleSearch = () => {
     setErrorMessage("");
 
@@ -155,7 +163,7 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
       return;
     }
 
-    if (tab === "song" && !keyword && !artist && !anime && !category) {
+    if (tab === "song" && !keyword.trim() && !artist.trim() && !anime.trim()) {
       setErrorMessage("曲名・歌手名・アニメタイトルのいずれかを入力してください");
       return;
     }
@@ -297,7 +305,7 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
         </div>
       )}
 
-      <Button onClick={handleSearch} disabled={loading} className={styles.searchBtn}>
+      <Button onClick={handleSearch} disabled={loading || searchDisabled} className={styles.searchBtn}>
         {loading ? "検索中..." : "検索"}
       </Button>
 
