@@ -37,12 +37,28 @@ export async function ensureSongImage(song) {
 /* -------------------------------------------------------
    🚀 曲一覧の中で image_url が無いものをまとめてキャッシュ
 ------------------------------------------------------- */
-export async function ensureSongImages(songs) {
-  return Promise.all(
-    songs.map(async (song) => {
-      if (song.image_url) return song;
-      const image_url = await ensureSongImage(song);
-      return { ...song, image_url };
-    })
+// 並列数を制限しながら順序を保って map する
+// （アーティスト詳細で最大100曲を一度に処理する際、iTunes へ同時大量
+//   リクエストを投げるとレート制限/接続枯渇で取りこぼすため）
+async function mapWithConcurrency(items, limit, fn) {
+  const results = new Array(items.length);
+  let cursor = 0;
+  const worker = async () => {
+    while (cursor < items.length) {
+      const idx = cursor++;
+      results[idx] = await fn(items[idx]);
+    }
+  };
+  await Promise.all(
+    Array.from({ length: Math.min(limit, items.length) }, worker)
   );
+  return results;
+}
+
+export async function ensureSongImages(songs) {
+  return mapWithConcurrency(songs, 6, async (song) => {
+    if (song.image_url) return song;
+    const image_url = await ensureSongImage(song);
+    return { ...song, image_url };
+  });
 }

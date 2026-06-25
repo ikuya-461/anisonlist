@@ -85,12 +85,8 @@ export async function searchSongs({
 
   const rows = (data ?? []).map(formatSearchRow);
 
-  // ボカロ曲は iTunes に無関係な画像が付くため画像キャッシュをスキップ
-  const cached = await ensureSongImages(rows.filter((r) => r.category !== "vocaloid"));
-
-  // 元の並び順（id 昇順）を維持しつつ、キャッシュ済みの行で差し替え
-  const byId = new Map(cached.map((r) => [r.id, r]));
-  const songs = rows.map((r) => byId.get(r.id) ?? r);
+  // 画像は iTunes API から取得（ボカロ/VTuber 含む全カテゴリ）
+  const songs = await ensureSongImages(rows);
 
   return {
     songs,
