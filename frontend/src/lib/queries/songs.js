@@ -1,31 +1,13 @@
 import { supabase } from "../supabaseClient";
 import { normalizeText } from "../imageCache/normalize";
-import { ensureSongImages } from "../imageCache/songImageCache";
+import { ensureSongImage, ensureSongImages } from "../imageCache/songImageCache";
 import { calcRange, calcTotalPages } from "../utils/pagination";
 
-const buildSearchSelect = ({ needArtistJoin, needAnimeJoin }) => `
-  id,
-  song_title,
-  song_type,
-  category,
-  image_url,
-  artist:artists!artist_id${needArtistJoin ? "!inner" : ""} ( name ),
-  anime:anime!anime_id${needAnimeJoin ? "!inner" : ""} ( title_jp ),
-  song_artists ( role, artist:artists!artist_id ( name ) )
-`;
-
-const formatSearchRow = (row) => {
-  const links = row.song_artists ?? [];
-  const vocalists = links
-    .filter((l) => l.role === "vocalist")
-    .map((l) => l.artist?.name)
-    .filter(Boolean);
-  const producers = links
-    .filter((l) => l.role === "producer")
-    .map((l) => l.artist?.name)
-    .filter(Boolean);
-
+// RPC search_songs の1行を画面表示用に整形
+const formatRpcRow = (row) => {
   const isVocaloid = row.category === "vocaloid";
+  const vocalists = row.vocalists ? row.vocalists.split(", ") : [];
+  const producers = row.producers ? row.producers.split(", ") : [];
 
   return {
     id: row.id,
@@ -35,8 +17,8 @@ const formatSearchRow = (row) => {
     image_url: row.image_url,
     // ボカロ曲は artist_id を持たず song_artists に紐付くため、
     // 表示はボーカル（artist枠）・プロデューサー（anime_title枠）に振り分ける
-    artist: isVocaloid ? (vocalists.join(", ") || null) : (row.artist?.name ?? null),
-    anime_title: isVocaloid ? (producers.join(", ") || null) : (row.anime?.title_jp ?? null),
+    artist: isVocaloid ? (row.vocalists || null) : (row.artist_name ?? null),
+    anime_title: isVocaloid ? (row.producers || null) : (row.anime_title ?? null),
     vocalists,
     producers
   };
@@ -44,6 +26,8 @@ const formatSearchRow = (row) => {
 
 /* -------------------------------------------------------
    ① 曲一覧（複合検索 + ページネーション）
+   歌手名は artist_id（アニソン/VTuber）と song_artists
+   （ボカロのボーカル/プロデューサー）の両方にヒットする（RPC側）
 ------------------------------------------------------- */
 export async function searchSongs({
   keyword: rawKeyword = "",
@@ -57,42 +41,35 @@ export async function searchSongs({
   const artist = normalizeText(rawArtist);
   const anime = normalizeText(rawAnime);
 
-  const { from, to } = calcRange(page);
+  const { from } = calcRange(page);
+  const limit = calcRange(1).to + 1; // = PAGE_SIZE
 
-  const select = buildSearchSelect({
-    needArtistJoin: Boolean(artist),
-    needAnimeJoin: Boolean(anime)
+  const { data, error } = await supabase.rpc("search_songs", {
+    p_keyword: keyword,
+    p_artist: artist,
+    p_anime: anime,
+    p_type: type,
+    p_category: category,
+    p_limit: limit,
+    p_offset: from
   });
-
-  let query = supabase
-    .from("songs")
-    .select(select, { count: "exact" })
-    .order("id", { ascending: true })
-    .range(from, to);
-
-  if (keyword) query = query.ilike("song_title", `%${keyword}%`);
-  if (artist) query = query.ilike("artists.name", `%${artist}%`);
-  if (anime) query = query.ilike("anime.title_jp", `%${anime}%`);
-  if (type) query = query.eq("song_type", type);
-  if (category) query = query.eq("category", category);
-
-  const { data, error, count } = await query;
 
   if (error) {
     console.error("searchSongs error:", error);
     return { songs: [], total: 0, page: Number(page), totalPages: 1 };
   }
 
-  const rows = (data ?? []).map(formatSearchRow);
+  const rows = (data ?? []).map(formatRpcRow);
+  const total = data && data.length ? Number(data[0].total_count) : 0;
 
   // 画像は iTunes API から取得（ボカロ/VTuber 含む全カテゴリ）
   const songs = await ensureSongImages(rows);
 
   return {
     songs,
-    total: count ?? 0,
+    total,
     page: Number(page),
-    totalPages: calcTotalPages(count),
+    totalPages: calcTotalPages(total),
   };
 }
 
@@ -142,7 +119,7 @@ export async function getSongDetail(id) {
     .map((l) => ({ id: l.artist?.id ?? null, name: l.artist?.name }))
     .filter((a) => a.name);
 
-  return {
+  const result = {
     ...data,
     anime_title: data.anime?.title_jp ?? null,
     // 曲自身の release_date を優先（ボカロ曲）、無ければ紐づくアニメの公開日
@@ -154,6 +131,20 @@ export async function getSongDetail(id) {
     vocalists,
     producers
   };
+
+  // 画像未取得なら iTunes から取得（検索を経ず直リンクで来た場合の保険）
+  if (!result.image_url) {
+    const artistForImage = result.artist || vocalists.map((v) => v.name).join(", ");
+    const image_url = await ensureSongImage({
+      song_id: result.id,
+      song_title: result.song_title,
+      artist: artistForImage,
+      image_url: null
+    });
+    if (image_url) result.image_url = image_url;
+  }
+
+  return result;
 }
 
 /* -------------------------------------------------------

@@ -10,7 +10,9 @@ export async function ensureSongImage(song) {
   if (!song.song_title || !song.artist) return null;
 
   const title = normalizeText(song.song_title);
-  const artist = normalizeText(song.artist);
+  // ボカロ等は複数アーティストが ", " 連結されるため、検索は先頭1名のみ使う
+  // （連結したままだと iTunes がほぼマッチしない）
+  const artist = normalizeText(song.artist).split(",")[0].trim();
 
   const query = encodeURIComponent(`${title} ${artist}`);
   const url = `${ITUNES_SEARCH_API}?term=${query}&entity=song&limit=1`;
