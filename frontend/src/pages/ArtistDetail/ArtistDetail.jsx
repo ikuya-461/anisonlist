@@ -62,6 +62,10 @@ export default function ArtistDetail() {
         ← 戻る
       </button>
 
+      {artist.image_url && (
+        <img src={artist.image_url} alt={artist.name} className={styles.artistImage} />
+      )}
+
       <h1 className={pageStyles.title}>{artist.name}</h1>
       {artist.role && <div className={styles.role}>{artist.role}</div>}
 

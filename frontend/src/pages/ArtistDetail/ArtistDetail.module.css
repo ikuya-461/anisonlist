@@ -4,6 +4,18 @@
    は DetailPage.module.css を参照
 ------------------------------------------------------- */
 
+/* アーティスト画像 */
+.artistImage {
+  display: block;
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin: 0 auto 12px;
+  border: 2px solid rgba(1, 253, 254, 0.4);
+  box-shadow: 0 0 20px rgba(1, 253, 254, 0.25);
+}
+
 /* 役割ラベル */
 .role {
   font-size: 14px;

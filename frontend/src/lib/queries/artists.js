@@ -1,6 +1,7 @@
 import { supabase } from "../supabaseClient";
 import { normalizeText } from "../imageCache/normalize";
 import { ensureSongImages } from "../imageCache/songImageCache";
+import { ensureArtistImage, ensureArtistImages } from "../imageCache/artistImageCache";
 import { calcRange, calcTotalPages } from "../utils/pagination";
 
 // 担当曲の1ページ表示件数（初音ミク等は数万曲ひも付くためページング必須）
@@ -16,7 +17,7 @@ export async function searchArtists({ keyword: rawKeyword = "", page = 1 } = {})
 
   let query = supabase
     .from("artists")
-    .select("id, name, role, created_at", { count: "exact" })
+    .select("id, name, role, image_url, created_at", { count: "exact" })
     .order("id", { ascending: true })
     .range(from, to);
 
@@ -29,8 +30,11 @@ export async function searchArtists({ keyword: rawKeyword = "", page = 1 } = {})
     return { artists: [], total: 0, page: Number(page), totalPages: 1 };
   }
 
+  // 画像未取得のアーティストは iTunes(JP) から取得して DB にキャッシュ
+  const artists = await ensureArtistImages(data ?? []);
+
   return {
-    artists: data ?? [],
+    artists,
     total: count ?? 0,
     page: Number(page),
     totalPages: calcTotalPages(count),
@@ -43,7 +47,7 @@ export async function searchArtists({ keyword: rawKeyword = "", page = 1 } = {})
 export async function getArtistBasic(id) {
   const { data, error } = await supabase
     .from("artists")
-    .select("id, name, role, created_at")
+    .select("id, name, role, image_url, created_at")
     .eq("id", id)
     .single();
 
@@ -62,6 +66,11 @@ export async function getArtistBasic(id) {
 export async function getArtistDetail(id, page = 1) {
   const artist = await getArtistBasic(id);
   if (!artist) return null;
+
+  // 画像未取得ならこの場で取得してキャッシュ（直リンクでも画像表示）
+  if (!artist.image_url) {
+    artist.image_url = await ensureArtistImage(artist);
+  }
 
   const songSelect = `
     song_id:id,
