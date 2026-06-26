@@ -303,6 +303,7 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
               <option value="anime">アニソン</option>
               <option value="vocaloid">ボカロ</option>
               <option value="Vtuber">VTuber</option>
+              <option value="game">ゲーム</option>
             </select>
           </label>
 

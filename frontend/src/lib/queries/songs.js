@@ -91,12 +91,14 @@ export async function getSongDetail(id) {
       image_url,
       youtube_id,
       anime_id,
+      game_id,
       artist_id,
       lyricist_id,
       composer_id,
       arranger_id,
       created_at,
       anime:anime!anime_id ( title_jp, release_date ),
+      game:games!game_id ( title_jp ),
       artist:artists!artist_id ( name ),
       lyricist:artists!lyricist_id ( name ),
       composer:artists!composer_id ( name ),
@@ -124,6 +126,7 @@ export async function getSongDetail(id) {
   const result = {
     ...data,
     anime_title: data.anime?.title_jp ?? null,
+    game_title: data.game?.title_jp ?? null,
     // 曲自身の release_date を優先（ボカロ曲）、無ければ紐づくアニメの公開日
     release_date: data.release_date ?? data.anime?.release_date ?? null,
     artist: data.artist?.name ?? null,

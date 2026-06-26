@@ -137,6 +137,11 @@ export default function SongDetail() {
         </div>
       )}
 
+      {/* ゲームタイトル（ゲーム曲。作品名のみ表示） */}
+      {song.category === "game" && song.game_title && (
+        <div className={styles.animeTitle}>🎮 {song.game_title}</div>
+      )}
+
       {/* YouTube 埋め込み */}
       <div className={styles.youtubeSection}>
         {currentYtId ? (
