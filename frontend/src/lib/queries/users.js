@@ -27,7 +27,7 @@ export async function getMyProfile() {
 /* -------------------------------------------------------
    ★ ユーザー登録（Supabase signUp 後に呼ぶ）
 ------------------------------------------------------- */
-export async function createUserProfile({ user_name, bio = "", icon_url = "" }) {
+export async function createUserProfile({ user_name, bio = "", icon_url = "", birth_year = null }) {
   const {
     data: { user }
   } = await supabase.auth.getUser();
@@ -36,7 +36,7 @@ export async function createUserProfile({ user_name, bio = "", icon_url = "" }) 
 
   const { error } = await supabase
     .from("users")
-    .insert({ id: user.id, user_name, bio, icon_url });
+    .insert({ id: user.id, user_name, bio, icon_url, birth_year });
 
   if (error) {
     console.error("createUserProfile error:", error);

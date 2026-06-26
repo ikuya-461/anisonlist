@@ -12,9 +12,12 @@ export default function Register() {
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [userName, setUserName] = useState("");
+  const [birthYear, setBirthYear] = useState("");
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+
+  const currentYear = new Date().getFullYear();
 
   const getPasswordStrength = (pw) => {
     let score = 0;
@@ -40,8 +43,14 @@ export default function Register() {
     setErrorMessage("");
     setSuccessMessage("");
 
-    if (!userName.trim() || !email.trim() || !password.trim() || !passwordConfirm.trim()) {
+    if (!userName.trim() || !email.trim() || !password.trim() || !passwordConfirm.trim() || !birthYear) {
       setErrorMessage("すべての項目を入力してください");
+      return;
+    }
+
+    const year = Number(birthYear);
+    if (!Number.isInteger(year) || year < 1900 || year > currentYear) {
+      setErrorMessage(`生年は1900〜${currentYear}の範囲で入力してください`);
       return;
     }
 
@@ -64,7 +73,7 @@ export default function Register() {
 
     setSuccessMessage("登録が完了しました。メールを確認してください。");
 
-    const ok = await createUserProfile({ user_name: userName });
+    const ok = await createUserProfile({ user_name: userName, birth_year: year });
     if (!ok) {
       setErrorMessage("ユーザー情報の保存に失敗しました");
       return;
@@ -86,6 +95,18 @@ export default function Register() {
         value={userName}
         onChange={(e) => setUserName(e.target.value)}
         autoComplete="username"
+      />
+
+      <input
+        className={styles.input}
+        type="number"
+        inputMode="numeric"
+        placeholder={`生年（例: 2000）`}
+        value={birthYear}
+        onChange={(e) => setBirthYear(e.target.value)}
+        min={1900}
+        max={currentYear}
+        autoComplete="bday-year"
       />
 
       <input
