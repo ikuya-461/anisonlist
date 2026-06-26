@@ -31,6 +31,7 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
   const [anime, setAnime] = useState(searchParams.get("anime") || "");
   const [type, setType] = useState(searchParams.get("type") || "");
   const [category, setCategory] = useState(searchParams.get("category") || "");
+  const [sort, setSort] = useState(searchParams.get("sort") || "");
 
   // タブ別の検索語（アニメ／アーティスト検索欄）
   const [animeKeyword, setAnimeKeyword] = useState(searchParams.get("q") || "");
@@ -79,7 +80,7 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
      🎯 楽曲検索（ログイン版）
   ------------------------------------------------------- */
   const fetchSongs = async (targetPage) => {
-    const data = await searchSongs({ keyword, artist, anime, type, category, page: targetPage });
+    const data = await searchSongs({ keyword, artist, anime, type, category, sort, page: targetPage });
 
     const formatted = data.songs.map((row) => ({
       id: row.id,
@@ -138,7 +139,7 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
     } else if (tab === "artist") {
       setSearchParams({ tab, q: artistKeyword, page: newPage });
     } else {
-      setSearchParams({ tab, keyword, artist, anime, type, category, page: newPage });
+      setSearchParams({ tab, keyword, artist, anime, type, category, sort, page: newPage });
     }
   };
 
@@ -282,6 +283,12 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
             <option value="ED">ED</option>
             <option value="IN">挿入歌</option>
             <option value="OTHER">その他</option>
+          </select>
+
+          <select value={sort} onChange={(e) => setSort(e.target.value)} className={styles.select}>
+            <option value="">関連順</option>
+            <option value="newest">新しい順（年代・シーズン）</option>
+            <option value="oldest">古い順（年代・シーズン）</option>
           </select>
         </div>
       )}
