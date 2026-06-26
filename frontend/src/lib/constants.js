@@ -8,6 +8,8 @@ export const PAGE_SIZE = 10;
 // --- 外部 API ---
 export const JIKAN_API_BASE      = "https://api.jikan.moe/v4";
 export const ITUNES_SEARCH_API   = "https://itunes.apple.com/search";
+// アニメ画像は AniList を使用（Jikanは504頻発・日本語検索に弱いため）
+export const ANILIST_API         = "https://graphql.anilist.co";
 
 // --- Jikan API レート制限対策（3 req/秒）---
 export const JIKAN_REQUEST_INTERVAL_MS = 400;

@@ -68,7 +68,9 @@ export default function AnimeDetail() {
       <SongList
         songs={songs.map((s) => ({
           id: s.song_id,
+          song_id: s.song_id,
           title: s.song_title,
+          song_title: s.song_title,
           type: s.song_type,
           sequence: s.sequence,
           image_url: s.image_url,
@@ -76,7 +78,7 @@ export default function AnimeDetail() {
           anime_title: anime.title_jp
         }))}
         sortable={false}
-        onSongClick={(song) => navigate(`/songs/${song.id}`)}
+        onClickSong={(songId) => navigate(`/songs/${songId}`)}
       />
     </div>
   );

@@ -1,6 +1,6 @@
 import { supabase } from "../supabaseClient";
 import { normalizeText } from "../imageCache/normalize";
-import { ensureAnimeImages } from "../imageCache/animeImageCache";
+import { ensureAnimeImages, fetchAnimeCover } from "../imageCache/animeImageCache";
 import { ensureSongImages } from "../imageCache/songImageCache";
 import { calcRange, calcTotalPages } from "../utils/pagination";
 
@@ -59,26 +59,12 @@ export async function getAnimeImage(title) {
 
   if (cached?.image_url) return cached.image_url;
 
-  try {
-    const jikanRes = await fetch(
-      `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(normalizeText(title))}&limit=1`
-    );
-    const data = await jikanRes.json();
-
-    const image =
-      data?.data?.[0]?.images?.jpg?.large_image_url ||
-      data?.data?.[0]?.images?.jpg?.image_url ||
-      null;
-
-    if (image) {
-      await supabase.from("anime").update({ image_url: image }).eq("title_jp", title);
-    }
-
-    return image;
-  } catch (err) {
-    console.error("getAnimeImage error:", err);
-    return null;
+  // AniList から取得（Jikanは504頻発・日本語に弱いため）
+  const image = await fetchAnimeCover(title);
+  if (image) {
+    await supabase.from("anime").update({ image_url: image }).eq("title_jp", title);
   }
+  return image;
 }
 
 /* -------------------------------------------------------
