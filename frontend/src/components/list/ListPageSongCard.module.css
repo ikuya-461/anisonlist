@@ -40,6 +40,9 @@
   user-select: none;
   transition: color 0.15s, text-shadow 0.15s;
   position: relative;
+  /* スマホでハンドルに触れた瞬間、ブラウザのスクロールに奪われず
+     dnd-kit のドラッグ検知に渡すため touch-action を無効化 */
+  touch-action: none;
 }
 
 .dragHandle:hover {
