@@ -56,6 +56,18 @@
   margin-bottom: 16px;
 }
 
+.field {
+  display: grid;
+  gap: 4px;
+}
+
+.fieldLabel {
+  font-size: 12px;
+  color: var(--text-sub);
+  padding-left: 2px;
+  letter-spacing: 0.04em;
+}
+
 .select {
   padding: 12px 14px;
   border-radius: 4px;

@@ -20,6 +20,18 @@ const TABS = [
   { key: "artist", label: "アーティスト" }
 ];
 
+// 年代セレクタの選択肢（今年〜1950年）
+const YEARS = [];
+for (let y = new Date().getFullYear(); y >= 1950; y--) YEARS.push(y);
+
+// シーズン（DBの release_season 値に合わせる）
+const SEASONS = [
+  { value: "冬アニメ", label: "冬" },
+  { value: "春アニメ", label: "春" },
+  { value: "夏アニメ", label: "夏" },
+  { value: "秋アニメ", label: "秋" }
+];
+
 export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -31,10 +43,12 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
   const [anime, setAnime] = useState(searchParams.get("anime") || "");
   const [type, setType] = useState(searchParams.get("type") || "");
   const [category, setCategory] = useState(searchParams.get("category") || "");
-  const [sort, setSort] = useState(searchParams.get("sort") || "");
+  const [year, setYear] = useState(searchParams.get("year") || "");
 
   // タブ別の検索語（アニメ／アーティスト検索欄）
   const [animeKeyword, setAnimeKeyword] = useState(searchParams.get("q") || "");
+  const [animeYear, setAnimeYear] = useState(searchParams.get("year") || "");
+  const [animeSeason, setAnimeSeason] = useState(searchParams.get("season") || "");
   const [artistKeyword, setArtistKeyword] = useState(searchParams.get("q") || "");
 
   const [page, setPage] = useState(Number(searchParams.get("page") || 1));
@@ -80,7 +94,7 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
      🎯 楽曲検索（ログイン版）
   ------------------------------------------------------- */
   const fetchSongs = async (targetPage) => {
-    const data = await searchSongs({ keyword, artist, anime, type, category, sort, page: targetPage });
+    const data = await searchSongs({ keyword, artist, anime, type, category, year, page: targetPage });
 
     const formatted = data.songs.map((row) => ({
       id: row.id,
@@ -108,7 +122,12 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
      🎯 アニメ検索
   ------------------------------------------------------- */
   const fetchAnime = async (targetPage) => {
-    const data = await searchAnime({ keyword: animeKeyword, page: targetPage });
+    const data = await searchAnime({
+      keyword: animeKeyword,
+      year: animeYear,
+      season: animeSeason,
+      page: targetPage
+    });
     setResults(data.anime);
     setTotalPages(data.totalPages || 1);
   };
@@ -135,18 +154,18 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
 
   const updateURL = (newPage) => {
     if (tab === "anime") {
-      setSearchParams({ tab, q: animeKeyword, page: newPage });
+      setSearchParams({ tab, q: animeKeyword, year: animeYear, season: animeSeason, page: newPage });
     } else if (tab === "artist") {
       setSearchParams({ tab, q: artistKeyword, page: newPage });
     } else {
-      setSearchParams({ tab, keyword, artist, anime, type, category, sort, page: newPage });
+      setSearchParams({ tab, keyword, artist, anime, type, category, year, page: newPage });
     }
   };
 
-  // 各タブで必要なテキストが空なら検索不可
+  // 各タブで検索に必要な条件が無ければ検索不可
   const searchDisabled =
     tab === "anime"
-      ? !animeKeyword.trim()
+      ? !animeKeyword.trim() && !animeYear && !animeSeason
       : tab === "artist"
       ? !artistKeyword.trim()
       : !keyword.trim() && !artist.trim() && !anime.trim();
@@ -154,8 +173,8 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
   const handleSearch = () => {
     setErrorMessage("");
 
-    if (tab === "anime" && !animeKeyword) {
-      setErrorMessage("アニメタイトルを入力してください");
+    if (tab === "anime" && !animeKeyword.trim() && !animeYear && !animeSeason) {
+      setErrorMessage("アニメタイトル・年代・シーズンのいずれかを指定してください");
       return;
     }
 
@@ -266,30 +285,40 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
           <Input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="歌手名" />
           <Input value={anime} onChange={(e) => setAnime(e.target.value)} placeholder="アニメタイトル" />
 
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className={styles.select}
-          >
-            <option value="">すべて</option>
-            <option value="anime">アニソン</option>
-            <option value="vocaloid">ボカロ</option>
-            <option value="Vtuber">VTuber</option>
-          </select>
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>カテゴリー</span>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className={styles.select}
+            >
+              <option value="">すべて</option>
+              <option value="anime">アニソン</option>
+              <option value="vocaloid">ボカロ</option>
+              <option value="Vtuber">VTuber</option>
+            </select>
+          </label>
 
-          <select value={type} onChange={(e) => setType(e.target.value)} className={styles.select}>
-            <option value="">すべて</option>
-            <option value="OP">OP</option>
-            <option value="ED">ED</option>
-            <option value="IN">挿入歌</option>
-            <option value="OTHER">その他</option>
-          </select>
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>曲タイプ</span>
+            <select value={type} onChange={(e) => setType(e.target.value)} className={styles.select}>
+              <option value="">すべて</option>
+              <option value="OP">OP</option>
+              <option value="ED">ED</option>
+              <option value="IN">挿入歌</option>
+              <option value="OTHER">その他</option>
+            </select>
+          </label>
 
-          <select value={sort} onChange={(e) => setSort(e.target.value)} className={styles.select}>
-            <option value="">関連順</option>
-            <option value="newest">新しい順（年代・シーズン）</option>
-            <option value="oldest">古い順（年代・シーズン）</option>
-          </select>
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>年代</span>
+            <select value={year} onChange={(e) => setYear(e.target.value)} className={styles.select}>
+              <option value="">すべて</option>
+              {YEARS.map((y) => (
+                <option key={y} value={y}>{y}年</option>
+              ))}
+            </select>
+          </label>
         </div>
       )}
 
@@ -300,6 +329,34 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
             onChange={(e) => setAnimeKeyword(e.target.value)}
             placeholder="アニメタイトル"
           />
+
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>年代</span>
+            <select
+              value={animeYear}
+              onChange={(e) => setAnimeYear(e.target.value)}
+              className={styles.select}
+            >
+              <option value="">すべて</option>
+              {YEARS.map((y) => (
+                <option key={y} value={y}>{y}年</option>
+              ))}
+            </select>
+          </label>
+
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>シーズン</span>
+            <select
+              value={animeSeason}
+              onChange={(e) => setAnimeSeason(e.target.value)}
+              className={styles.select}
+            >
+              <option value="">すべて</option>
+              {SEASONS.map((s) => (
+                <option key={s.value} value={s.value}>{s.label}</option>
+              ))}
+            </select>
+          </label>
         </div>
       )}
 

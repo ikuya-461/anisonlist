@@ -35,7 +35,7 @@ export async function searchSongs({
   anime: rawAnime = "",
   type = "",
   category = "",
-  sort = "",
+  year = "",
   page = 1
 } = {}) {
   const keyword = normalizeText(rawKeyword);
@@ -51,7 +51,7 @@ export async function searchSongs({
     p_anime: anime,
     p_type: type,
     p_category: category,
-    p_sort: sort,
+    p_year: year ? Number(year) : 0,
     p_limit: limit,
     p_offset: from
   });

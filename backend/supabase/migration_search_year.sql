@@ -1,12 +1,11 @@
 -- =========================================================
--- 曲検索に年代別・シーズン別ソートを追加
---  ソート用日付 sort_date を計算:
---   - release_date があればそれ（ボカロ/VTuber）
---   - 無ければ所属アニメの release_year + クール(release_season)→月
---     （冬=1月 / 春=4月 / 夏=7月 / 秋=10月）から組み立てる
---  → 新しい順/古い順で「年代＋シーズン」の時系列ソートになる
+-- 曲検索: 年代「ソート」を年代「フィルタ」に変更
+--  p_year を指定すると、その年の曲だけに絞り込む
+--  曲の年 = release_date の年（ボカロ/VTuber）。無ければ
+--          所属アニメの release_year（アニソン）
 -- =========================================================
 
+drop function if exists public.search_songs(text, text, text, text, text, text, int, int);
 drop function if exists public.search_songs(text, text, text, text, text, int, int);
 
 create or replace function public.search_songs(
@@ -15,7 +14,7 @@ create or replace function public.search_songs(
   p_anime    text default '',
   p_type     text default '',
   p_category text default '',
-  p_sort     text default '',   -- '' | 'newest' | 'oldest'
+  p_year     int  default 0,    -- 0 = 指定なし
   p_limit    int  default 10,
   p_offset   int  default 0
 )
@@ -46,23 +45,7 @@ as $$
     where p_artist <> '' and a.name ilike '%' || p_artist || '%'
   ),
   base as (
-    select
-      s.*,
-      coalesce(
-        s.release_date,
-        case when an.release_year is not null then
-          make_date(
-            an.release_year,
-            case an.release_season
-              when '冬アニメ' then 1
-              when '春アニメ' then 4
-              when '夏アニメ' then 7
-              when '秋アニメ' then 10
-              else 1
-            end,
-            1)
-        end
-      ) as sort_date
+    select s.*
     from public.songs s
     left join public.anime an on an.id = s.anime_id
     where (p_keyword  = '' or s.song_title ilike '%' || p_keyword || '%')
@@ -72,6 +55,8 @@ as $$
             select 1 from public.anime a2
             where a2.id = s.anime_id and a2.title_jp ilike '%' || p_anime || '%'))
       and (p_artist   = '' or s.id in (select id from artist_songs))
+      and (p_year     = 0  or
+           coalesce(extract(year from s.release_date)::int, an.release_year) = p_year)
   ),
   counted as (select count(*) c from base)
   select
@@ -90,12 +75,9 @@ as $$
       where sa.song_id = b.id and sa.role = 'producer')                  as producers,
     (select c from counted)                                             as total_count
   from base b
-  order by
-    (case when p_sort = 'newest' then b.sort_date end) desc nulls last,
-    (case when p_sort = 'oldest' then b.sort_date end) asc  nulls last,
-    b.id asc
+  order by b.id asc
   limit p_limit offset p_offset;
 $$;
 
-grant execute on function public.search_songs(text, text, text, text, text, text, int, int)
+grant execute on function public.search_songs(text, text, text, text, text, int, int, int)
   to anon, authenticated;

@@ -7,7 +7,7 @@ import { calcRange, calcTotalPages } from "../utils/pagination";
 /* -------------------------------------------------------
    ① アニメ一覧（検索 + ページネーション）
 ------------------------------------------------------- */
-export async function searchAnime({ keyword: rawKeyword = "", page = 1 } = {}) {
+export async function searchAnime({ keyword: rawKeyword = "", year = "", season = "", page = 1 } = {}) {
   const keyword = normalizeText(rawKeyword);
 
   const { from, to } = calcRange(page);
@@ -24,6 +24,8 @@ export async function searchAnime({ keyword: rawKeyword = "", page = 1 } = {}) {
   if (keyword) {
     query = query.or(`title_jp.ilike.%${keyword}%,title_en.ilike.%${keyword}%`);
   }
+  if (year) query = query.eq("release_year", Number(year));
+  if (season) query = query.eq("release_season", season);
 
   const { data, error, count } = await query;
 
