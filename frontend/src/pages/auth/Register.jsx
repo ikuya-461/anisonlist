@@ -13,6 +13,7 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [userName, setUserName] = useState("");
   const [birthYear, setBirthYear] = useState("");
+  const [gender, setGender] = useState("");
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -43,7 +44,7 @@ export default function Register() {
     setErrorMessage("");
     setSuccessMessage("");
 
-    if (!userName.trim() || !email.trim() || !password.trim() || !passwordConfirm.trim() || !birthYear) {
+    if (!userName.trim() || !email.trim() || !password.trim() || !passwordConfirm.trim() || !birthYear || !gender) {
       setErrorMessage("すべての項目を入力してください");
       return;
     }
@@ -73,7 +74,7 @@ export default function Register() {
 
     setSuccessMessage("登録が完了しました。メールを確認してください。");
 
-    const ok = await createUserProfile({ user_name: userName, birth_year: year });
+    const ok = await createUserProfile({ user_name: userName, birth_year: year, gender });
     if (!ok) {
       setErrorMessage("ユーザー情報の保存に失敗しました");
       return;
@@ -108,6 +109,18 @@ export default function Register() {
         max={currentYear}
         autoComplete="bday-year"
       />
+
+      <select
+        className={styles.input}
+        value={gender}
+        onChange={(e) => setGender(e.target.value)}
+      >
+        <option value="">性別を選択</option>
+        <option value="男性">男性</option>
+        <option value="女性">女性</option>
+        <option value="その他">その他</option>
+        <option value="回答しない">回答しない</option>
+      </select>
 
       <input
         className={styles.input}

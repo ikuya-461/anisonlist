@@ -32,6 +32,13 @@ const SEASONS = [
   { value: "秋アニメ", label: "秋" }
 ];
 
+// 曲タイプ（song_type_enum の値そのまま）
+const SONG_TYPES = [
+  "OP", "ED", "挿入歌", "テーマソング", "イメージソング", "CMソング",
+  "アレンジ曲", "アレンジ原曲", "スピンオフ", "非公式関連曲",
+  "ボカロ曲", "オリジナル曲", "なし", "不明"
+];
+
 export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -303,10 +310,9 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
             <span className={styles.fieldLabel}>曲タイプ</span>
             <select value={type} onChange={(e) => setType(e.target.value)} className={styles.select}>
               <option value="">すべて</option>
-              <option value="OP">OP</option>
-              <option value="ED">ED</option>
-              <option value="IN">挿入歌</option>
-              <option value="OTHER">その他</option>
+              {SONG_TYPES.map((t) => (
+                <option key={t} value={t}>{t}</option>
+              ))}
             </select>
           </label>
 
