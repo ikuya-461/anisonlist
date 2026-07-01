@@ -7,15 +7,22 @@ const EMOTION_OPTIONS = [
   { value: "hype",         label: "🔥 熱い" },
   { value: "nostalgic",    label: "🕰️ エモい" },
   { value: "life_changing",label: "💊 人生変わった" },
+  { value: "night_listen", label: "🌙 夜聴く系" },
+  { value: "work_bgm",     label: "🥱 作業用" },
+  { value: "chuunibyou",   label: "💀 厨二病" },
+  { value: "lyrics_insane",label: "🤯 歌詞がヤバい" },
 ];
 
 const ENCOUNTER_OPTIONS = [
   { value: "anime",        label: "📺 アニメを見て" },
   { value: "niconico",     label: "🎵 ニコニコ動画" },
+  { value: "youtube",      label: "🌐 YouTube" },
+  { value: "streaming",    label: "🎧 サブスク（Spotify等）" },
   { value: "sns",          label: "📱 SNS（X/TikTok）" },
   { value: "friend",       label: "👥 友人に教えてもらった" },
   { value: "rhythm_game",  label: "🎮 音ゲー" },
   { value: "karaoke",      label: "🎤 カラオケ" },
+  { value: "live_event",   label: "🎪 ライブ・フェスで" },
   { value: "random",       label: "🔀 たまたま流れてきた" },
 ];
 

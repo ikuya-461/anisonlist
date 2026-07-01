@@ -17,7 +17,7 @@ export async function searchArtists({ keyword: rawKeyword = "", page = 1 } = {})
 
   let query = supabase
     .from("artists")
-    .select("id, name, role, image_url, created_at", { count: "exact" })
+    .select("id, name, name_en, role, image_url, created_at", { count: "exact" })
     .order("id", { ascending: true })
     .range(from, to);
 
@@ -47,7 +47,7 @@ export async function searchArtists({ keyword: rawKeyword = "", page = 1 } = {})
 export async function getArtistBasic(id) {
   const { data, error } = await supabase
     .from("artists")
-    .select("id, name, role, image_url, created_at")
+    .select("id, name, name_en, role, image_url, created_at")
     .eq("id", id)
     .single();
 

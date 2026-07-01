@@ -6,6 +6,23 @@ const EMOTION_LABELS = {
   hype:          "🔥 熱い",
   nostalgic:     "🕰️ エモい",
   life_changing: "💊 人生変わった",
+  night_listen:  "🌙 夜聴く系",
+  work_bgm:      "🥱 作業用",
+  chuunibyou:    "💀 厨二病",
+  lyrics_insane: "🤯 歌詞がヤバい",
+};
+
+const ENCOUNTER_LABELS = {
+  anime:       "📺 アニメを見て",
+  niconico:    "🎵 ニコニコ動画",
+  youtube:     "🌐 YouTube",
+  streaming:   "🎧 サブスク",
+  sns:         "📱 SNS",
+  friend:      "👥 友人に教わった",
+  rhythm_game: "🎮 音ゲー",
+  karaoke:     "🎤 カラオケ",
+  live_event:  "🎪 ライブ・フェス",
+  random:      "🔀 たまたま",
 };
 
 export default function ListPageSongCard({
@@ -57,11 +74,16 @@ export default function ListPageSongCard({
         {song.memo && (
           <div className={styles.memo}>💬 {song.memo}</div>
         )}
-        {song.emotion_tags?.length > 0 && (
+        {(song.emotion_tags?.length > 0 || song.encounter_type) && (
           <div className={styles.tagRow}>
-            {song.emotion_tags.map((t) => (
+            {song.emotion_tags?.map((t) => (
               <span key={t} className={styles.emotionTag}>{EMOTION_LABELS[t] ?? t}</span>
             ))}
+            {song.encounter_type && (
+              <span className={styles.encounterTag}>
+                {ENCOUNTER_LABELS[song.encounter_type] ?? song.encounter_type}
+              </span>
+            )}
           </div>
         )}
       </div>

@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 
 import { searchSongs } from "../../lib/queries/songs";
 import { searchAnime, getAnimeDetail } from "../../lib/queries/anime";
+import { searchGames, getGameDetail } from "../../lib/queries/games";
 import { searchArtists, getArtistDetail } from "../../lib/queries/artists";
 
 import SongList from "../list/SongList";
@@ -10,6 +11,7 @@ import MediaCard from "../cards/MediaCard";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
 import ErrorMessage from "../ui/ErrorMessage";
+import { SongListSkeleton, MediaGridSkeleton } from "../ui/Skeleton";
 
 import styles from "./SearchSong.module.css";
 import gridStyles from "../list/SongList.module.css";
@@ -17,6 +19,7 @@ import gridStyles from "../list/SongList.module.css";
 const TABS = [
   { key: "song", label: "曲" },
   { key: "anime", label: "アニメ" },
+  { key: "game", label: "ゲーム" },
   { key: "artist", label: "アーティスト" }
 ];
 
@@ -56,6 +59,8 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
   const [animeKeyword, setAnimeKeyword] = useState(searchParams.get("q") || "");
   const [animeYear, setAnimeYear] = useState(searchParams.get("year") || "");
   const [animeSeason, setAnimeSeason] = useState(searchParams.get("season") || "");
+  const [gameKeyword, setGameKeyword] = useState(searchParams.get("q") || "");
+  const [gameYear, setGameYear] = useState(searchParams.get("year") || "");
   const [artistKeyword, setArtistKeyword] = useState(searchParams.get("q") || "");
 
   const [page, setPage] = useState(Number(searchParams.get("page") || 1));
@@ -140,6 +145,19 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
   };
 
   /* -------------------------------------------------------
+     🎯 ゲーム検索
+  ------------------------------------------------------- */
+  const fetchGames = async (targetPage) => {
+    const data = await searchGames({
+      keyword: gameKeyword,
+      year: gameYear,
+      page: targetPage
+    });
+    setResults(data.games);
+    setTotalPages(data.totalPages || 1);
+  };
+
+  /* -------------------------------------------------------
      🎯 アーティスト検索
   ------------------------------------------------------- */
   const fetchArtists = async (targetPage) => {
@@ -153,6 +171,7 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
     setErrorMessage("");
 
     if (tab === "anime") await fetchAnime(targetPage);
+    else if (tab === "game") await fetchGames(targetPage);
     else if (tab === "artist") await fetchArtists(targetPage);
     else await fetchSongs(targetPage);
 
@@ -162,6 +181,8 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
   const updateURL = (newPage) => {
     if (tab === "anime") {
       setSearchParams({ tab, q: animeKeyword, year: animeYear, season: animeSeason, page: newPage });
+    } else if (tab === "game") {
+      setSearchParams({ tab, q: gameKeyword, year: gameYear, page: newPage });
     } else if (tab === "artist") {
       setSearchParams({ tab, q: artistKeyword, page: newPage });
     } else {
@@ -173,6 +194,8 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
   const searchDisabled =
     tab === "anime"
       ? !animeKeyword.trim() && !animeYear && !animeSeason
+      : tab === "game"
+      ? !gameKeyword.trim() && !gameYear
       : tab === "artist"
       ? !artistKeyword.trim()
       : !keyword.trim() && !artist.trim() && !anime.trim();
@@ -182,6 +205,11 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
 
     if (tab === "anime" && !animeKeyword.trim() && !animeYear && !animeSeason) {
       setErrorMessage("アニメタイトル・年代・シーズンのいずれかを指定してください");
+      return;
+    }
+
+    if (tab === "game" && !gameKeyword.trim() && !gameYear) {
+      setErrorMessage("ゲームタイトル・年代のいずれかを指定してください");
       return;
     }
 
@@ -227,6 +255,20 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
           image_url: s.image_url,
           artist: s.artist,
           anime_title: name,
+        }))
+      );
+    } else if (type === "game") {
+      const detail = await getGameDetail(id);
+      setPickerSongs(
+        (detail?.songs ?? []).map((s) => ({
+          id: s.song_id,
+          song_id: s.song_id,
+          title: s.song_title,
+          song_title: s.song_title,
+          type: s.song_type,
+          image_url: s.image_url,
+          artist: s.artist,
+          game_title: name,
         }))
       );
     } else {
@@ -367,6 +409,30 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
         </div>
       )}
 
+      {tab === "game" && (
+        <div className={styles.form}>
+          <Input
+            value={gameKeyword}
+            onChange={(e) => setGameKeyword(e.target.value)}
+            placeholder="ゲームタイトル"
+          />
+
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>年代</span>
+            <select
+              value={gameYear}
+              onChange={(e) => setGameYear(e.target.value)}
+              className={styles.select}
+            >
+              <option value="">すべて</option>
+              {YEARS.map((y) => (
+                <option key={y} value={y}>{y}年</option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
+
       {tab === "artist" && (
         <div className={styles.form}>
           <Input
@@ -382,7 +448,13 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
       </Button>
 
       {/* 検索結果（タブ別表示） */}
-      {hasSearched && tab === "song" && (
+      {loading && !pickerMedia && (
+        tab === "song"
+          ? <SongListSkeleton count={6} />
+          : <MediaGridSkeleton count={6} />
+      )}
+
+      {!loading && hasSearched && tab === "song" && (
         <SongList
           songs={results}
           sortable={false}
@@ -398,10 +470,10 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
             ← {pickerMedia.name} の検索結果に戻る
           </button>
           <p className={styles.pickerTitle}>
-            {pickerMedia.type === "anime" ? "🎬" : "🎤"} {pickerMedia.name} の曲
+            {pickerMedia.type === "anime" ? "🎬" : pickerMedia.type === "game" ? "🎮" : "🎤"} {pickerMedia.name} の曲
           </p>
           {pickerLoading ? (
-            <p className={styles.pickerEmpty}>読み込み中...</p>
+            <SongListSkeleton count={5} />
           ) : pickerSongs.length === 0 ? (
             <p className={styles.pickerEmpty}>曲が見つかりませんでした。</p>
           ) : (
@@ -415,7 +487,7 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
         </div>
       )}
 
-      {hasSearched && !pickerMedia && tab === "anime" && (
+      {!loading && hasSearched && !pickerMedia && tab === "anime" && (
         <div className={gridStyles.grid}>
           {results.map((a) => (
             <MediaCard
@@ -431,7 +503,23 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
         </div>
       )}
 
-      {hasSearched && !pickerMedia && tab === "artist" && (
+      {!loading && hasSearched && !pickerMedia && tab === "game" && (
+        <div className={gridStyles.grid}>
+          {results.map((g) => (
+            <MediaCard
+              key={g.id}
+              type="game"
+              data={g}
+              onClick={(id) => onAdd
+                ? openPicker("game", id, g.title_jp)
+                : navigate(`/game/${id}`)
+              }
+            />
+          ))}
+        </div>
+      )}
+
+      {!loading && hasSearched && !pickerMedia && tab === "artist" && (
         <div className={gridStyles.grid}>
           {results.map((a) => (
             <MediaCard

@@ -2,6 +2,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getAnimeDetail, getAnimeImage } from "../../lib/queries/anime";
 import { useDetailPage } from "../../hooks/useDetailPage";
 import SongList from "../../components/list/SongList";
+import { DetailSkeleton } from "../../components/ui/Skeleton";
+import { useLanguage } from "../../contexts/LanguageContext";
+import { animeTitle } from "../../lib/displayText";
 import pageStyles from "../DetailPage.module.css";
 import styles from "./AnimeDetail.module.css";
 
@@ -20,13 +23,18 @@ async function fetchAnimeDetail(id) {
 export default function AnimeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { lang } = useLanguage();
 
   const { data, loading } = useDetailPage(fetchAnimeDetail, id);
 
-  if (loading) return <div className={pageStyles.loading}>読み込み中...</div>;
+  if (loading) return <div className={pageStyles.outer}><DetailSkeleton /></div>;
   if (!data) return <div className={pageStyles.loading}>アニメが見つかりません。</div>;
 
   const { anime, songs } = data;
+
+  // メイン表示は選択言語、サブ表示はもう一方の言語（重複時は非表示）
+  const mainTitle = animeTitle(anime, lang);
+  const subTitle  = lang === "en" ? anime.title_jp : (anime.title_en || anime.title_romaji);
 
   return (
     <div className={pageStyles.outer}>
@@ -38,13 +46,15 @@ export default function AnimeDetail() {
       {/* アニメ画像 */}
       <img
         src={anime.image_url || "/noimage.png"}
-        alt={anime.title_jp}
+        alt={mainTitle}
         className={styles.image}
       />
 
       {/* タイトル */}
-      <h1 className={pageStyles.title}>{anime.title_jp}</h1>
-      {anime.title_en && <div className={styles.titleEn}>{anime.title_en}</div>}
+      <h1 className={pageStyles.title}>{mainTitle}</h1>
+      {subTitle && subTitle !== mainTitle && (
+        <div className={styles.titleEn}>{subTitle}</div>
+      )}
 
       {/* 基本情報 */}
       <div className={styles.infoBox}>
@@ -75,7 +85,7 @@ export default function AnimeDetail() {
           sequence: s.sequence,
           image_url: s.image_url,
           artist: s.artist,
-          anime_title: anime.title_jp
+          anime_title: mainTitle
         }))}
         sortable={false}
         onClickSong={(songId) => navigate(`/songs/${songId}`)}

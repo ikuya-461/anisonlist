@@ -10,6 +10,9 @@ export const JIKAN_API_BASE      = "https://api.jikan.moe/v4";
 export const ITUNES_SEARCH_API   = "https://itunes.apple.com/search";
 // アニメ画像は AniList を使用（Jikanは504頻発・日本語検索に弱いため）
 export const ANILIST_API         = "https://graphql.anilist.co";
+// ゲーム画像は RAWG を使用（認証不要・フロントから直接叩ける）
+export const RAWG_API            = "https://api.rawg.io/api/games";
+export const RAWG_API_KEY        = process.env.REACT_APP_RAWG_API_KEY;
 
 // --- Jikan API レート制限対策（3 req/秒）---
 export const JIKAN_REQUEST_INTERVAL_MS = 400;

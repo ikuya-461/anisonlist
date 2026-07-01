@@ -4,6 +4,7 @@ import { supabase } from "../lib/supabaseClient";
 
 import Header from "../components/ui/Header";
 import Layout from "./Layout";
+import { LanguageProvider } from "../contexts/LanguageContext";
 
 import Home from "./Home";
 import SongDetail from "./SongDetail/SongDetail";
@@ -13,6 +14,7 @@ import MyPage from "./Mypage/MyPage";
 import ListPage from "./ListPage/ListPage";
 import ForgotPassword from "./auth/ForgotPassword";
 import AnimeDetail from "./AnimeDetail/AnimeDetail";
+import GameDetail from "./GameDetail/GameDetail";
 import ArtistDetail from "./ArtistDetail/ArtistDetail";
 import PublicListPage from "./PublicListPage/PublicListPage";
 import PublicProfilePage from "./PublicProfilePage/PublicProfilePage";
@@ -42,6 +44,7 @@ function App() {
   if (isLoggedIn === null) return null;
 
   return (
+    <LanguageProvider>
     <BrowserRouter>
       <Header isLoggedIn={isLoggedIn} updateLoginState={updateLoginState} />
 
@@ -50,6 +53,7 @@ function App() {
           <Route path="/" element={<Home isLoggedIn={isLoggedIn} />} />
           <Route path="/songs/:id" element={<SongDetail />} />
           <Route path="/anime/:id" element={<AnimeDetail />} />
+          <Route path="/game/:id" element={<GameDetail />} />
           <Route path="/artist/:id" element={<ArtistDetail />} />
 
           <Route
@@ -70,6 +74,7 @@ function App() {
         </Routes>
       </Layout>
     </BrowserRouter>
+    </LanguageProvider>
   );
 }
 

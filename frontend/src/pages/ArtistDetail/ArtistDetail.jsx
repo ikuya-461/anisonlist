@@ -3,6 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getArtistDetail } from "../../lib/queries/artists";
 import SongList from "../../components/list/SongList";
 import Button from "../../components/ui/Button";
+import { DetailSkeleton } from "../../components/ui/Skeleton";
+import { useLanguage } from "../../contexts/LanguageContext";
+import { artistName } from "../../lib/displayText";
 import pageStyles from "../DetailPage.module.css";
 import styles from "./ArtistDetail.module.css";
 
@@ -20,6 +23,7 @@ const getPageNumbers = (current, total) => {
 export default function ArtistDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { lang } = useLanguage();
 
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -46,7 +50,7 @@ export default function ArtistDetail() {
     };
   }, [id, page]);
 
-  if (loading && !data) return <div className={pageStyles.loading}>読み込み中...</div>;
+  if (loading && !data) return <div className={pageStyles.outer}><DetailSkeleton /></div>;
   if (!data) return <div className={pageStyles.loading}>アーティストが見つかりません。</div>;
 
   const { artist, songs, total, totalPages } = data;
@@ -63,10 +67,10 @@ export default function ArtistDetail() {
       </button>
 
       {artist.image_url && (
-        <img src={artist.image_url} alt={artist.name} className={styles.artistImage} />
+        <img src={artist.image_url} alt={artistName(artist, lang)} className={styles.artistImage} />
       )}
 
-      <h1 className={pageStyles.title}>{artist.name}</h1>
+      <h1 className={pageStyles.title}>{artistName(artist, lang)}</h1>
       {artist.role && <div className={styles.role}>{artist.role}</div>}
 
       <h2 className={pageStyles.sectionTitle}>🎵 担当曲</h2>

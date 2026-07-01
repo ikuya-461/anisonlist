@@ -1,6 +1,6 @@
 import { supabase } from "../supabaseClient";
 import { normalizeText } from "../imageCache/normalize";
-import { ensureAnimeImages, fetchAnimeCover } from "../imageCache/animeImageCache";
+import { ensureAnimeImages, fetchAnimeMeta } from "../imageCache/animeImageCache";
 import { ensureSongImages } from "../imageCache/songImageCache";
 import { calcRange, calcTotalPages } from "../utils/pagination";
 
@@ -14,7 +14,7 @@ export async function searchAnime({ keyword: rawKeyword = "", year = "", season 
 
   let query = supabase
     .from("anime")
-    .select("id, title_jp, title_en, release_year, release_season, type, image_url, created_at", {
+    .select("id, title_jp, title_en, title_romaji, release_year, release_season, type, image_url, created_at", {
       count: "exact"
     })
     .order("release_year", { ascending: false })
@@ -52,19 +52,29 @@ export async function getAnimeImage(title) {
 
   const { data: cached } = await supabase
     .from("anime")
-    .select("image_url")
+    .select("image_url, title_en, title_romaji")
     .eq("title_jp", title)
     .limit(1)
     .maybeSingle();
 
-  if (cached?.image_url) return cached.image_url;
-
-  // AniList から取得（Jikanは504頻発・日本語に弱いため）
-  const image = await fetchAnimeCover(title);
-  if (image) {
-    await supabase.from("anime").update({ image_url: image }).eq("title_jp", title);
+  // 画像・英題・ローマ字がすべて揃っていればAPIを叩かない
+  if (cached?.image_url && cached?.title_en && cached?.title_romaji) {
+    return cached.image_url;
   }
-  return image;
+
+  // AniList から画像＋英題/ローマ字をまとめて取得（Jikanは504頻発・日本語に弱いため）
+  const meta = await fetchAnimeMeta(title);
+  if (!meta) return cached?.image_url ?? null;
+
+  const patch = {};
+  if (!cached?.image_url && meta.cover)            patch.image_url    = meta.cover;
+  if (!cached?.title_en && meta.title_en)          patch.title_en     = meta.title_en;
+  if (!cached?.title_romaji && meta.title_romaji)  patch.title_romaji = meta.title_romaji;
+
+  if (Object.keys(patch).length) {
+    await supabase.from("anime").update(patch).eq("title_jp", title);
+  }
+  return patch.image_url || cached?.image_url || null;
 }
 
 /* -------------------------------------------------------
@@ -73,7 +83,7 @@ export async function getAnimeImage(title) {
 export async function getAnimeBasic(id) {
   const { data, error } = await supabase
     .from("anime")
-    .select("id, title_jp, title_en, release_year, release_season, type, image_url, created_at")
+    .select("id, title_jp, title_en, title_romaji, release_year, release_season, type, image_url, created_at")
     .eq("id", id)
     .single();
 

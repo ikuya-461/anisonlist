@@ -26,6 +26,45 @@
   mix-blend-mode: screen;
 }
 
+/* 右側アクション群 */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 言語切替トグル（JP / EN） */
+.langToggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  background: transparent;
+  border: 1.5px solid rgba(1, 253, 254, 0.3);
+  border-radius: 20px;
+  color: var(--text-sub);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.langToggle:hover {
+  border-color: #01FDFE;
+  box-shadow: 0 0 10px rgba(1, 253, 254, 0.3);
+}
+
+.langActive {
+  color: var(--cyan);
+  text-shadow: 0 0 8px rgba(1, 253, 254, 0.5);
+}
+
+.langSep {
+  color: rgba(1, 253, 254, 0.25);
+}
+
 /* ユーザーアイコン */
 .userIcon {
   font-size: 22px;

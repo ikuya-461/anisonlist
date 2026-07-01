@@ -4,6 +4,7 @@ import { getSongDetail, updateYoutubeId } from "../../lib/queries/songs";
 import { useDetailPage } from "../../hooks/useDetailPage";
 import { SONG_TYPE_COLORS } from "../../lib/constants";
 import { supabase } from "../../lib/supabaseClient";
+import { DetailSkeleton } from "../../components/ui/Skeleton";
 import pageStyles from "../DetailPage.module.css";
 import styles from "./SongDetail.module.css";
 
@@ -55,7 +56,7 @@ export default function SongDetail() {
     setYtSaving(false);
   };
 
-  if (loading) return <div className={pageStyles.loading}>読み込み中...</div>;
+  if (loading) return <div className={pageStyles.outer}><DetailSkeleton /></div>;
   if (!song) return <div className={pageStyles.loading}>曲が見つかりませんでした。</div>;
 
   const typeColor = SONG_TYPE_COLORS[song.song_type] ?? SONG_TYPE_COLORS.default;

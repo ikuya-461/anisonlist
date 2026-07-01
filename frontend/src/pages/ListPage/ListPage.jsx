@@ -14,6 +14,7 @@ import ListSelect from "../../components/list/ListSelect";
 import SearchSong from "../../components/search/SearchSong";
 import SongList from "../../components/list/SongList";
 import AddSongModal from "../../components/modals/AddSongModal";
+import { SongListSkeleton } from "../../components/ui/Skeleton";
 
 import styles from "./ListPage.module.css";
 
@@ -24,6 +25,7 @@ export default function ListPage() {
   const [songs, setSongs] = useState([]);
   const [listInfo, setListInfo] = useState(null);
   const [pendingSong, setPendingSong] = useState(null); // モーダル用
+  const [songsLoading, setSongsLoading] = useState(true); // 初回ロード用
 
   const navigate = useNavigate();
 
@@ -37,6 +39,7 @@ export default function ListPage() {
   // useCallback で安定化させることで useEffect の deps に安全に追加できる
   const fetchListSongs = useCallback(async () => {
     const data = await getListSongs(listId);
+    setSongsLoading(false);
     setSongs(data.map((row) => ({
       id: row.id,
       song_id: row.song_id,
@@ -121,14 +124,18 @@ export default function ListPage() {
           }}
         />
 
-        <SongList
-          songs={songs}
-          sortable={true}
-          onChangeOrder={handleChangeOrder}
-          onDeleted={handleDeleteSong}
-          onAdd={handleAddSong}
-          onClickSong={(songId) => navigate(`/songs/${songId}`)}
-        />
+        {songsLoading ? (
+          <SongListSkeleton count={6} />
+        ) : (
+          <SongList
+            songs={songs}
+            sortable={true}
+            onChangeOrder={handleChangeOrder}
+            onDeleted={handleDeleteSong}
+            onAdd={handleAddSong}
+            onClickSong={(songId) => navigate(`/songs/${songId}`)}
+          />
+        )}
 
         <SearchSong onAdd={handleAddSong} />
       </div>

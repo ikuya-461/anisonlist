@@ -1,0 +1,38 @@
+/* -------------------------------------------------------
+   GameDetail 固有スタイル
+   共通クラス（outer / backBtn / title / sectionTitle / loading）
+   は DetailPage.module.css を参照
+------------------------------------------------------- */
+
+.image {
+  width: 100%;
+  max-width: 260px;
+  height: 360px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin: 0 auto 20px;
+  display: block;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.titleEn {
+  font-size: 16px;
+  text-align: center;
+  color: var(--text-sub);
+  margin-bottom: 20px;
+}
+
+.infoBox {
+  background: var(--color-card);
+  border: 1px solid var(--color-card-border);
+  color: var(--text-main);
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  line-height: 1.8;
+  font-size: 15px;
+}
+
+.infoBox strong {
+  color: var(--cyan);
+}
