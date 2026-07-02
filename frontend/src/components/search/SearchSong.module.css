@@ -25,15 +25,21 @@
 }
 
 .tabBtn {
-  padding: 7px 18px;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 7px 4px;
   border: 1.5px solid rgba(1,253,254,0.2);
   border-radius: 3px;
   background: transparent;
   color: var(--text-sub);
   cursor: pointer;
-  font-size: 13px;
-  letter-spacing: 1px;
+  font-size: 11px;
+  letter-spacing: 0.3px;
   text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
 }
 
