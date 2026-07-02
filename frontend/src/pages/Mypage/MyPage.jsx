@@ -7,9 +7,11 @@ import styles from "./MyPage.module.css";
 
 import ListGallery from "../../components/list/ListGallery";
 import CreateListButton from "../../components/buttons/CreateListButton";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 export default function MyPage({ updateLoginState }) {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const fetchLists = async () => {
     return getMyLists();
@@ -95,7 +97,7 @@ export default function MyPage({ updateLoginState }) {
     navigate("/", { replace: true });
   };
 
-  if (loading) return <p>読み込み中...</p>;
+  if (loading) return <p>{t("common.loading")}</p>;
 
   return (
     <div className={styles.outer}>
@@ -114,7 +116,7 @@ export default function MyPage({ updateLoginState }) {
           <div className={styles.stats}>
             <div>
               <strong>{lists.length}</strong>
-              <span>リスト</span>
+              <span>{t("mypage.lists")}</span>
             </div>
           </div>
         </div>
@@ -142,13 +144,13 @@ export default function MyPage({ updateLoginState }) {
 
             <div className={styles.btnRow}>
               <button onClick={saveProfile} className={styles.saveBtn}>
-                保存
+                {t("common.save")}
               </button>
               <button
                 onClick={() => setEditing(false)}
                 className={styles.cancelBtn}
               >
-                キャンセル
+                {t("common.cancel")}
               </button>
             </div>
           </div>
@@ -166,7 +168,7 @@ export default function MyPage({ updateLoginState }) {
               }}
               className={styles.editBtn}
             >
-              プロフィールを編集
+              {t("mypage.editProfile")}
             </button>
 
             <div className={styles.publicRow}>
@@ -174,7 +176,7 @@ export default function MyPage({ updateLoginState }) {
                 className={`${styles.toggleBtn} ${isPublic ? styles.toggleBtnOn : ""}`}
                 onClick={handleToggleProfilePublic}
               >
-                {isPublic ? "🌐 公開中" : "🔒 非公開"}
+                {isPublic ? t("mypage.public") : t("mypage.private")}
               </button>
               {isPublic && (
                 <a
@@ -183,7 +185,7 @@ export default function MyPage({ updateLoginState }) {
                   rel="noreferrer"
                   className={styles.publicLink}
                 >
-                  公開ページを見る →
+                  {t("mypage.viewPublicProfile")}
                 </a>
               )}
             </div>
@@ -191,7 +193,7 @@ export default function MyPage({ updateLoginState }) {
         )}
 
         {/* ギャラリー（リスト一覧） */}
-        <h3 className={styles.galleryTitle}>作品ギャラリー</h3>
+        <h3 className={styles.galleryTitle}>{t("mypage.gallery")}</h3>
 
         <ListGallery
           lists={lists}
@@ -226,7 +228,7 @@ export default function MyPage({ updateLoginState }) {
 
         {/* ログアウト */}
         <button onClick={handleLogout} className={styles.logoutBtn}>
-          ログアウト
+          {t("auth.logout")}
         </button>
 
       </div>

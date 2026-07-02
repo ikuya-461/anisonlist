@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { getMyLists } from "../../lib/queries/lists";
+import { useLanguage } from "../../contexts/LanguageContext";
 import styles from "./ListSelect.module.css";
 
 export default function ListSelect({ selectedList, onSelectList }) {
+  const { t } = useLanguage();
   const [lists, setLists] = useState([]);
 
   const fetchLists = async () => {
@@ -32,7 +34,7 @@ export default function ListSelect({ selectedList, onSelectList }) {
       >
         {/* デフォルト表示（選択不可） */}
         <option value="" disabled>
-          別のリストへ移動
+          {t("list.moveToOther")}
         </option>
 
         {/* 今開いているリストは除外 */}

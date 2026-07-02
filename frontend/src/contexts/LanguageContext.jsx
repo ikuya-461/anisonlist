@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
+import { translate } from "../lib/i18n";
 
 /* =========================================================
    表示言語コンテキスト（ja / en）
@@ -8,7 +9,8 @@ import { createContext, useContext, useState, useEffect, useCallback } from "rea
 const LanguageContext = createContext({
   lang: "ja",
   setLang: () => {},
-  toggleLang: () => {}
+  toggleLang: () => {},
+  t: (key) => key
 });
 
 const STORAGE_KEY = "soniclist:lang";
@@ -36,8 +38,13 @@ export function LanguageProvider({ children }) {
     setLangState((prev) => (prev === "en" ? "ja" : "en"));
   }, []);
 
+  // t(key, vars) — 現在の言語で文言を返す簡易ヘルパー
+  const t = useCallback((key, vars) => translate(key, lang, vars), [lang]);
+
+  const value = useMemo(() => ({ lang, setLang, toggleLang, t }), [lang, setLang, toggleLang, t]);
+
   return (
-    <LanguageContext.Provider value={{ lang, setLang, toggleLang }}>
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
   );

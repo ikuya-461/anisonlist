@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { createList } from "../../lib/queries/lists";
+import { useLanguage } from "../../contexts/LanguageContext";
 import styles from "./CreateListButton.module.css";
 
 export default function CreateListButton({ onCreated }) {
+  const { t } = useLanguage();
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -27,7 +29,7 @@ export default function CreateListButton({ onCreated }) {
         className={styles.openButton}
         onClick={() => setOpen(true)}
       >
-        ＋ 新しいリストを作成
+        {t("list.createNew")}
       </button>
     );
   }
@@ -36,7 +38,7 @@ export default function CreateListButton({ onCreated }) {
     <div className={styles.box}>
       <input
         className={styles.input}
-        placeholder="新しいリスト名"
+        placeholder={t("list.newNamePh")}
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
@@ -47,7 +49,7 @@ export default function CreateListButton({ onCreated }) {
           onClick={handleCreate}
           disabled={loading}
         >
-          {loading ? "作成中..." : "作成"}
+          {loading ? t("list.creating") : t("list.createBtn")}
         </button>
 
         <button
@@ -57,7 +59,7 @@ export default function CreateListButton({ onCreated }) {
             setName("");
           }}
         >
-          キャンセル
+          {t("common.cancel")}
         </button>
       </div>
     </div>

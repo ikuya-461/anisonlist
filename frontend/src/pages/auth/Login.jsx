@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabaseClient";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 export default function Login({ updateLoginState }) {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,7 +21,7 @@ export default function Login({ updateLoginState }) {
     });
 
     if (error) {
-      setErrorMsg("メールアドレスまたはパスワードが違います");
+      setErrorMsg(t("auth.err.invalidCredentials"));
       return;
     }
 
@@ -29,12 +31,12 @@ export default function Login({ updateLoginState }) {
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.title}>ログイン</h2>
+      <h2 style={styles.title}>{t("auth.login.title")}</h2>
 
       <form onSubmit={handleLogin} style={styles.form}>
         <input
           type="email"
-          placeholder="メールアドレス"
+          placeholder={t("auth.ph.email")}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           style={styles.input}
@@ -44,7 +46,7 @@ export default function Login({ updateLoginState }) {
 
         <input
           type="password"
-          placeholder="パスワード"
+          placeholder={t("auth.ph.password")}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           style={styles.input}
@@ -55,7 +57,7 @@ export default function Login({ updateLoginState }) {
         {errorMsg && <p style={styles.error}>{errorMsg}</p>}
 
         <button type="submit" style={styles.button}>
-          ログイン
+          {t("auth.btn.login")}
         </button>
       </form>
 
@@ -64,14 +66,14 @@ export default function Login({ updateLoginState }) {
           style={styles.link}
           onClick={() => navigate("/register")}
         >
-          👉 新規登録はこちら
+          👉 {t("auth.registerHere")}
         </p>
 
         <p
           style={styles.link}
           onClick={() => navigate("/forgot-password")}
         >
-          パスワードを忘れた場合
+          {t("auth.forgotPassword")}
         </p>
       </div>
     </div>

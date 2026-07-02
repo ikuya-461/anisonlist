@@ -1,6 +1,7 @@
 import styles from "./MediaCard.module.css";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { animeTitle, gameTitle, artistName } from "../../lib/displayText";
+import { valueLabel, SEASON_LABELS } from "../../lib/i18n";
 
 /**
  * アニメ・ゲーム・アーティスト共通カード
@@ -10,7 +11,7 @@ import { animeTitle, gameTitle, artistName } from "../../lib/displayText";
  * @param {function}                onClick (id) => void
  */
 export default function MediaCard({ type, data, onClick }) {
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const isAnime = type === "anime";
   const isGame  = type === "game";
 
@@ -20,11 +21,12 @@ export default function MediaCard({ type, data, onClick }) {
     : isGame
     ? gameTitle(data, lang)
     : artistName(data, lang);
+  const yearText = (y) => (y ? t("search.year.suffix", { year: y }) : "");
   const meta     = isAnime
-    ? [data.release_year ? `${data.release_year}年` : "", data.release_season || ""]
+    ? [yearText(data.release_year), valueLabel(SEASON_LABELS, data.release_season, lang)]
         .filter(Boolean).join(" ・ ")
     : isGame
-    ? (data.release_year ? `${data.release_year}年` : "")
+    ? yearText(data.release_year)
     : data.role || "";
 
   return (

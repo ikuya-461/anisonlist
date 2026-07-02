@@ -1,8 +1,12 @@
 import { useState } from "react";
 import styles from "./MediaCard.module.css";
+import { useLanguage } from "../../contexts/LanguageContext";
+import { valueLabel, SONG_TYPE_LABELS } from "../../lib/i18n";
+import { songTitle } from "../../lib/displayText";
 
 export default function SongCard({ song, onAdd, onClick }) {
   const [added, setAdded] = useState(false);
+  const { lang } = useLanguage();
   return (
     <div
       className={styles.card}
@@ -26,7 +30,7 @@ export default function SongCard({ song, onAdd, onClick }) {
               styles[song.type] || ""
             }`}
           >
-            {song.type}
+            {valueLabel(SONG_TYPE_LABELS, song.type, lang)}
           </span>
         )}
       </div>
@@ -34,7 +38,7 @@ export default function SongCard({ song, onAdd, onClick }) {
       {/* 曲情報 */}
       <div className={styles.info}>
         <div className={styles.title}>
-          {song.title || song.song_title}
+          {songTitle(song, lang)}
         </div>
 
         <div className={styles.meta}>

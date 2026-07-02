@@ -16,6 +16,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { useNavigate } from "react-router-dom";
 import DeleteListButton from "../buttons/DeleteListButton";
+import { useLanguage } from "../../contexts/LanguageContext";
 import styles from "./ListGallery.module.css";
 import { DND_ACTIVATION_CONSTRAINT } from "../../lib/constants";
 
@@ -93,6 +94,7 @@ function SortableItem({ list, children }) {
 ------------------------------------------------------- */
 function GalleryItem({ list, onDeleted, onTogglePublic, dragHandleProps }) {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   return (
     <div className={styles.item}>
@@ -119,7 +121,7 @@ function GalleryItem({ list, onDeleted, onTogglePublic, dragHandleProps }) {
             className={styles.publicLink}
             onClick={(e) => e.stopPropagation()}
           >
-            🌐 公開ページ
+            {t("list.publicPage")}
           </a>
         )}
       </div>
@@ -129,7 +131,7 @@ function GalleryItem({ list, onDeleted, onTogglePublic, dragHandleProps }) {
           <button
             className={`${styles.publicToggle} ${list.is_public ? styles.publicToggleOn : ""}`}
             onClick={(e) => { e.stopPropagation(); onTogglePublic(list.id, list.is_public); }}
-            title={list.is_public ? "公開中（クリックで非公開）" : "非公開（クリックで公開）"}
+            title={list.is_public ? t("list.togglePublicOn") : t("list.togglePublicOff")}
           >
             {list.is_public ? "🌐" : "🔒"}
           </button>

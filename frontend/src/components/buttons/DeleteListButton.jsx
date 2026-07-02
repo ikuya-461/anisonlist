@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabaseClient";
+import { useLanguage } from "../../contexts/LanguageContext";
 import styles from "./DeleteListButton.module.css";
 
 export default function DeleteListButton({ listId, onDeleted }) {
+  const { t } = useLanguage();
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -39,22 +41,22 @@ export default function DeleteListButton({ listId, onDeleted }) {
     <>
       {/* 削除ボタン */}
       <button className={styles.deleteBtn} onClick={() => setShowModal(true)}>
-        削除
+        {t("list.delete")}
       </button>
 
       {/* モーダル */}
       {showModal && (
         <div className={styles.overlay} onClick={() => setShowModal(false)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <h3 className={styles.title}>リストを削除しますか？</h3>
-            <p className={styles.text}>この操作は取り消せません。</p>
+            <h3 className={styles.title}>{t("list.confirmDeleteTitle")}</h3>
+            <p className={styles.text}>{t("list.confirmDeleteText")}</p>
 
             <div className={styles.btnRow}>
               <button
                 className={styles.cancelBtn}
                 onClick={() => setShowModal(false)}
               >
-                キャンセル
+                {t("common.cancel")}
               </button>
 
               <button
@@ -62,7 +64,7 @@ export default function DeleteListButton({ listId, onDeleted }) {
                 onClick={deleteList}
                 disabled={loading}
               >
-                {loading ? "削除中..." : "削除する"}
+                {loading ? t("list.deleting") : t("list.deleteConfirm")}
               </button>
             </div>
           </div>

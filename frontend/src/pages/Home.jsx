@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import SearchSong from "../components/search/SearchSong";
+import { useLanguage } from "../contexts/LanguageContext";
 import styles from "./Home.module.css";
 
 export default function Home({ isLoggedIn }) {
+  const { t } = useLanguage();
   return (
     <div className={styles.outer}>
       <div className={styles.heroWrap}>
@@ -18,14 +20,16 @@ export default function Home({ isLoggedIn }) {
       {!isLoggedIn && (
         <div className={styles.ctaWrap}>
           <p className={styles.ctaText}>
-            プレイリストを作成・シェアするには<br />アカウントが必要です
+            {t("home.ctaText").split("\n").map((line, i) => (
+              <span key={i}>{i > 0 && <br />}{line}</span>
+            ))}
           </p>
           <div className={styles.ctaBtns}>
             <Link to="/register" className={styles.ctaPrimary}>
-              無料で始める
+              {t("home.getStarted")}
             </Link>
             <Link to="/login" className={styles.ctaSecondary}>
-              ログイン
+              {t("home.login")}
             </Link>
           </div>
         </div>

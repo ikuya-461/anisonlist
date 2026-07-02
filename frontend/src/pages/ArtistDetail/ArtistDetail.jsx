@@ -23,7 +23,7 @@ const getPageNumbers = (current, total) => {
 export default function ArtistDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
 
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -51,7 +51,7 @@ export default function ArtistDetail() {
   }, [id, page]);
 
   if (loading && !data) return <div className={pageStyles.outer}><DetailSkeleton /></div>;
-  if (!data) return <div className={pageStyles.loading}>アーティストが見つかりません。</div>;
+  if (!data) return <div className={pageStyles.loading}>{t("detail.artist.notFound")}</div>;
 
   const { artist, songs, total, totalPages } = data;
 
@@ -63,7 +63,7 @@ export default function ArtistDetail() {
   return (
     <div className={pageStyles.outer}>
       <button className={pageStyles.backBtn} onClick={() => navigate(-1)}>
-        ← 戻る
+        {t("common.back")}
       </button>
 
       {artist.image_url && (
@@ -73,10 +73,12 @@ export default function ArtistDetail() {
       <h1 className={pageStyles.title}>{artistName(artist, lang)}</h1>
       {artist.role && <div className={styles.role}>{artist.role}</div>}
 
-      <h2 className={pageStyles.sectionTitle}>🎵 担当曲</h2>
+      <h2 className={pageStyles.sectionTitle}>{t("detail.section.artistSongs")}</h2>
       {total > 0 && (
         <div className={styles.count}>
-          全 {total} 曲{totalPages > 1 ? `（${page} / ${totalPages} ページ）` : ""}
+          {totalPages > 1
+            ? t("detail.artist.totalPaged", { total, page, pages: totalPages })
+            : t("detail.artist.total", { total })}
         </div>
       )}
 

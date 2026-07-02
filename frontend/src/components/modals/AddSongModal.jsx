@@ -1,32 +1,14 @@
 import { useState } from "react";
 import styles from "./AddSongModal.module.css";
+import { useLanguage } from "../../contexts/LanguageContext";
+import { EMOTION_LABELS, ENCOUNTER_OPTION_LABELS } from "../../lib/i18n";
+import { songTitle } from "../../lib/displayText";
 
-const EMOTION_OPTIONS = [
-  { value: "god",          label: "✨ 神曲" },
-  { value: "cry",          label: "😭 泣ける" },
-  { value: "hype",         label: "🔥 熱い" },
-  { value: "nostalgic",    label: "🕰️ エモい" },
-  { value: "life_changing",label: "💊 人生変わった" },
-  { value: "night_listen", label: "🌙 夜聴く系" },
-  { value: "work_bgm",     label: "🥱 作業用" },
-  { value: "chuunibyou",   label: "💀 厨二病" },
-  { value: "lyrics_insane",label: "🤯 歌詞がヤバい" },
-];
-
-const ENCOUNTER_OPTIONS = [
-  { value: "anime",        label: "📺 アニメを見て" },
-  { value: "niconico",     label: "🎵 ニコニコ動画" },
-  { value: "youtube",      label: "🌐 YouTube" },
-  { value: "streaming",    label: "🎧 サブスク（Spotify等）" },
-  { value: "sns",          label: "📱 SNS（X/TikTok）" },
-  { value: "friend",       label: "👥 友人に教えてもらった" },
-  { value: "rhythm_game",  label: "🎮 音ゲー" },
-  { value: "karaoke",      label: "🎤 カラオケ" },
-  { value: "live_event",   label: "🎪 ライブ・フェスで" },
-  { value: "random",       label: "🔀 たまたま流れてきた" },
-];
+const EMOTION_KEYS = Object.keys(EMOTION_LABELS);
+const ENCOUNTER_KEYS = Object.keys(ENCOUNTER_OPTION_LABELS);
 
 export default function AddSongModal({ song, onSave, onSkip }) {
+  const { lang, t } = useLanguage();
   const [memo, setMemo]               = useState("");
   const [emotionTags, setEmotionTags] = useState([]);
   const [encounter, setEncounter]     = useState("");
@@ -50,21 +32,21 @@ export default function AddSongModal({ song, onSave, onSkip }) {
       <div className={styles.modal}>
         {/* 曲名 */}
         <div className={styles.songName}>
-          ＋ {song.title || song.song_title}
+          {t("modal.added", { title: songTitle(song, lang) })}
         </div>
-        <p className={styles.sub}>追加しました！タグをつけますか？</p>
+        <p className={styles.sub}>{t("modal.sub")}</p>
 
         {/* 感情タグ */}
         <div className={styles.section}>
-          <div className={styles.sectionLabel}>この曲は？</div>
+          <div className={styles.sectionLabel}>{t("modal.emotionLabel")}</div>
           <div className={styles.tagRow}>
-            {EMOTION_OPTIONS.map((opt) => (
+            {EMOTION_KEYS.map((key) => (
               <button
-                key={opt.value}
-                className={`${styles.tag} ${emotionTags.includes(opt.value) ? styles.tagSelected : ""}`}
-                onClick={() => toggleEmotion(opt.value)}
+                key={key}
+                className={`${styles.tag} ${emotionTags.includes(key) ? styles.tagSelected : ""}`}
+                onClick={() => toggleEmotion(key)}
               >
-                {opt.label}
+                {EMOTION_LABELS[key][lang] ?? EMOTION_LABELS[key].ja}
               </button>
             ))}
           </div>
@@ -72,15 +54,15 @@ export default function AddSongModal({ song, onSave, onSkip }) {
 
         {/* 出会い方 */}
         <div className={styles.section}>
-          <div className={styles.sectionLabel}>どこで知った？</div>
+          <div className={styles.sectionLabel}>{t("modal.encounterLabel")}</div>
           <div className={styles.tagRow}>
-            {ENCOUNTER_OPTIONS.map((opt) => (
+            {ENCOUNTER_KEYS.map((key) => (
               <button
-                key={opt.value}
-                className={`${styles.tag} ${encounter === opt.value ? styles.tagSelected : ""}`}
-                onClick={() => setEncounter((prev) => prev === opt.value ? "" : opt.value)}
+                key={key}
+                className={`${styles.tag} ${encounter === key ? styles.tagSelected : ""}`}
+                onClick={() => setEncounter((prev) => prev === key ? "" : key)}
               >
-                {opt.label}
+                {ENCOUNTER_OPTION_LABELS[key][lang] ?? ENCOUNTER_OPTION_LABELS[key].ja}
               </button>
             ))}
           </div>
@@ -88,13 +70,13 @@ export default function AddSongModal({ song, onSave, onSkip }) {
 
         {/* 一言メモ */}
         <div className={styles.section}>
-          <div className={styles.sectionLabel}>一言メモ（任意）</div>
+          <div className={styles.sectionLabel}>{t("modal.memoLabel")}</div>
           <div className={styles.memoWrapper}>
             <input
               className={styles.memoInput}
               value={memo}
               onChange={(e) => setMemo(e.target.value.slice(0, 30))}
-              placeholder="例：厨二病が悪化した神曲"
+              placeholder={t("modal.memoPh")}
               maxLength={30}
             />
             <span className={`${styles.memoCount} ${memo.length >= 30 ? styles.memoCountOver : ""}`}>
@@ -106,10 +88,10 @@ export default function AddSongModal({ song, onSave, onSkip }) {
         {/* ボタン */}
         <div className={styles.btnRow}>
           <button className={styles.skipBtn} onClick={onSkip}>
-            スキップ
+            {t("modal.skip")}
           </button>
           <button className={styles.saveBtn} onClick={handleSave}>
-            保存する
+            {t("modal.save")}
           </button>
         </div>
       </div>

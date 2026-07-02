@@ -4,21 +4,17 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { getPublicListDetail, getListLikeStatus, toggleListLike } from "../../lib/queries/lists";
 import { getListSongs } from "../../lib/queries/listSongs";
 import { getPublicProfile } from "../../lib/queries/users";
+import { useLanguage } from "../../contexts/LanguageContext";
+import { valueLabel, EMOTION_LABELS, ENCOUNTER_LABELS } from "../../lib/i18n";
+import { songTitle } from "../../lib/displayText";
 
 import pageStyles from "../DetailPage.module.css";
 import styles from "./PublicListPage.module.css";
 
-const EMOTION_LABELS = {
-  god:           "✨ 神曲",
-  cry:           "😭 泣ける",
-  hype:          "🔥 熱い",
-  nostalgic:     "🕰️ エモい",
-  life_changing: "💊 人生変わった",
-};
-
 export default function PublicListPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { lang, t } = useLanguage();
 
   const [listInfo, setListInfo] = useState(null);
   const [songs, setSongs] = useState([]);
@@ -62,19 +58,19 @@ export default function PublicListPage() {
     setLikeLoading(false);
   };
 
-  if (loading) return <div className={pageStyles.loading}>読み込み中...</div>;
-  if (!listInfo)  return <div className={pageStyles.loading}>このリストは非公開または存在しません。</div>;
+  if (loading) return <div className={pageStyles.loading}>{t("common.loading")}</div>;
+  if (!listInfo)  return <div className={pageStyles.loading}>{t("public.listPrivate")}</div>;
 
   return (
     <div className={pageStyles.outer}>
       <button className={pageStyles.backBtn} onClick={() => navigate(-1)}>
-        ← 戻る
+        {t("common.back")}
       </button>
 
       {/* 作成者 */}
       {author && (
         <div className={styles.authorRow}>
-          <span className={styles.authorLabel}>作成者：</span>
+          <span className={styles.authorLabel}>{t("public.author")}</span>
           <Link to={`/user/${author.id}`} className={styles.authorLink}>
             {author.user_name}
           </Link>
@@ -101,7 +97,7 @@ export default function PublicListPage() {
           rel="noreferrer"
           className={styles.xShareBtn}
         >
-          𝕏 シェア
+          {t("list.share")}
         </a>
         </div>
       </div>
@@ -109,7 +105,7 @@ export default function PublicListPage() {
       {/* 曲一覧（読み取り専用） */}
       <div className={styles.songList}>
         {songs.length === 0 ? (
-          <p className={styles.empty}>曲が登録されていません。</p>
+          <p className={styles.empty}>{t("public.noSongs")}</p>
         ) : (
           songs.map((song) => (
             <div
@@ -119,12 +115,12 @@ export default function PublicListPage() {
             >
               <div className={styles.thumb}>
                 {song.image_url
-                  ? <img src={song.image_url} alt={song.song_title} />
+                  ? <img src={song.image_url} alt={songTitle(song, lang)} />
                   : <div className={styles.noImage}>NO IMAGE</div>
                 }
               </div>
               <div className={styles.songInfo}>
-                <div className={styles.songTitle}>{song.song_title}</div>
+                <div className={styles.songTitle}>{songTitle(song, lang)}</div>
                 <div className={styles.songMeta}>
                   {song.artist || ""}
                   {song.anime_title ? ` ・ ${song.anime_title}` : ""}
@@ -132,11 +128,14 @@ export default function PublicListPage() {
                 {song.memo && (
                   <div className={styles.memo}>💬 {song.memo}</div>
                 )}
-                {song.emotion_tags?.length > 0 && (
+                {(song.emotion_tags?.length > 0 || song.encounter_type) && (
                   <div className={styles.tagRow}>
-                    {song.emotion_tags.map((t) => (
-                      <span key={t} className={styles.emotionTag}>{EMOTION_LABELS[t] ?? t}</span>
+                    {song.emotion_tags?.map((tag) => (
+                      <span key={tag} className={styles.emotionTag}>{valueLabel(EMOTION_LABELS, tag, lang)}</span>
                     ))}
+                    {song.encounter_type && (
+                      <span className={styles.emotionTag}>{valueLabel(ENCOUNTER_LABELS, song.encounter_type, lang)}</span>
+                    )}
                   </div>
                 )}
               </div>

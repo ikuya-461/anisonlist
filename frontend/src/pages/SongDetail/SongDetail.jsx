@@ -5,6 +5,9 @@ import { useDetailPage } from "../../hooks/useDetailPage";
 import { SONG_TYPE_COLORS } from "../../lib/constants";
 import { supabase } from "../../lib/supabaseClient";
 import { DetailSkeleton } from "../../components/ui/Skeleton";
+import { useLanguage } from "../../contexts/LanguageContext";
+import { songTitle } from "../../lib/displayText";
+import { valueLabel, SONG_TYPE_LABELS } from "../../lib/i18n";
 import pageStyles from "../DetailPage.module.css";
 import styles from "./SongDetail.module.css";
 
@@ -23,6 +26,7 @@ function extractYoutubeId(input) {
 export default function SongDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { lang, t } = useLanguage();
 
   const { data: song, loading } = useDetailPage(getSongDetail, id);
 
@@ -57,7 +61,7 @@ export default function SongDetail() {
   };
 
   if (loading) return <div className={pageStyles.outer}><DetailSkeleton /></div>;
-  if (!song) return <div className={pageStyles.loading}>曲が見つかりませんでした。</div>;
+  if (!song) return <div className={pageStyles.loading}>{t("detail.song.notFound")}</div>;
 
   const typeColor = SONG_TYPE_COLORS[song.song_type] ?? SONG_TYPE_COLORS.default;
 
@@ -71,12 +75,14 @@ export default function SongDetail() {
     return `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
   })();
 
+  const displayTitle = songTitle(song, lang);
+
   const formattedDate = song.release_date
     ? new Date(song.release_date).toISOString().split("T")[0]
-    : "不明";
+    : t("common.unknown");
 
   const renderArtist = (name, artistId) => {
-    if (!name) return "不明";
+    if (!name) return t("common.unknown");
     if (!artistId) return name;
 
     return (
@@ -91,10 +97,11 @@ export default function SongDetail() {
 
   // 複数人（ボカロのボーカル/プロデューサー）をリンク付きで並べる
   const renderArtistList = (people) => {
-    if (!people || people.length === 0) return "不明";
+    if (!people || people.length === 0) return t("common.unknown");
+    const sep = lang === "en" ? ", " : "、";
     return people.map((p, i) => (
       <span key={p.id ?? p.name}>
-        {i > 0 && "、"}
+        {i > 0 && sep}
         {renderArtist(p.name, p.id)}
       </span>
     ));
@@ -106,7 +113,7 @@ export default function SongDetail() {
     <div className={styles.outer}>
       {/* 戻る */}
       <button className={styles.backBtn} onClick={() => navigate(-1)}>
-        ← 戻る
+        {t("common.back")}
       </button>
 
       {/* 画像（fallback あり） */}
@@ -120,12 +127,12 @@ export default function SongDetail() {
       <div className={styles.titleRow}>
         {song.song_type && (
           <span className={styles.typeBadge} style={{ background: typeColor }}>
-            {song.song_type}
+            {valueLabel(SONG_TYPE_LABELS, song.song_type, lang)}
             {song.sequence ? ` ${song.sequence}` : ""}
           </span>
         )}
 
-        <h1 className={styles.title}>{song.song_title}</h1>
+        <h1 className={styles.title}>{displayTitle}</h1>
       </div>
 
       {/* アニメタイトル（クリックで遷移）。ボカロ曲は紐づくアニメが無いので非表示 */}
@@ -163,7 +170,7 @@ export default function SongDetail() {
             rel="noreferrer"
             className={styles.ytSearchLink}
           >
-            ▶ YouTubeで検索
+            {t("song.ytSearch")}
           </a>
         )}
 
@@ -176,18 +183,18 @@ export default function SongDetail() {
                   className={styles.ytInput}
                   value={ytInput}
                   onChange={(e) => setYtInput(e.target.value)}
-                  placeholder="YouTube URL または動画ID"
+                  placeholder={t("song.ytPh")}
                 />
                 <button className={styles.ytSaveBtn} onClick={handleYtSave} disabled={ytSaving}>
-                  {ytSaving ? "保存中..." : "保存"}
+                  {ytSaving ? t("common.saving") : t("common.save")}
                 </button>
                 <button className={styles.ytCancelBtn} onClick={() => { setYtEditing(false); setYtInput(""); }}>
-                  キャンセル
+                  {t("common.cancel")}
                 </button>
               </div>
             ) : (
               <button className={styles.ytEditBtn} onClick={() => setYtEditing(true)}>
-                {currentYtId ? "▶ YouTube IDを変更" : "▶ YouTube IDを登録"}
+                {currentYtId ? t("song.ytEdit") : t("song.ytRegister")}
               </button>
             )}
           </div>
@@ -201,7 +208,7 @@ export default function SongDetail() {
         rel="noreferrer"
         className={styles.xShareBtn}
       >
-        𝕏 この曲をシェア
+        {t("song.share")}
       </a>
 
       {/* 詳細情報 */}
@@ -209,41 +216,41 @@ export default function SongDetail() {
         {isVocaloid ? (
           <>
             <div>
-              <strong>ボーカル：</strong>
+              <strong>{t("song.field.vocal")}：</strong>
               {renderArtistList(song.vocalists)}
             </div>
             <div>
-              <strong>プロデューサー：</strong>
+              <strong>{t("song.field.producer")}：</strong>
               {renderArtistList(song.producers)}
             </div>
           </>
         ) : (
           <>
             <div>
-              <strong>歌手：</strong>
+              <strong>{t("song.field.singer")}：</strong>
               {renderArtist(song.artist, song.artist_id)}
             </div>
             <div>
-              <strong>作詞：</strong>
+              <strong>{t("song.field.lyricist")}：</strong>
               {renderArtist(song.lyricist, song.lyricist_id)}
             </div>
             <div>
-              <strong>作曲：</strong>
+              <strong>{t("song.field.composer")}：</strong>
               {renderArtist(song.composer, song.composer_id)}
             </div>
             <div>
-              <strong>編曲：</strong>
+              <strong>{t("song.field.arranger")}：</strong>
               {renderArtist(song.arranger, song.arranger_id)}
             </div>
           </>
         )}
-        <div><strong>公開日：</strong>{formattedDate}</div>
+        <div><strong>{t("song.field.releaseDate")}：</strong>{formattedDate}</div>
 
         {/* 曲情報 */}
         <div className={styles.songInfo}>
-          <strong>曲情報：</strong>
+          <strong>{t("song.field.songInfo")}：</strong>
           <div className={styles.songInfoText}>
-            {song.song_info || "なし"}
+            {song.song_info || t("common.none")}
           </div>
         </div>
       </div>

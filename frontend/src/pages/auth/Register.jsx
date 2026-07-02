@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { createUserProfile } from "../../lib/queries/users";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "../../contexts/LanguageContext";
 import styles from "./LoginRegister.module.css";
 
 export default function Register() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -45,18 +47,18 @@ export default function Register() {
     setSuccessMessage("");
 
     if (!userName.trim() || !email.trim() || !password.trim() || !passwordConfirm.trim() || !birthYear || !gender) {
-      setErrorMessage("すべての項目を入力してください");
+      setErrorMessage(t("auth.err.allFields"));
       return;
     }
 
     const year = Number(birthYear);
     if (!Number.isInteger(year) || year < 1900 || year > currentYear) {
-      setErrorMessage(`生年は1900〜${currentYear}の範囲で入力してください`);
+      setErrorMessage(t("auth.err.birthRange", { year: currentYear }));
       return;
     }
 
     if (password !== passwordConfirm) {
-      setErrorMessage("パスワードが一致していません");
+      setErrorMessage(t("auth.err.pwMismatch"));
       return;
     }
 
@@ -72,11 +74,11 @@ export default function Register() {
       return;
     }
 
-    setSuccessMessage("登録が完了しました。メールを確認してください。");
+    setSuccessMessage(t("auth.msg.signupDone"));
 
     const ok = await createUserProfile({ user_name: userName, birth_year: year, gender });
     if (!ok) {
-      setErrorMessage("ユーザー情報の保存に失敗しました");
+      setErrorMessage(t("auth.err.profileSave"));
       return;
     }
 
@@ -85,14 +87,14 @@ export default function Register() {
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>新規登録</h2>
+      <h2 className={styles.title}>{t("auth.register.title")}</h2>
 
       {errorMessage && <div className={styles.error}>{errorMessage}</div>}
       {successMessage && <div className={styles.success}>{successMessage}</div>}
 
       <input
         className={styles.input}
-        placeholder="ユーザー名"
+        placeholder={t("auth.ph.userName")}
         value={userName}
         onChange={(e) => setUserName(e.target.value)}
         autoComplete="username"
@@ -102,7 +104,7 @@ export default function Register() {
         className={styles.input}
         type="number"
         inputMode="numeric"
-        placeholder={`生年（例: 2000）`}
+        placeholder={t("auth.ph.birthYear")}
         value={birthYear}
         onChange={(e) => setBirthYear(e.target.value)}
         min={1900}
@@ -115,16 +117,16 @@ export default function Register() {
         value={gender}
         onChange={(e) => setGender(e.target.value)}
       >
-        <option value="">性別を選択</option>
-        <option value="男性">男性</option>
-        <option value="女性">女性</option>
-        <option value="その他">その他</option>
-        <option value="回答しない">回答しない</option>
+        <option value="">{t("auth.ph.gender")}</option>
+        <option value="男性">{t("gender.male")}</option>
+        <option value="女性">{t("gender.female")}</option>
+        <option value="その他">{t("gender.other")}</option>
+        <option value="回答しない">{t("gender.noAnswer")}</option>
       </select>
 
       <input
         className={styles.input}
-        placeholder="メールアドレス"
+        placeholder={t("auth.ph.email")}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         autoComplete="email"
@@ -133,7 +135,7 @@ export default function Register() {
       <div className={styles.passwordWrapper}>
         <input
           className={styles.input}
-          placeholder="パスワード"
+          placeholder={t("auth.ph.password")}
           type={showPassword ? "text" : "password"}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -149,7 +151,7 @@ export default function Register() {
 
       <input
         className={styles.input}
-        placeholder="パスワード（確認）"
+        placeholder={t("auth.ph.passwordConfirm")}
         type={showPassword ? "text" : "password"}
         value={passwordConfirm}
         onChange={(e) => setPasswordConfirm(e.target.value)}
@@ -172,22 +174,22 @@ export default function Register() {
           </div>
           <div className={styles.strengthText}>
             {strength <= 2
-              ? "弱いパスワードです"
+              ? t("auth.pw.weak")
               : strength === 3
-              ? "普通の強さです"
-              : "強いパスワードです"}
+              ? t("auth.pw.medium")
+              : t("auth.pw.strong")}
           </div>
         </div>
       )}
 
       <button className={styles.button} onClick={handleSignUp}>
-        登録する
+        {t("auth.btn.signup")}
       </button>
 
       <div className={styles.subText}>
-        すでにアカウントをお持ちの方は{" "}
+        {t("auth.haveAccount")}{" "}
         <span className={styles.link} onClick={() => navigate("/login")}>
-          ログインはこちら
+          {t("auth.loginHere")}
         </span>
       </div>
     </div>

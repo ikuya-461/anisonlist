@@ -12,28 +12,29 @@ import Input from "../ui/Input";
 import Button from "../ui/Button";
 import ErrorMessage from "../ui/ErrorMessage";
 import { SongListSkeleton, MediaGridSkeleton } from "../ui/Skeleton";
+import { useLanguage } from "../../contexts/LanguageContext";
+import { valueLabel, SONG_TYPE_LABELS, SEASON_LABELS, CATEGORY_LABELS } from "../../lib/i18n";
+import { animeTitle, gameTitle, artistName } from "../../lib/displayText";
 
 import styles from "./SearchSong.module.css";
 import gridStyles from "../list/SongList.module.css";
 
 const TABS = [
-  { key: "song", label: "曲" },
-  { key: "anime", label: "アニメ" },
-  { key: "game", label: "ゲーム" },
-  { key: "artist", label: "アーティスト" }
+  { key: "song",   labelKey: "search.tab.song" },
+  { key: "anime",  labelKey: "search.tab.anime" },
+  { key: "game",   labelKey: "search.tab.game" },
+  { key: "artist", labelKey: "search.tab.artist" }
 ];
 
 // 年代セレクタの選択肢（今年〜1950年）
 const YEARS = [];
 for (let y = new Date().getFullYear(); y >= 1950; y--) YEARS.push(y);
 
-// シーズン（DBの release_season 値に合わせる）
-const SEASONS = [
-  { value: "冬アニメ", label: "冬" },
-  { value: "春アニメ", label: "春" },
-  { value: "夏アニメ", label: "夏" },
-  { value: "秋アニメ", label: "秋" }
-];
+// シーズン（DBの release_season 値。ラベルは i18n の SEASON_LABELS を使用）
+const SEASONS = ["冬アニメ", "春アニメ", "夏アニメ", "秋アニメ"];
+
+// カテゴリー（DBの category 値。ラベルは i18n の CATEGORY_LABELS を使用）
+const CATEGORIES = ["anime", "vocaloid", "Vtuber", "game"];
 
 // 曲タイプ（song_type_enum の値そのまま）
 const SONG_TYPES = [
@@ -42,9 +43,11 @@ const SONG_TYPES = [
   "ボカロ曲", "オリジナル曲", "なし", "不明"
 ];
 
-export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
+export default function SearchSong({ onAdd, heading }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { lang, t } = useLanguage();
+  const resolvedHeading = heading ?? t("search.heading.addToList");
 
   const [tab, setTab] = useState(searchParams.get("tab") || "song");
 
@@ -204,22 +207,22 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
     setErrorMessage("");
 
     if (tab === "anime" && !animeKeyword.trim() && !animeYear && !animeSeason) {
-      setErrorMessage("アニメタイトル・年代・シーズンのいずれかを指定してください");
+      setErrorMessage(t("search.err.animeNeed"));
       return;
     }
 
     if (tab === "game" && !gameKeyword.trim() && !gameYear) {
-      setErrorMessage("ゲームタイトル・年代のいずれかを指定してください");
+      setErrorMessage(t("search.err.gameNeed"));
       return;
     }
 
     if (tab === "artist" && !artistKeyword) {
-      setErrorMessage("アーティスト名を入力してください");
+      setErrorMessage(t("search.err.artistNeed"));
       return;
     }
 
     if (tab === "song" && !keyword.trim() && !artist.trim() && !anime.trim()) {
-      setErrorMessage("曲名・歌手名・アニメタイトルのいずれかを入力してください");
+      setErrorMessage(t("search.err.songNeed"));
       return;
     }
 
@@ -310,17 +313,17 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
 
   return (
     <div className={styles.container}>
-      <h3 className={styles.heading}>{heading}</h3>
+      <h3 className={styles.heading}>{resolvedHeading}</h3>
 
       {/* タブ切り替え */}
       <div className={styles.tabs}>
-        {TABS.map((t) => (
+        {TABS.map((tabItem) => (
           <button
-            key={t.key}
-            className={`${styles.tabBtn} ${tab === t.key ? styles.activeTab : ""}`}
-            onClick={() => switchTab(t.key)}
+            key={tabItem.key}
+            className={`${styles.tabBtn} ${tab === tabItem.key ? styles.activeTab : ""}`}
+            onClick={() => switchTab(tabItem.key)}
           >
-            {t.label}
+            {t(tabItem.labelKey)}
           </button>
         ))}
       </div>
@@ -330,41 +333,40 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
       {/* 検索フォーム（タブ別） */}
       {tab === "song" && (
         <div className={styles.form}>
-          <Input value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="曲名" />
-          <Input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder="歌手名" />
-          <Input value={anime} onChange={(e) => setAnime(e.target.value)} placeholder="アニメタイトル" />
+          <Input value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder={t("search.ph.songTitle")} />
+          <Input value={artist} onChange={(e) => setArtist(e.target.value)} placeholder={t("search.ph.artist")} />
+          <Input value={anime} onChange={(e) => setAnime(e.target.value)} placeholder={t("search.ph.animeTitle")} />
 
           <label className={styles.field}>
-            <span className={styles.fieldLabel}>カテゴリー</span>
+            <span className={styles.fieldLabel}>{t("search.label.category")}</span>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               className={styles.select}
             >
-              <option value="">すべて</option>
-              <option value="anime">アニソン</option>
-              <option value="vocaloid">ボカロ</option>
-              <option value="Vtuber">VTuber</option>
-              <option value="game">ゲーム</option>
-            </select>
-          </label>
-
-          <label className={styles.field}>
-            <span className={styles.fieldLabel}>曲タイプ</span>
-            <select value={type} onChange={(e) => setType(e.target.value)} className={styles.select}>
-              <option value="">すべて</option>
-              {SONG_TYPES.map((t) => (
-                <option key={t} value={t}>{t}</option>
+              <option value="">{t("common.all")}</option>
+              {CATEGORIES.map((c) => (
+                <option key={c} value={c}>{valueLabel(CATEGORY_LABELS, c, lang)}</option>
               ))}
             </select>
           </label>
 
           <label className={styles.field}>
-            <span className={styles.fieldLabel}>年代</span>
+            <span className={styles.fieldLabel}>{t("search.label.songType")}</span>
+            <select value={type} onChange={(e) => setType(e.target.value)} className={styles.select}>
+              <option value="">{t("common.all")}</option>
+              {SONG_TYPES.map((st) => (
+                <option key={st} value={st}>{valueLabel(SONG_TYPE_LABELS, st, lang)}</option>
+              ))}
+            </select>
+          </label>
+
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>{t("search.label.year")}</span>
             <select value={year} onChange={(e) => setYear(e.target.value)} className={styles.select}>
-              <option value="">すべて</option>
+              <option value="">{t("common.all")}</option>
               {YEARS.map((y) => (
-                <option key={y} value={y}>{y}年</option>
+                <option key={y} value={y}>{t("search.year.suffix", { year: y })}</option>
               ))}
             </select>
           </label>
@@ -376,33 +378,33 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
           <Input
             value={animeKeyword}
             onChange={(e) => setAnimeKeyword(e.target.value)}
-            placeholder="アニメタイトル"
+            placeholder={t("search.ph.animeTitle")}
           />
 
           <label className={styles.field}>
-            <span className={styles.fieldLabel}>年代</span>
+            <span className={styles.fieldLabel}>{t("search.label.year")}</span>
             <select
               value={animeYear}
               onChange={(e) => setAnimeYear(e.target.value)}
               className={styles.select}
             >
-              <option value="">すべて</option>
+              <option value="">{t("common.all")}</option>
               {YEARS.map((y) => (
-                <option key={y} value={y}>{y}年</option>
+                <option key={y} value={y}>{t("search.year.suffix", { year: y })}</option>
               ))}
             </select>
           </label>
 
           <label className={styles.field}>
-            <span className={styles.fieldLabel}>シーズン</span>
+            <span className={styles.fieldLabel}>{t("search.label.season")}</span>
             <select
               value={animeSeason}
               onChange={(e) => setAnimeSeason(e.target.value)}
               className={styles.select}
             >
-              <option value="">すべて</option>
+              <option value="">{t("common.all")}</option>
               {SEASONS.map((s) => (
-                <option key={s.value} value={s.value}>{s.label}</option>
+                <option key={s} value={s}>{valueLabel(SEASON_LABELS, s, lang)}</option>
               ))}
             </select>
           </label>
@@ -414,19 +416,19 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
           <Input
             value={gameKeyword}
             onChange={(e) => setGameKeyword(e.target.value)}
-            placeholder="ゲームタイトル"
+            placeholder={t("search.ph.gameTitle")}
           />
 
           <label className={styles.field}>
-            <span className={styles.fieldLabel}>年代</span>
+            <span className={styles.fieldLabel}>{t("search.label.year")}</span>
             <select
               value={gameYear}
               onChange={(e) => setGameYear(e.target.value)}
               className={styles.select}
             >
-              <option value="">すべて</option>
+              <option value="">{t("common.all")}</option>
               {YEARS.map((y) => (
-                <option key={y} value={y}>{y}年</option>
+                <option key={y} value={y}>{t("search.year.suffix", { year: y })}</option>
               ))}
             </select>
           </label>
@@ -438,13 +440,13 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
           <Input
             value={artistKeyword}
             onChange={(e) => setArtistKeyword(e.target.value)}
-            placeholder="アーティスト名"
+            placeholder={t("search.ph.artistName")}
           />
         </div>
       )}
 
       <Button onClick={handleSearch} disabled={loading || searchDisabled} className={styles.searchBtn}>
-        {loading ? "検索中..." : "検索"}
+        {loading ? t("common.searching") : t("common.search")}
       </Button>
 
       {/* 検索結果（タブ別表示） */}
@@ -467,15 +469,15 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
       {pickerMedia && (
         <div className={styles.picker}>
           <button className={styles.pickerBack} onClick={closePicker}>
-            ← {pickerMedia.name} の検索結果に戻る
+            {t("search.picker.back", { name: pickerMedia.name })}
           </button>
           <p className={styles.pickerTitle}>
-            {pickerMedia.type === "anime" ? "🎬" : pickerMedia.type === "game" ? "🎮" : "🎤"} {pickerMedia.name} の曲
+            {pickerMedia.type === "anime" ? "🎬" : pickerMedia.type === "game" ? "🎮" : "🎤"} {t("search.picker.songs", { name: pickerMedia.name })}
           </p>
           {pickerLoading ? (
             <SongListSkeleton count={5} />
           ) : pickerSongs.length === 0 ? (
-            <p className={styles.pickerEmpty}>曲が見つかりませんでした。</p>
+            <p className={styles.pickerEmpty}>{t("search.picker.empty")}</p>
           ) : (
             <SongList
               songs={pickerSongs}
@@ -495,7 +497,7 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
               type="anime"
               data={a}
               onClick={(id) => onAdd
-                ? openPicker("anime", id, a.title_jp)
+                ? openPicker("anime", id, animeTitle(a, lang))
                 : navigate(`/anime/${id}`)
               }
             />
@@ -511,7 +513,7 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
               type="game"
               data={g}
               onClick={(id) => onAdd
-                ? openPicker("game", id, g.title_jp)
+                ? openPicker("game", id, gameTitle(g, lang))
                 : navigate(`/game/${id}`)
               }
             />
@@ -527,7 +529,7 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
               type="artist"
               data={a}
               onClick={(id) => onAdd
-                ? openPicker("artist", id, a.name)
+                ? openPicker("artist", id, artistName(a, lang))
                 : navigate(`/artist/${id}`)
               }
             />
@@ -538,7 +540,7 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
       {hasSearched && (
         <div className={styles.pagination}>
           <Button disabled={page <= 1} onClick={() => changePage(page - 1)} className={styles.pageBtn}>
-            ← 前へ
+            {t("search.pager.prev")}
           </Button>
 
           {getPageNumbers(page, totalPages).map((p, i) =>
@@ -556,7 +558,7 @@ export default function SearchSong({ onAdd, heading = "ADD TO LIST" }) {
           )}
 
           <Button disabled={page >= totalPages} onClick={() => changePage(page + 1)} className={styles.pageBtn}>
-            次へ →
+            {t("search.pager.next")}
           </Button>
         </div>
       )}

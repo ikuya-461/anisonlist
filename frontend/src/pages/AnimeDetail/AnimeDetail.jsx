@@ -5,6 +5,7 @@ import SongList from "../../components/list/SongList";
 import { DetailSkeleton } from "../../components/ui/Skeleton";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { animeTitle } from "../../lib/displayText";
+import { valueLabel, ANIME_TYPE_LABELS, SEASON_LABELS } from "../../lib/i18n";
 import pageStyles from "../DetailPage.module.css";
 import styles from "./AnimeDetail.module.css";
 
@@ -23,12 +24,12 @@ async function fetchAnimeDetail(id) {
 export default function AnimeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
 
   const { data, loading } = useDetailPage(fetchAnimeDetail, id);
 
   if (loading) return <div className={pageStyles.outer}><DetailSkeleton /></div>;
-  if (!data) return <div className={pageStyles.loading}>アニメが見つかりません。</div>;
+  if (!data) return <div className={pageStyles.loading}>{t("detail.anime.notFound")}</div>;
 
   const { anime, songs } = data;
 
@@ -40,7 +41,7 @@ export default function AnimeDetail() {
     <div className={pageStyles.outer}>
       {/* 戻る */}
       <button className={pageStyles.backBtn} onClick={() => navigate(-1)}>
-        ← 戻る
+        {t("common.back")}
       </button>
 
       {/* アニメ画像 */}
@@ -58,22 +59,22 @@ export default function AnimeDetail() {
 
       {/* 基本情報 */}
       <div className={styles.infoBox}>
-        <div><strong>タイプ：</strong>{anime.type}</div>
+        <div><strong>{t("detail.field.type")}：</strong>{valueLabel(ANIME_TYPE_LABELS, anime.type, lang)}</div>
 
         {anime.type === "Anime" ? (
           <>
-            <div><strong>放送年：</strong>{anime.release_year}</div>
-            <div><strong>シーズン：</strong>{anime.release_season}</div>
+            <div><strong>{t("detail.field.airYear")}：</strong>{anime.release_year}</div>
+            <div><strong>{t("detail.field.season")}：</strong>{valueLabel(SEASON_LABELS, anime.release_season, lang)}</div>
           </>
         ) : (
           <>
-            <div><strong>リリース年：</strong>{anime.release_year}</div>
+            <div><strong>{t("detail.field.releaseYear")}：</strong>{anime.release_year}</div>
           </>
         )}
       </div>
 
       {/* 曲一覧 */}
-      <h2 className={pageStyles.sectionTitle}>🎵 このアニメの曲</h2>
+      <h2 className={pageStyles.sectionTitle}>{t("detail.section.animeSongs")}</h2>
 
       <SongList
         songs={songs.map((s) => ({

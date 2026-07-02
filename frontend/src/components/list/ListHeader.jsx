@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { renameList, updateListDescription } from "../../lib/queries/lists";
+import { useLanguage } from "../../contexts/LanguageContext";
 import styles from "./ListHeader.module.css";
 
 export default function ListHeader({ listId, listInfo, onUpdated }) {
+  const { t } = useLanguage();
   const [editing, setEditing]           = useState(false);
   const [name, setName]                 = useState(listInfo?.name || "");
   const [desc, setDesc]                 = useState(listInfo?.description || "");
@@ -36,13 +38,13 @@ export default function ListHeader({ listId, listInfo, onUpdated }) {
             onChange={(e) => setName(e.target.value)}
             className={styles.editInput}
           />
-          <button onClick={saveName} className={styles.saveBtn}>保存</button>
-          <button onClick={() => setEditing(false)} className={styles.cancelBtn}>キャンセル</button>
+          <button onClick={saveName} className={styles.saveBtn}>{t("common.save")}</button>
+          <button onClick={() => setEditing(false)} className={styles.cancelBtn}>{t("common.cancel")}</button>
         </div>
       ) : (
         <div className={styles.viewRow}>
           <h2 className={styles.title}>{listInfo?.name}</h2>
-          <button onClick={() => setEditing(true)} className={styles.renameBtn}>名前変更</button>
+          <button onClick={() => setEditing(true)} className={styles.renameBtn}>{t("list.rename")}</button>
         </div>
       )}
 
@@ -55,7 +57,7 @@ export default function ListHeader({ listId, listInfo, onUpdated }) {
             rel="noreferrer"
             className={styles.publicPageLink}
           >
-            🌐 公開ページを見る
+            {t("list.viewPublic")}
           </a>
           <a
             href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`🎵 ${listInfo.name}\n#SONICLIST`)}&url=${encodeURIComponent(`${window.location.origin}/public/${listId}`)}`}
@@ -63,7 +65,7 @@ export default function ListHeader({ listId, listInfo, onUpdated }) {
             rel="noreferrer"
             className={styles.xShareBtn}
           >
-            𝕏 シェア
+            {t("list.share")}
           </a>
         </div>
       )}
@@ -75,20 +77,20 @@ export default function ListHeader({ listId, listInfo, onUpdated }) {
             value={desc}
             onChange={(e) => setDesc(e.target.value.slice(0, 200))}
             className={styles.descTextarea}
-            placeholder="リストの説明（200文字以内）"
+            placeholder={t("list.descPh")}
             maxLength={200}
           />
           <div className={styles.descMeta}>
             <span className={styles.descCount}>{desc.length}/200</span>
-            <button onClick={saveDesc} className={styles.saveBtn}>保存</button>
-            <button onClick={() => { setEditingDesc(false); setDesc(listInfo?.description || ""); }} className={styles.cancelBtn}>キャンセル</button>
+            <button onClick={saveDesc} className={styles.saveBtn}>{t("common.save")}</button>
+            <button onClick={() => { setEditingDesc(false); setDesc(listInfo?.description || ""); }} className={styles.cancelBtn}>{t("common.cancel")}</button>
           </div>
         </div>
       ) : (
         <div className={styles.descRow} onClick={() => setEditingDesc(true)}>
           {desc
             ? <p className={styles.desc}>{desc}</p>
-            : <p className={styles.descEmpty}>説明を追加...</p>
+            : <p className={styles.descEmpty}>{t("list.addDesc")}</p>
           }
         </div>
       )}

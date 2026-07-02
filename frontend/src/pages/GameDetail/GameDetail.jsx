@@ -23,12 +23,12 @@ async function fetchGameDetail(id) {
 export default function GameDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
 
   const { data, loading } = useDetailPage(fetchGameDetail, id);
 
   if (loading) return <div className={pageStyles.outer}><DetailSkeleton /></div>;
-  if (!data) return <div className={pageStyles.loading}>ゲームが見つかりません。</div>;
+  if (!data) return <div className={pageStyles.loading}>{t("detail.game.notFound")}</div>;
 
   const { game, songs } = data;
 
@@ -39,7 +39,7 @@ export default function GameDetail() {
     <div className={pageStyles.outer}>
       {/* 戻る */}
       <button className={pageStyles.backBtn} onClick={() => navigate(-1)}>
-        ← 戻る
+        {t("common.back")}
       </button>
 
       {/* ゲーム画像 */}
@@ -57,11 +57,11 @@ export default function GameDetail() {
 
       {/* 基本情報 */}
       <div className={styles.infoBox}>
-        <div><strong>リリース年：</strong>{game.release_year || "不明"}</div>
+        <div><strong>{t("detail.field.releaseYear")}：</strong>{game.release_year || t("common.unknown")}</div>
       </div>
 
       {/* 曲一覧 */}
-      <h2 className={pageStyles.sectionTitle}>🎮 このゲームの曲</h2>
+      <h2 className={pageStyles.sectionTitle}>{t("detail.section.gameSongs")}</h2>
 
       <SongList
         songs={songs.map((s) => ({

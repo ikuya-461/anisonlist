@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 
 import { getPublicProfile } from "../../lib/queries/users";
 import { getPublicListsByUser } from "../../lib/queries/lists";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 import pageStyles from "../DetailPage.module.css";
 import styles from "./PublicProfilePage.module.css";
@@ -10,6 +11,7 @@ import styles from "./PublicProfilePage.module.css";
 export default function PublicProfilePage() {
   const { userId } = useParams();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const [profile, setProfile] = useState(null);
   const [lists, setLists] = useState([]);
@@ -30,13 +32,13 @@ export default function PublicProfilePage() {
     load();
   }, [userId]);
 
-  if (loading) return <div className={pageStyles.loading}>読み込み中...</div>;
-  if (!profile) return <div className={pageStyles.loading}>このプロフィールは非公開または存在しません。</div>;
+  if (loading) return <div className={pageStyles.loading}>{t("common.loading")}</div>;
+  if (!profile) return <div className={pageStyles.loading}>{t("public.profilePrivate")}</div>;
 
   return (
     <div className={styles.outer}>
       <button className={pageStyles.backBtn} onClick={() => navigate(-1)}>
-        ← 戻る
+        {t("common.back")}
       </button>
 
       {/* プロフィール */}
@@ -53,10 +55,10 @@ export default function PublicProfilePage() {
       </div>
 
       {/* 公開リスト一覧 */}
-      <h2 className={pageStyles.sectionTitle}>🎵 公開リスト</h2>
+      <h2 className={pageStyles.sectionTitle}>{t("public.publicLists")}</h2>
 
       {lists.length === 0 ? (
-        <p className={styles.empty}>公開リストはありません。</p>
+        <p className={styles.empty}>{t("public.noPublicLists")}</p>
       ) : (
         <div className={styles.listGrid}>
           {lists.map((list) => (
