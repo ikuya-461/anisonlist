@@ -17,10 +17,18 @@
 }
 
 /* 役割ラベル */
+.nameSub {
+  font-size: 15px;
+  text-align: center;
+  color: var(--text-sub);
+  margin-top: -6px;
+  margin-bottom: 10px;
+}
+
 .role {
   font-size: 14px;
   text-align: center;
-  color: #666;
+  color: var(--text-sub);
   margin-bottom: 20px;
 }
 

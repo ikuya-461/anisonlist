@@ -71,6 +71,12 @@ export default function ArtistDetail() {
       )}
 
       <h1 className={pageStyles.title}>{artistName(artist, lang)}</h1>
+      {(() => {
+        const sub = lang === "en" ? artist.name : artist.name_en;
+        return sub && sub !== artistName(artist, lang)
+          ? <div className={styles.nameSub}>{sub}</div>
+          : null;
+      })()}
       {artist.role && <div className={styles.role}>{artist.role}</div>}
 
       <h2 className={pageStyles.sectionTitle}>{t("detail.section.artistSongs")}</h2>

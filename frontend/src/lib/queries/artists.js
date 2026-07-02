@@ -2,6 +2,7 @@ import { supabase } from "../supabaseClient";
 import { normalizeText } from "../imageCache/normalize";
 import { ensureSongImages } from "../imageCache/songImageCache";
 import { ensureArtistImage, ensureArtistImages } from "../imageCache/artistImageCache";
+import { ensureArtistNameEn } from "../imageCache/artistNameCache";
 import { calcRange, calcTotalPages } from "../utils/pagination";
 
 // 担当曲の1ページ表示件数（初音ミク等は数万曲ひも付くためページング必須）
@@ -67,9 +68,13 @@ export async function getArtistDetail(id, page = 1) {
   const artist = await getArtistBasic(id);
   if (!artist) return null;
 
-  // 画像未取得ならこの場で取得してキャッシュ（直リンクでも画像表示）
+  // 画像・英語名が未取得ならこの場で取得してキャッシュ（直リンクでも表示）
   if (!artist.image_url) {
     artist.image_url = await ensureArtistImage(artist);
+  }
+  if (!artist.name_en) {
+    // MusicBrainz から英語名を取得（レート制限に配慮し1人ずつ）
+    artist.name_en = await ensureArtistNameEn(artist);
   }
 
   const songSelect = `

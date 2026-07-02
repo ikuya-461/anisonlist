@@ -84,6 +84,7 @@ export async function getSongDetail(id) {
     .select(`
       id,
       song_title,
+      title_en,
       song_type,
       song_info,
       category,
@@ -147,6 +148,13 @@ export async function getSongDetail(id) {
       image_url: null
     });
     if (image_url) result.image_url = image_url;
+  }
+
+  // 曲名が既にラテン文字表記なら、それをそのまま英題としてキャッシュ（API不要）
+  // 例: "oath sign", "God knows..."。日本語表記の曲はローマ字変換が要るため対象外
+  if (!result.title_en && result.song_title && !/[぀-ヿ一-龯]/.test(result.song_title)) {
+    result.title_en = result.song_title;
+    await supabase.from("songs").update({ title_en: result.song_title }).eq("id", result.id);
   }
 
   return result;
