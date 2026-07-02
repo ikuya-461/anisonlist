@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getSongDetail, updateYoutubeId } from "../../lib/queries/songs";
 import { useDetailPage } from "../../hooks/useDetailPage";
 import { SONG_TYPE_COLORS } from "../../lib/constants";
 import { supabase } from "../../lib/supabaseClient";
+import { ensureSongImage } from "../../lib/imageCache/songImageCache";
 import { DetailSkeleton } from "../../components/ui/Skeleton";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { songTitle } from "../../lib/displayText";
@@ -28,7 +29,24 @@ export default function SongDetail() {
   const navigate = useNavigate();
   const { lang, t } = useLanguage();
 
-  const { data: song, loading } = useDetailPage(getSongDetail, id);
+  const { data: song, loading, setData: setSong } = useDetailPage(getSongDetail, id);
+
+  // 画像はバックグラウンドで取得し(iTunes API)、揃い次第差し替える（詳細表示はブロックしない）
+  useEffect(() => {
+    if (!song || song.image_url) return;
+    let cancelled = false;
+    const artistForImage = song.artist || (song.vocalists ?? []).map((v) => v.name).join(", ");
+    ensureSongImage({
+      song_id: song.id,
+      song_title: song.song_title,
+      artist: artistForImage,
+      image_url: null
+    }).then((image_url) => {
+      if (cancelled || !image_url) return;
+      setSong((prev) => (prev ? { ...prev, image_url } : prev));
+    });
+    return () => { cancelled = true; };
+  }, [song, setSong]);
 
   const [isLoggedIn, setIsLoggedIn] = useState(null);
   const [ytInput, setYtInput] = useState("");

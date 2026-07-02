@@ -1,7 +1,6 @@
 import { supabase } from "../supabaseClient";
 import { normalizeText } from "../imageCache/normalize";
-import { ensureAnimeImages, fetchAnimeMeta } from "../imageCache/animeImageCache";
-import { ensureSongImages } from "../imageCache/songImageCache";
+import { fetchAnimeMeta } from "../imageCache/animeImageCache";
 import { calcRange, calcTotalPages } from "../utils/pagination";
 
 /* -------------------------------------------------------
@@ -34,10 +33,9 @@ export async function searchAnime({ keyword: rawKeyword = "", year = "", season 
     return { anime: [], total: 0, page: Number(page), totalPages: 1 };
   }
 
-  const anime = await ensureAnimeImages(data ?? []);
-
+  // 画像・英題の取得は呼び出し側でバックグラウンド実行させ、結果表示をブロックしない
   return {
-    anime,
+    anime: data ?? [],
     total: count ?? 0,
     page: Number(page),
     totalPages: calcTotalPages(count),
@@ -128,7 +126,6 @@ export async function getAnimeDetail(id) {
     artist: row.artist?.name ?? null
   }));
 
-  const songs = await ensureSongImages(formatted);
-
-  return { anime, songs };
+  // 画像取得は呼び出し側でバックグラウンド実行させ、詳細表示をブロックしない
+  return { anime, songs: formatted };
 }

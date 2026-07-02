@@ -5,7 +5,11 @@ import { useEffect, useState } from "react";
  *
  * @param {(id: string) => Promise<any>} fetchFn  データ取得関数
  * @param {string} id  URL パラメータ
- * @returns {{ data: any, loading: boolean }}
+ * @returns {{ data: any, loading: boolean, setData: Function }}
+ *
+ * setData も返す。画像など重い付随データ(外部API)は fetchFn 内で待たず、
+ * 呼び出し元コンポーネントが background で取得して setData((prev) => ...) で
+ * 後からマージできるようにするため。
  */
 export function useDetailPage(fetchFn, id) {
   const [data, setData] = useState(null);
@@ -33,5 +37,5 @@ export function useDetailPage(fetchFn, id) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  return { data, loading };
+  return { data, loading, setData };
 }

@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getArtistDetail } from "../../lib/queries/artists";
+import { ensureArtistImage } from "../../lib/imageCache/artistImageCache";
+import { ensureArtistNameEn } from "../../lib/imageCache/artistNameCache";
+import { ensureSongImages } from "../../lib/imageCache/songImageCache";
 import SongList from "../../components/list/SongList";
 import Button from "../../components/ui/Button";
 import { DetailSkeleton } from "../../components/ui/Skeleton";
@@ -49,6 +52,38 @@ export default function ArtistDetail() {
       cancelled = true;
     };
   }, [id, page]);
+
+  // 画像・英語名・曲画像はバックグラウンドで取得し(iTunes/MusicBrainz)、揃い次第差し替える
+  // (id, page) の組ごとに1回だけ実行（見つからない項目があっても再取得を繰り返さないようガード）
+  const fetchedKeyRef = useRef(null);
+  useEffect(() => {
+    if (!data) return;
+    const key = `${id}:${page}`;
+    if (fetchedKeyRef.current === key) return;
+    fetchedKeyRef.current = key;
+    let cancelled = false;
+
+    if (!data.artist.image_url) {
+      ensureArtistImage(data.artist).then((image_url) => {
+        if (cancelled || !image_url) return;
+        setData((prev) => (prev ? { ...prev, artist: { ...prev.artist, image_url } } : prev));
+      });
+    }
+    if (!data.artist.name_en) {
+      ensureArtistNameEn(data.artist).then((name_en) => {
+        if (cancelled || !name_en) return;
+        setData((prev) => (prev ? { ...prev, artist: { ...prev.artist, name_en } } : prev));
+      });
+    }
+    if (data.songs.some((s) => !s.image_url)) {
+      ensureSongImages(data.songs).then((withImages) => {
+        if (cancelled) return;
+        setData((prev) => (prev ? { ...prev, songs: withImages } : prev));
+      });
+    }
+
+    return () => { cancelled = true; };
+  }, [data, id, page, setData]);
 
   if (loading && !data) return <div className={pageStyles.outer}><DetailSkeleton /></div>;
   if (!data) return <div className={pageStyles.loading}>{t("detail.artist.notFound")}</div>;
@@ -106,7 +141,7 @@ export default function ArtistDetail() {
       {totalPages > 1 && (
         <div className={styles.pagination}>
           <Button disabled={page <= 1} onClick={() => changePage(page - 1)} className={styles.pageBtn}>
-            ← 前へ
+            {t("search.pager.prev")}
           </Button>
 
           {getPageNumbers(page, totalPages).map((p, i) =>
@@ -124,7 +159,7 @@ export default function ArtistDetail() {
           )}
 
           <Button disabled={page >= totalPages} onClick={() => changePage(page + 1)} className={styles.pageBtn}>
-            次へ →
+            {t("search.pager.next")}
           </Button>
         </div>
       )}

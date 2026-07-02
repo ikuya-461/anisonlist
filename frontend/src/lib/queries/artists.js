@@ -1,8 +1,5 @@
 import { supabase } from "../supabaseClient";
 import { normalizeText } from "../imageCache/normalize";
-import { ensureSongImages } from "../imageCache/songImageCache";
-import { ensureArtistImage, ensureArtistImages } from "../imageCache/artistImageCache";
-import { ensureArtistNameEn } from "../imageCache/artistNameCache";
 import { calcRange, calcTotalPages } from "../utils/pagination";
 
 // 担当曲の1ページ表示件数（初音ミク等は数万曲ひも付くためページング必須）
@@ -31,11 +28,9 @@ export async function searchArtists({ keyword: rawKeyword = "", page = 1 } = {})
     return { artists: [], total: 0, page: Number(page), totalPages: 1 };
   }
 
-  // 画像未取得のアーティストは iTunes(JP) から取得して DB にキャッシュ
-  const artists = await ensureArtistImages(data ?? []);
-
+  // 画像取得は呼び出し側でバックグラウンド実行させ、結果表示をブロックしない
   return {
-    artists,
+    artists: data ?? [],
     total: count ?? 0,
     page: Number(page),
     totalPages: calcTotalPages(count),
@@ -68,14 +63,7 @@ export async function getArtistDetail(id, page = 1) {
   const artist = await getArtistBasic(id);
   if (!artist) return null;
 
-  // 画像・英語名が未取得ならこの場で取得してキャッシュ（直リンクでも表示）
-  if (!artist.image_url) {
-    artist.image_url = await ensureArtistImage(artist);
-  }
-  if (!artist.name_en) {
-    // MusicBrainz から英語名を取得（レート制限に配慮し1人ずつ）
-    artist.name_en = await ensureArtistNameEn(artist);
-  }
+  // 画像・英語名の取得(iTunes/MusicBrainz)は呼び出し側でバックグラウンド実行させ、詳細表示をブロックしない
 
   const songSelect = `
     song_id:id,
@@ -131,11 +119,10 @@ export async function getArtistDetail(id, page = 1) {
     artist: row.category === "vocaloid" ? artist.name : (row.artist?.name ?? null)
   }));
 
-  const songs = await ensureSongImages(formatted);
-
+  // 画像取得は呼び出し側でバックグラウンド実行させ、詳細表示をブロックしない
   return {
     artist,
-    songs,
+    songs: formatted,
     page: p,
     total,
     totalPages: Math.max(1, Math.ceil(total / ARTIST_SONGS_PAGE_SIZE))

@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
 import { searchSongs } from "../../lib/queries/songs";
 import { searchAnime, getAnimeDetail } from "../../lib/queries/anime";
 import { searchGames, getGameDetail } from "../../lib/queries/games";
 import { searchArtists, getArtistDetail } from "../../lib/queries/artists";
+import { ensureSongImages } from "../../lib/imageCache/songImageCache";
+import { ensureAnimeImages } from "../../lib/imageCache/animeImageCache";
+import { ensureGameImages } from "../../lib/imageCache/gameImageCache";
+import { ensureArtistImages } from "../../lib/imageCache/artistImageCache";
 
 import SongList from "../list/SongList";
 import MediaCard from "../cards/MediaCard";
@@ -88,6 +92,9 @@ export default function SearchSong({ onAdd, heading }) {
 
   const [errorMessage, setErrorMessage] = useState("");
 
+  // 検索が切り替わった後に古い画像取得結果でstateを上書きしないためのトークン
+  const searchTokenRef = useRef(0);
+
   const getPageNumbers = (current, total) => {
     const pages = [];
     pages.push(1);
@@ -108,7 +115,7 @@ export default function SearchSong({ onAdd, heading }) {
   /* -------------------------------------------------------
      🎯 楽曲検索（ログイン版）
   ------------------------------------------------------- */
-  const fetchSongs = async (targetPage) => {
+  const fetchSongs = async (targetPage, token) => {
     const data = await searchSongs({ keyword, artist, anime, type, category, year, page: targetPage });
 
     const formatted = data.songs.map((row) => ({
@@ -129,56 +136,85 @@ export default function SearchSong({ onAdd, heading }) {
       image_url: row.image_url || null
     }));
 
+    if (searchTokenRef.current !== token) return; // 別の検索に切り替わっていたら破棄
     setResults(formatted);
     setTotalPages(data.totalPages || 1);
+
+    // 画像はバックグラウンドで取得し、揃い次第差し替える（結果表示はブロックしない）
+    ensureSongImages(formatted).then((withImages) => {
+      if (searchTokenRef.current !== token) return;
+      setResults(withImages);
+    });
   };
 
   /* -------------------------------------------------------
      🎯 アニメ検索
   ------------------------------------------------------- */
-  const fetchAnime = async (targetPage) => {
+  const fetchAnime = async (targetPage, token) => {
     const data = await searchAnime({
       keyword: animeKeyword,
       year: animeYear,
       season: animeSeason,
       page: targetPage
     });
+
+    if (searchTokenRef.current !== token) return;
     setResults(data.anime);
     setTotalPages(data.totalPages || 1);
+
+    ensureAnimeImages(data.anime).then((withImages) => {
+      if (searchTokenRef.current !== token) return;
+      setResults(withImages);
+    });
   };
 
   /* -------------------------------------------------------
      🎯 ゲーム検索
   ------------------------------------------------------- */
-  const fetchGames = async (targetPage) => {
+  const fetchGames = async (targetPage, token) => {
     const data = await searchGames({
       keyword: gameKeyword,
       year: gameYear,
       page: targetPage
     });
+
+    if (searchTokenRef.current !== token) return;
     setResults(data.games);
     setTotalPages(data.totalPages || 1);
+
+    ensureGameImages(data.games).then((withImages) => {
+      if (searchTokenRef.current !== token) return;
+      setResults(withImages);
+    });
   };
 
   /* -------------------------------------------------------
      🎯 アーティスト検索
   ------------------------------------------------------- */
-  const fetchArtists = async (targetPage) => {
+  const fetchArtists = async (targetPage, token) => {
     const data = await searchArtists({ keyword: artistKeyword, page: targetPage });
+
+    if (searchTokenRef.current !== token) return;
     setResults(data.artists);
     setTotalPages(data.totalPages || 1);
+
+    ensureArtistImages(data.artists).then((withImages) => {
+      if (searchTokenRef.current !== token) return;
+      setResults(withImages);
+    });
   };
 
   const fetchByTab = async (targetPage) => {
+    const token = ++searchTokenRef.current;
     setLoading(true);
     setErrorMessage("");
 
-    if (tab === "anime") await fetchAnime(targetPage);
-    else if (tab === "game") await fetchGames(targetPage);
-    else if (tab === "artist") await fetchArtists(targetPage);
-    else await fetchSongs(targetPage);
+    if (tab === "anime") await fetchAnime(targetPage, token);
+    else if (tab === "game") await fetchGames(targetPage, token);
+    else if (tab === "artist") await fetchArtists(targetPage, token);
+    else await fetchSongs(targetPage, token);
 
-    setLoading(false);
+    if (searchTokenRef.current === token) setLoading(false);
   };
 
   const updateURL = (newPage) => {

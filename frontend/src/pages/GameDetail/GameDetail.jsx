@@ -1,5 +1,7 @@
+import { useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getGameDetail, getGameImage } from "../../lib/queries/games";
+import { ensureSongImages } from "../../lib/imageCache/songImageCache";
 import { useDetailPage } from "../../hooks/useDetailPage";
 import SongList from "../../components/list/SongList";
 import { DetailSkeleton } from "../../components/ui/Skeleton";
@@ -12,12 +14,7 @@ import styles from "./GameDetail.module.css";
 async function fetchGameDetail(id) {
   const data = await getGameDetail(id);
   if (!data) return null;
-
-  const image_url = await getGameImage(data.game.title_jp);
-  return {
-    game: { ...data.game, image_url: image_url || data.game.image_url },
-    songs: data.songs || [],
-  };
+  return { game: data.game, songs: data.songs || [] };
 }
 
 export default function GameDetail() {
@@ -25,7 +22,32 @@ export default function GameDetail() {
   const navigate = useNavigate();
   const { lang, t } = useLanguage();
 
-  const { data, loading } = useDetailPage(fetchGameDetail, id);
+  const { data, loading, setData } = useDetailPage(fetchGameDetail, id);
+
+  // 画像はバックグラウンドで取得し(RAWG/iTunes)、揃い次第差し替える
+  // id ごとに1回だけ実行（画像が見つからない曲があっても再取得を繰り返さないようガード）
+  const fetchedForId = useRef(null);
+  useEffect(() => {
+    if (!data || fetchedForId.current === id) return;
+    fetchedForId.current = id;
+    let cancelled = false;
+
+    if (!data.game.image_url) {
+      getGameImage(data.game.title_jp).then((image_url) => {
+        if (cancelled || !image_url) return;
+        setData((prev) => (prev ? { ...prev, game: { ...prev.game, image_url } } : prev));
+      });
+    }
+
+    if (data.songs.some((s) => !s.image_url)) {
+      ensureSongImages(data.songs).then((withImages) => {
+        if (cancelled) return;
+        setData((prev) => (prev ? { ...prev, songs: withImages } : prev));
+      });
+    }
+
+    return () => { cancelled = true; };
+  }, [data, id, setData]);
 
   if (loading) return <div className={pageStyles.outer}><DetailSkeleton /></div>;
   if (!data) return <div className={pageStyles.loading}>{t("detail.game.notFound")}</div>;

@@ -1,6 +1,5 @@
 import { supabase } from "../supabaseClient";
 import { normalizeText } from "../imageCache/normalize";
-import { ensureSongImage, ensureSongImages } from "../imageCache/songImageCache";
 import { calcRange, calcTotalPages } from "../utils/pagination";
 
 // RPC search_songs の1行を画面表示用に整形
@@ -64,11 +63,9 @@ export async function searchSongs({
   const rows = (data ?? []).map(formatRpcRow);
   const total = data && data.length ? Number(data[0].total_count) : 0;
 
-  // 画像は iTunes API から取得（ボカロ/VTuber 含む全カテゴリ）
-  const songs = await ensureSongImages(rows);
-
+  // 画像取得(iTunes API)は呼び出し側でバックグラウンド実行させ、結果表示をブロックしない
   return {
-    songs,
+    songs: rows,
     total,
     page: Number(page),
     totalPages: calcTotalPages(total),
@@ -138,17 +135,7 @@ export async function getSongDetail(id) {
     producers
   };
 
-  // 画像未取得なら iTunes から取得（検索を経ず直リンクで来た場合の保険）
-  if (!result.image_url) {
-    const artistForImage = result.artist || vocalists.map((v) => v.name).join(", ");
-    const image_url = await ensureSongImage({
-      song_id: result.id,
-      song_title: result.song_title,
-      artist: artistForImage,
-      image_url: null
-    });
-    if (image_url) result.image_url = image_url;
-  }
+  // 画像取得(iTunes API)は呼び出し側でバックグラウンド実行させ、詳細表示をブロックしない
 
   // 曲名が既にラテン文字表記なら、それをそのまま英題としてキャッシュ（API不要）
   // 例: "oath sign", "God knows..."。日本語表記の曲はローマ字変換が要るため対象外

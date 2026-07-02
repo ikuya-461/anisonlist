@@ -1,5 +1,7 @@
+import { useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getAnimeDetail, getAnimeImage } from "../../lib/queries/anime";
+import { ensureSongImages } from "../../lib/imageCache/songImageCache";
 import { useDetailPage } from "../../hooks/useDetailPage";
 import SongList from "../../components/list/SongList";
 import { DetailSkeleton } from "../../components/ui/Skeleton";
@@ -13,12 +15,7 @@ import styles from "./AnimeDetail.module.css";
 async function fetchAnimeDetail(id) {
   const data = await getAnimeDetail(id);
   if (!data) return null;
-
-  const image_url = await getAnimeImage(data.anime.title_jp);
-  return {
-    anime: { ...data.anime, image_url: image_url || data.anime.image_url },
-    songs: data.songs || [],
-  };
+  return { anime: data.anime, songs: data.songs || [] };
 }
 
 export default function AnimeDetail() {
@@ -26,7 +23,32 @@ export default function AnimeDetail() {
   const navigate = useNavigate();
   const { lang, t } = useLanguage();
 
-  const { data, loading } = useDetailPage(fetchAnimeDetail, id);
+  const { data, loading, setData } = useDetailPage(fetchAnimeDetail, id);
+
+  // 画像はバックグラウンドで取得し(AniList/iTunes)、揃い次第差し替える
+  // id ごとに1回だけ実行（画像が見つからない曲があっても再取得を繰り返さないようガード）
+  const fetchedForId = useRef(null);
+  useEffect(() => {
+    if (!data || fetchedForId.current === id) return;
+    fetchedForId.current = id;
+    let cancelled = false;
+
+    if (!data.anime.image_url) {
+      getAnimeImage(data.anime.title_jp).then((image_url) => {
+        if (cancelled || !image_url) return;
+        setData((prev) => (prev ? { ...prev, anime: { ...prev.anime, image_url } } : prev));
+      });
+    }
+
+    if (data.songs.some((s) => !s.image_url)) {
+      ensureSongImages(data.songs).then((withImages) => {
+        if (cancelled) return;
+        setData((prev) => (prev ? { ...prev, songs: withImages } : prev));
+      });
+    }
+
+    return () => { cancelled = true; };
+  }, [data, id, setData]);
 
   if (loading) return <div className={pageStyles.outer}><DetailSkeleton /></div>;
   if (!data) return <div className={pageStyles.loading}>{t("detail.anime.notFound")}</div>;

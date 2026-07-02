@@ -1,7 +1,6 @@
 import { supabase } from "../supabaseClient";
 import { normalizeText } from "../imageCache/normalize";
-import { ensureSongImages } from "../imageCache/songImageCache";
-import { ensureGameImages, getGameImage } from "../imageCache/gameImageCache";
+import { getGameImage } from "../imageCache/gameImageCache";
 import { calcRange, calcTotalPages } from "../utils/pagination";
 
 /* -------------------------------------------------------
@@ -29,10 +28,9 @@ export async function searchGames({ keyword: rawKeyword = "", year = "", page = 
     return { games: [], total: 0, page: Number(page), totalPages: 1 };
   }
 
-  const games = await ensureGameImages(data ?? []);
-
+  // 画像・英題の取得は呼び出し側でバックグラウンド実行させ、結果表示をブロックしない
   return {
-    games,
+    games: data ?? [],
     total: count ?? 0,
     page: Number(page),
     totalPages: calcTotalPages(count),
@@ -94,7 +92,6 @@ export async function getGameDetail(id) {
     artist: row.artist?.name ?? null
   }));
 
-  const songs = await ensureSongImages(formatted);
-
-  return { game, songs };
+  // 画像取得は呼び出し側でバックグラウンド実行させ、詳細表示をブロックしない
+  return { game, songs: formatted };
 }
