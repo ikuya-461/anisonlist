@@ -14,7 +14,9 @@ import ListSelect from "../../components/list/ListSelect";
 import SearchSong from "../../components/search/SearchSong";
 import SongList from "../../components/list/SongList";
 import AddSongModal from "../../components/modals/AddSongModal";
+import RankingImageModal from "../../components/modals/RankingImageModal";
 import { SongListSkeleton } from "../../components/ui/Skeleton";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 import styles from "./ListPage.module.css";
 
@@ -26,8 +28,10 @@ export default function ListPage() {
   const [listInfo, setListInfo] = useState(null);
   const [pendingSong, setPendingSong] = useState(null); // モーダル用
   const [songsLoading, setSongsLoading] = useState(true); // 初回ロード用
+  const [showRanking, setShowRanking] = useState(false); // ランキング画像モーダル
 
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   // リスト情報を再取得する（リスト名変更後にも再利用）
   const fetchListInfo = useCallback(async () => {
@@ -110,6 +114,13 @@ export default function ListPage() {
           onSkip={handleModalSkip}
         />
       )}
+      {showRanking && (
+        <RankingImageModal
+          listName={listInfo?.name}
+          songs={songs}
+          onClose={() => setShowRanking(false)}
+        />
+      )}
       <div className={styles.inner}>
         <ListHeader
           listId={listId}
@@ -123,6 +134,12 @@ export default function ListPage() {
             window.location.href = `/list/${newId}`;
           }}
         />
+
+        {!songsLoading && songs.length > 0 && (
+          <button className={styles.rankingBtn} onClick={() => setShowRanking(true)}>
+            {t("ranking.open")}
+          </button>
+        )}
 
         {songsLoading ? (
           <SongListSkeleton count={6} />

@@ -1,6 +1,7 @@
 [build]
   command = "npm run build"
   publish = "build"
+  functions = "netlify/functions"
 
 # React Router (CRA) のクライアントサイドルーティングに対応するため、
 # 全パスを index.html にフォールバックさせる

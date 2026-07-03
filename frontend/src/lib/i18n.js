@@ -154,6 +154,15 @@ export const TR = {
     "list.namePh": "リスト名",
 
     /* マイページ / 公開ページ */
+    /* ランキング画像 */
+    "ranking.open": "🖼️ ランキング画像を作る",
+    "ranking.title": "ランキング画像",
+    "ranking.templateLabel": "テンプレート（この気分で選ぶ）",
+    "ranking.download": "画像を保存",
+    "ranking.share": "SNSでシェア",
+    "ranking.generating": "生成中...",
+    "ranking.empty": "リストに曲がありません",
+
     "mypage.myLists": "マイリスト",
     "mypage.logout": "ログアウト",
     "mypage.lists": "リスト",
@@ -319,6 +328,14 @@ export const TR = {
     "list.confirmDelete": "Delete this list?",
     "list.create": "＋ New list",
     "list.namePh": "List name",
+
+    "ranking.open": "🖼️ Create ranking image",
+    "ranking.title": "Ranking image",
+    "ranking.templateLabel": "Template (pick your mood)",
+    "ranking.download": "Save image",
+    "ranking.share": "Share to SNS",
+    "ranking.generating": "Generating...",
+    "ranking.empty": "No songs in this list",
 
     "mypage.myLists": "My lists",
     "mypage.logout": "Log out",
