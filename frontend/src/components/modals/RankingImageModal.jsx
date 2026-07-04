@@ -14,6 +14,7 @@ export default function RankingImageModal({ listName, songs, onClose }) {
   const { lang, t } = useLanguage();
   const canvasRef = useRef(null);
   const [templateKey, setTemplateKey] = useState(RANKING_TEMPLATES[0].key);
+  const [mode, setMode] = useState("ranking"); // ranking=順位あり / list=順位なし
   const [generating, setGenerating] = useState(true);
   const [canShareFile, setCanShareFile] = useState(false);
 
@@ -23,17 +24,17 @@ export default function RankingImageModal({ listName, songs, onClose }) {
     setCanShareFile(!!(navigator.canShare && navigator.canShare({ files: [dummy] })));
   }, []);
 
-  // テンプレート・言語が変わるたびに再描画
+  // テンプレート・形式・言語が変わるたびに再描画
   useEffect(() => {
     let cancelled = false;
     const canvas = canvasRef.current;
     if (!canvas) return;
     setGenerating(true);
-    drawRankingImage(canvas, { listName, songs, templateKey, lang })
+    drawRankingImage(canvas, { listName, songs, templateKey, lang, mode })
       .catch((err) => console.error("drawRankingImage error:", err))
       .finally(() => { if (!cancelled) setGenerating(false); });
     return () => { cancelled = true; };
-  }, [listName, songs, templateKey, lang]);
+  }, [listName, songs, templateKey, lang, mode]);
 
   const toBlob = () =>
     new Promise((resolve) => canvasRef.current.toBlob(resolve, "image/png"));
@@ -73,6 +74,20 @@ export default function RankingImageModal({ listName, songs, onClose }) {
         <div className={styles.header}>
           <h3 className={styles.title}>{t("ranking.title")}</h3>
           <button className={styles.closeBtn} onClick={onClose} aria-label="close">✕</button>
+        </div>
+
+        {/* 形式切替（ランキング / リスト） */}
+        <div className={styles.templateLabel}>{t("ranking.modeLabel")}</div>
+        <div className={styles.modes}>
+          {["ranking", "list"].map((m) => (
+            <button
+              key={m}
+              className={`${styles.modeBtn} ${mode === m ? styles.modeActive : ""}`}
+              onClick={() => setMode(m)}
+            >
+              {t(`ranking.mode.${m}`)}
+            </button>
+          ))}
         </div>
 
         {/* テンプレート選択ギャラリー */}

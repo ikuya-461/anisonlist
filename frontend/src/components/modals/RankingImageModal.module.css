@@ -55,6 +55,38 @@
   color: var(--cyan);
 }
 
+/* --- 形式切替 --- */
+.modes {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.modeBtn {
+  flex: 1;
+  padding: 9px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-sub);
+  border: 1.5px solid rgba(1, 253, 254, 0.2);
+  transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.modeBtn:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+.modeActive {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  background: rgba(1, 253, 254, 0.08);
+  box-shadow: 0 0 8px rgba(1, 253, 254, 0.3);
+}
+
 /* --- テンプレートギャラリー --- */
 .templateLabel {
   font-size: 12px;

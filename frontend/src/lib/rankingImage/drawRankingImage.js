@@ -57,9 +57,16 @@ function roundRectPath(ctx, x, y, w, h, r) {
 
 /**
  * @param {HTMLCanvasElement} canvas
- * @param {{ listName: string, songs: Array, templateKey: string, lang: "ja"|"en" }} opts
+ * @param {{
+ *   listName: string,
+ *   songs: Array,
+ *   templateKey: string,
+ *   lang: "ja"|"en",
+ *   mode?: "ranking"|"list"  // ranking=順位数字あり / list=順位なしの一覧
+ * }} opts
  */
-export async function drawRankingImage(canvas, { listName, songs, templateKey, lang = "ja" }) {
+export async function drawRankingImage(canvas, { listName, songs, templateKey, lang = "ja", mode = "ranking" }) {
+  const isRanking = mode !== "list";
   const tpl = getTemplate(templateKey);
   const ctx = canvas.getContext("2d");
   canvas.width = CANVAS_W;
@@ -120,28 +127,30 @@ export async function drawRankingImage(canvas, { listName, songs, templateKey, l
 
   rows.forEach((song, i) => {
     const y = rowTop + i * rowH;
-    const isTop3 = i < 3;
+    const isTop3 = isRanking && i < 3;
 
-    // 行背景（Top3はうっすらアクセント）
+    // 行背景（ランキングのTop3はうっすらアクセント）
     if (isTop3) {
       roundRectPath(ctx, PAD - 12, y, CANVAS_W - (PAD - 12) * 2, rowH - 10, 10);
       ctx.fillStyle = "rgba(255,255,255,0.045)";
       ctx.fill();
     }
 
-    // 順位
-    ctx.font = isTop3
-      ? "900 52px 'Orbitron', sans-serif"
-      : "700 38px 'Orbitron', sans-serif";
-    ctx.fillStyle = isTop3 ? tpl.rankColor : "rgba(255,255,255,0.55)";
-    ctx.textAlign = "right";
-    if (isTop3) { ctx.shadowColor = tpl.accent; ctx.shadowBlur = 16; }
-    ctx.fillText(String(i + 1), PAD + 74, y + rowH / 2 + (isTop3 ? 18 : 13));
-    ctx.shadowBlur = 0;
-    ctx.textAlign = "left";
+    // 順位（リスト形式では描かない）
+    if (isRanking) {
+      ctx.font = isTop3
+        ? "900 52px 'Orbitron', sans-serif"
+        : "700 38px 'Orbitron', sans-serif";
+      ctx.fillStyle = isTop3 ? tpl.rankColor : "rgba(255,255,255,0.55)";
+      ctx.textAlign = "right";
+      if (isTop3) { ctx.shadowColor = tpl.accent; ctx.shadowBlur = 16; }
+      ctx.fillText(String(i + 1), PAD + 74, y + rowH / 2 + (isTop3 ? 18 : 13));
+      ctx.shadowBlur = 0;
+      ctx.textAlign = "left";
+    }
 
-    // ジャケット
-    const cx = PAD + 100;
+    // ジャケット（リスト形式は順位ぶん左に詰める）
+    const cx = isRanking ? PAD + 100 : PAD;
     const cy = y + (rowH - 10 - coverSize) / 2;
     const img = covers[i];
     ctx.save();
