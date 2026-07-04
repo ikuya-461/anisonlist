@@ -21,6 +21,7 @@ const GameDetail = lazy(() => import("./GameDetail/GameDetail"));
 const ArtistDetail = lazy(() => import("./ArtistDetail/ArtistDetail"));
 const PublicListPage = lazy(() => import("./PublicListPage/PublicListPage"));
 const PublicProfilePage = lazy(() => import("./PublicProfilePage/PublicProfilePage"));
+const Privacy = lazy(() => import("./Privacy/Privacy"));
 
 function App() {
   // null = 初期確認中（ローディング扱い）、true/false = 確認済み
@@ -75,6 +76,7 @@ function App() {
             <Route path="/list/:id" element={<ListPage />} />
             <Route path="/public/:id" element={<PublicListPage />} />
             <Route path="/user/:userId" element={<PublicProfilePage />} />
+            <Route path="/privacy" element={<Privacy />} />
           </Routes>
         </Suspense>
       </Layout>

@@ -119,3 +119,20 @@ export async function toggleProfilePublic(currentValue) {
 
   return data.is_public;
 }
+
+/* -------------------------------------------------------
+   ★ アカウント削除（ストア審査要件）
+   - RPC(delete_my_account)が本人のauth.users+全関連データを削除
+   - 成功したらセッションも破棄する
+------------------------------------------------------- */
+export async function deleteMyAccount() {
+  const { error } = await supabase.rpc("delete_my_account");
+
+  if (error) {
+    console.error("deleteMyAccount error:", error);
+    return false;
+  }
+
+  await supabase.auth.signOut();
+  return true;
+}

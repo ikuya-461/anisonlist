@@ -125,6 +125,9 @@ export const TR = {
     "auth.err.profileSave": "ユーザー情報の保存に失敗しました",
     "auth.err.invalidCredentials": "メールアドレスまたはパスワードが違います",
     "auth.msg.signupDone": "登録が完了しました。メールを確認してください。",
+    "auth.privacyPre": "登録することで",
+    "auth.privacyLink": "プライバシーポリシー",
+    "auth.privacyPost": "に同意したものとみなされます",
     "auth.msg.resetSent": "再設定メールを送信しました。メールを確認してください。",
     "auth.err.emailRequired": "メールアドレスを入力してください",
     "auth.err.emailInvalid": "メールアドレスが正しくありません",
@@ -165,6 +168,14 @@ export const TR = {
     "ranking.share": "SNSでシェア",
     "ranking.generating": "生成中...",
     "ranking.empty": "リストに曲がありません",
+
+    /* アカウント削除 */
+    "account.delete": "アカウントを削除",
+    "account.deleteConfirmTitle": "アカウントを削除しますか？",
+    "account.deleteConfirmText": "リスト・いいねを含む全てのデータが完全に削除されます。この操作は取り消せません。",
+    "account.deleting": "削除中...",
+    "account.deleteConfirm": "完全に削除する",
+    "account.deleteFailed": "削除に失敗しました。時間をおいて再度お試しください。",
 
     "mypage.myLists": "マイリスト",
     "mypage.logout": "ログアウト",
@@ -306,6 +317,9 @@ export const TR = {
     "auth.err.profileSave": "Failed to save your profile",
     "auth.err.invalidCredentials": "Incorrect email or password",
     "auth.msg.signupDone": "Sign-up complete. Please check your email.",
+    "auth.privacyPre": "By signing up, you agree to our ",
+    "auth.privacyLink": "Privacy Policy",
+    "auth.privacyPost": ".",
     "auth.msg.resetSent": "Reset email sent. Please check your inbox.",
     "auth.err.emailRequired": "Enter your email address",
     "auth.err.emailInvalid": "That email address is not valid",
@@ -342,6 +356,13 @@ export const TR = {
     "ranking.share": "Share to SNS",
     "ranking.generating": "Generating...",
     "ranking.empty": "No songs in this list",
+
+    "account.delete": "Delete account",
+    "account.deleteConfirmTitle": "Delete your account?",
+    "account.deleteConfirmText": "All your data including lists and likes will be permanently deleted. This cannot be undone.",
+    "account.deleting": "Deleting...",
+    "account.deleteConfirm": "Delete permanently",
+    "account.deleteFailed": "Failed to delete. Please try again later.",
 
     "mypage.myLists": "My lists",
     "mypage.logout": "Log out",

@@ -242,3 +242,105 @@ span.icon {
   border-color: #C24347;
   color: #C24347;
 }
+
+/* --- アカウント削除（ストア審査要件） --- */
+.deleteAccountBtn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 4px;
+  background: transparent;
+  color: rgba(194,67,71,0.55);
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  text-decoration: underline;
+  transition: color 0.15s;
+}
+
+.deleteAccountBtn:hover {
+  color: #C24347;
+}
+
+.deleteOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.deleteModal {
+  width: min(400px, 100%);
+  background: var(--color-card);
+  border: 1px solid rgba(194,67,71,0.4);
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: 0 0 30px rgba(194,67,71,0.2);
+}
+
+.deleteTitle {
+  margin: 0 0 12px;
+  font-size: 17px;
+  color: #E05A5A;
+}
+
+.deleteText {
+  margin: 0 0 18px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-sub);
+}
+
+.deleteError {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: #E05A5A;
+}
+
+.deleteBtnRow {
+  display: flex;
+  gap: 10px;
+}
+
+.deleteCancelBtn {
+  flex: 1;
+  padding: 11px;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-sub);
+  border: 1.5px solid rgba(1,253,254,0.25);
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.deleteCancelBtn:hover:not(:disabled) {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+.deleteConfirmBtn {
+  flex: 1;
+  padding: 11px;
+  border-radius: 4px;
+  background: rgba(194,67,71,0.15);
+  color: #E05A5A;
+  border: 1.5px solid #C24347;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.deleteConfirmBtn:hover:not(:disabled) {
+  background: rgba(194,67,71,0.3);
+}
+
+.deleteCancelBtn:disabled,
+.deleteConfirmBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}

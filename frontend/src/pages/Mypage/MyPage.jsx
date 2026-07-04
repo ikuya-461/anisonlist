@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { getMyLists, toggleListPublic } from "../../lib/queries/lists";
-import { getMyProfile, updateMyProfile, toggleProfilePublic } from "../../lib/queries/users";
+import { getMyProfile, updateMyProfile, toggleProfilePublic, deleteMyAccount } from "../../lib/queries/users";
 import styles from "./MyPage.module.css";
 
 import ListGallery from "../../components/list/ListGallery";
@@ -30,6 +30,11 @@ export default function MyPage({ updateLoginState }) {
   const [editName, setEditName] = useState("");
   const [editBio, setEditBio] = useState("");
   const [editIcon, setEditIcon] = useState("");
+
+  // アカウント削除（ストア審査要件）
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   // ① ログイン確認 + プロフィール取得 + リスト一覧取得
   useEffect(() => {
@@ -93,6 +98,24 @@ export default function MyPage({ updateLoginState }) {
   // ⑦ ログアウト
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    await updateLoginState();
+    navigate("/", { replace: true });
+  };
+
+  // ⑧ アカウント削除（RPCが全データ削除→セッション破棄）
+  const handleDeleteAccount = async () => {
+    if (deletingAccount) return;
+    setDeletingAccount(true);
+    setDeleteError("");
+
+    const ok = await deleteMyAccount();
+
+    if (!ok) {
+      setDeletingAccount(false);
+      setDeleteError(t("account.deleteFailed"));
+      return;
+    }
+
     await updateLoginState();
     navigate("/", { replace: true });
   };
@@ -230,6 +253,37 @@ export default function MyPage({ updateLoginState }) {
         <button onClick={handleLogout} className={styles.logoutBtn}>
           {t("auth.logout")}
         </button>
+
+        {/* アカウント削除（ストア審査要件: アプリ内から削除可能にする） */}
+        <button onClick={() => setShowDeleteAccount(true)} className={styles.deleteAccountBtn}>
+          {t("account.delete")}
+        </button>
+
+        {showDeleteAccount && (
+          <div className={styles.deleteOverlay} onClick={() => !deletingAccount && setShowDeleteAccount(false)}>
+            <div className={styles.deleteModal} onClick={(e) => e.stopPropagation()}>
+              <h3 className={styles.deleteTitle}>{t("account.deleteConfirmTitle")}</h3>
+              <p className={styles.deleteText}>{t("account.deleteConfirmText")}</p>
+              {deleteError && <p className={styles.deleteError}>{deleteError}</p>}
+              <div className={styles.deleteBtnRow}>
+                <button
+                  className={styles.deleteCancelBtn}
+                  onClick={() => setShowDeleteAccount(false)}
+                  disabled={deletingAccount}
+                >
+                  {t("common.cancel")}
+                </button>
+                <button
+                  className={styles.deleteConfirmBtn}
+                  onClick={handleDeleteAccount}
+                  disabled={deletingAccount}
+                >
+                  {deletingAccount ? t("account.deleting") : t("account.deleteConfirm")}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>

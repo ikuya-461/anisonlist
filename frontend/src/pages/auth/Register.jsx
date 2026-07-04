@@ -186,6 +186,14 @@ export default function Register() {
         {t("auth.btn.signup")}
       </button>
 
+      <p className={styles.privacyNote}>
+        {t("auth.privacyPre")}
+        <span className={styles.link} onClick={() => navigate("/privacy")}>
+          {t("auth.privacyLink")}
+        </span>
+        {t("auth.privacyPost")}
+      </p>
+
       <div className={styles.subText}>
         {t("auth.haveAccount")}{" "}
         <span className={styles.link} onClick={() => navigate("/login")}>
