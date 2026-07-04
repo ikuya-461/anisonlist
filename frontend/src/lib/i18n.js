@@ -154,9 +154,9 @@ export const TR = {
     "list.namePh": "リスト名",
 
     /* マイページ / 公開ページ */
-    /* ランキング画像 */
-    "ranking.open": "🖼️ ランキング画像を作る",
-    "ranking.title": "ランキング画像",
+    /* シェア画像（ランキング/リスト） */
+    "ranking.open": "🖼️ リストを画像でシェア",
+    "ranking.title": "シェア画像",
     "ranking.templateLabel": "テンプレート（この気分で選ぶ）",
     "ranking.modeLabel": "形式",
     "ranking.mode.ranking": "🏆 ランキング",
@@ -332,8 +332,8 @@ export const TR = {
     "list.create": "＋ New list",
     "list.namePh": "List name",
 
-    "ranking.open": "🖼️ Create ranking image",
-    "ranking.title": "Ranking image",
+    "ranking.open": "🖼️ Share list as image",
+    "ranking.title": "Share image",
     "ranking.templateLabel": "Template (pick your mood)",
     "ranking.modeLabel": "Format",
     "ranking.mode.ranking": "🏆 Ranking",
