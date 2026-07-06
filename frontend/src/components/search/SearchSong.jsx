@@ -535,8 +535,10 @@ export default function SearchSong({ onAdd, onAddAnime, heading }) {
               key={a.id}
               type="anime"
               data={a}
+              // アニメリスト編集時：カード本体＝詳細閲覧、「＋」ボタン＝リスト追加
+              onAdd={onAddAnime ? (anime) => onAddAnime(anime) : undefined}
               onClick={(id) => onAddAnime
-                ? onAddAnime(a)
+                ? navigate(`/anime/${id}`)
                 : onAdd
                 ? openPicker("anime", id, animeTitle(a, lang))
                 : navigate(`/anime/${id}`)

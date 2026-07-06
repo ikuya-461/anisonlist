@@ -1,3 +1,4 @@
+import { useState } from "react";
 import styles from "./MediaCard.module.css";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { animeTitle, gameTitle, artistName } from "../../lib/displayText";
@@ -8,10 +9,12 @@ import { valueLabel, SEASON_LABELS } from "../../lib/i18n";
  *
  * @param {"anime"|"game"|"artist"} type
  * @param {object}                  data  アニメ/ゲーム/アーティストのオブジェクト
- * @param {function}                onClick (id) => void
+ * @param {function}                onClick (id) => void  カード本体クリック（詳細閲覧等）
+ * @param {function}                [onAdd] (data) => void  渡すと「＋」追加ボタンを表示
  */
-export default function MediaCard({ type, data, onClick }) {
+export default function MediaCard({ type, data, onClick, onAdd }) {
   const { lang, t } = useLanguage();
+  const [added, setAdded] = useState(false);
   const isAnime = type === "anime";
   const isGame  = type === "game";
 
@@ -43,6 +46,21 @@ export default function MediaCard({ type, data, onClick }) {
         <div className={styles.title}>{title}</div>
         <div className={styles.meta}>{meta}</div>
       </div>
+
+      {onAdd && (
+        <button
+          className={`${styles.addBtn} ${added ? styles.addBtnAdded : ""}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (added) return;
+            onAdd(data);
+            setAdded(true);
+            setTimeout(() => setAdded(false), 1500);
+          }}
+        >
+          {added ? "✓" : "＋"}
+        </button>
+      )}
     </div>
   );
 }

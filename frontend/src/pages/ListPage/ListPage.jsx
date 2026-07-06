@@ -229,9 +229,12 @@ export default function ListPage() {
           />
         )}
 
-        {isAnimeList
-          ? <SearchSong onAddAnime={handleAddAnime} />
-          : <SearchSong onAdd={handleAddSong} />}
+        {/* リストタイプ確定後に描画（曲検索が一瞬出るのを防ぐ） */}
+        {listInfo && (
+          isAnimeList
+            ? <SearchSong onAddAnime={handleAddAnime} />
+            : <SearchSong onAdd={handleAddSong} />
+        )}
       </div>
     </div>
   );

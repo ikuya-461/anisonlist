@@ -132,6 +132,8 @@
 
 /* 追加ボタン */
 .addBtn {
+  align-self: flex-end;
+  min-width: 44px;
   padding: 5px 14px;
   border-radius: 3px;
   border: 1.5px solid var(--cyan);
