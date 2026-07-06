@@ -85,3 +85,35 @@
 .cancelButton:hover {
   border-color: rgba(1,253,254,0.35);
 }
+
+/* リストの種類選択 */
+.typeRow {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.typeBtn {
+  flex: 1;
+  padding: 9px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-sub);
+  border: 1.5px solid rgba(1, 253, 254, 0.2);
+  transition: border-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.typeBtn:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}
+
+.typeActive {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  background: rgba(1, 253, 254, 0.08);
+  box-shadow: 0 0 8px rgba(1, 253, 254, 0.3);
+}

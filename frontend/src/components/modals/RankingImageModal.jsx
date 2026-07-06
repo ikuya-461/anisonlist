@@ -10,7 +10,7 @@ import styles from "./RankingImageModal.module.css";
    - 感情テンプレート9種から手動選択 → canvasプレビュー
    - ダウンロード / Web Share API（対応環境のみ）でSNSへ
    ========================================================= */
-export default function RankingImageModal({ listName, songs, onClose }) {
+export default function RankingImageModal({ listName, songs, itemType = "song", onClose }) {
   const { lang, t } = useLanguage();
   const canvasRef = useRef(null);
   const [templateKey, setTemplateKey] = useState(RANKING_TEMPLATES[0].key);
@@ -30,11 +30,11 @@ export default function RankingImageModal({ listName, songs, onClose }) {
     const canvas = canvasRef.current;
     if (!canvas) return;
     setGenerating(true);
-    drawRankingImage(canvas, { listName, songs, templateKey, lang, mode })
+    drawRankingImage(canvas, { listName, songs, templateKey, lang, mode, itemType })
       .catch((err) => console.error("drawRankingImage error:", err))
       .finally(() => { if (!cancelled) setGenerating(false); });
     return () => { cancelled = true; };
-  }, [listName, songs, templateKey, lang, mode]);
+  }, [listName, songs, templateKey, lang, mode, itemType]);
 
   const toBlob = () =>
     new Promise((resolve) => canvasRef.current.toBlob(resolve, "image/png"));

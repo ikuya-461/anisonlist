@@ -195,6 +195,12 @@ export const TR = {
     "public.noPublicLists": "公開リストはありません。",
     "list.createNew": "＋ 新しいリストを作成",
     "list.newNamePh": "新しいリスト名",
+    "list.typeLabel": "リストの種類",
+    "list.type.song": "🎵 曲リスト",
+    "list.type.anime": "📺 アニメリスト",
+    "animeModal.sub": "追加しました！タグをつけますか？",
+    "animeModal.tagLabel": "このアニメは？",
+    "anime.noAnime": "まだアニメがありません。下の検索から追加しましょう。",
     "list.creating": "作成中...",
     "list.createBtn": "作成",
     "list.delete": "削除",
@@ -382,6 +388,12 @@ export const TR = {
     "public.noPublicLists": "No public lists.",
     "list.createNew": "＋ Create a new list",
     "list.newNamePh": "New list name",
+    "list.typeLabel": "List type",
+    "list.type.song": "🎵 Song list",
+    "list.type.anime": "📺 Anime list",
+    "animeModal.sub": "Added! Want to tag it?",
+    "animeModal.tagLabel": "How's this anime?",
+    "anime.noAnime": "No anime yet. Add some from the search below.",
     "list.creating": "Creating...",
     "list.createBtn": "Create",
     "list.delete": "Delete",
@@ -441,6 +453,19 @@ export const EMOTION_LABELS = {
   work_bgm:      { ja: "🥱 作業用",     en: "🥱 Focus BGM" },
   chuunibyou:    { ja: "💀 厨二病",     en: "💀 Chuunibyou" },
   lyrics_insane: { ja: "🤯 歌詞がヤバい", en: "🤯 Wild lyrics" }
+};
+
+/* アニメリスト用タグ（曲の感情タグとは別語彙） */
+export const ANIME_TAG_LABELS = {
+  god_anime: { ja: "✨ 神アニメ",     en: "✨ Masterpiece" },
+  cry:       { ja: "😭 泣ける",       en: "😭 Tearjerker" },
+  sakuga:    { ja: "🎨 作画が神",     en: "🎨 God-tier animation" },
+  music:     { ja: "🎵 OP・EDが神",   en: "🎵 Great OP/ED" },
+  story:     { ja: "📖 考察が捗る",   en: "📖 Deep story" },
+  binge:     { ja: "🍿 一気見必至",   en: "🍿 Binge-worthy" },
+  healing:   { ja: "🌿 癒し",         en: "🌿 Healing" },
+  dark:      { ja: "🌑 鬱・ダーク",   en: "🌑 Dark" },
+  meshi:     { ja: "🍜 飯テロ",       en: "🍜 Food heaven" }
 };
 
 export const ENCOUNTER_LABELS = {

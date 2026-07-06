@@ -3,7 +3,7 @@ import { supabase } from "../supabaseClient";
 /* -------------------------------------------------------
    ★ 新規リスト作成
 ------------------------------------------------------- */
-export async function createList(name) {
+export async function createList(name, listType = "song") {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
@@ -19,8 +19,8 @@ export async function createList(name) {
 
   const { data, error } = await supabase
     .from("lists")
-    .insert({ user_id: user.id, name, position: nextPosition })
-    .select("id, user_id, name, created_at, position")
+    .insert({ user_id: user.id, name, position: nextPosition, list_type: listType })
+    .select("id, user_id, name, created_at, position, list_type")
     .single();
 
   if (error) {
@@ -37,7 +37,7 @@ export async function createList(name) {
 export async function getListDetail(listId) {
   const { data, error } = await supabase
     .from("lists")
-    .select("id, name, description, user_id, position, is_public, created_at")
+    .select("id, name, description, user_id, position, is_public, created_at, list_type")
     .eq("id", listId)
     .single();
 
@@ -62,7 +62,7 @@ export async function getMyLists() {
 
   const { data: lists, error } = await supabase
     .from("lists")
-    .select("id, user_id, name, created_at, position, is_public")
+    .select("id, user_id, name, created_at, position, is_public, list_type")
     .eq("user_id", user.id)
     .order("position", { ascending: true });
 
@@ -73,14 +73,25 @@ export async function getMyLists() {
 
   return Promise.all(
     (lists ?? []).map(async (list) => {
-      const { data: previewRows } = await supabase
-        .from("list_songs")
-        .select("song:songs!song_id ( image_url, song_type )")
-        .eq("list_id", list.id)
-        .order("position", { ascending: true })
-        .limit(1);
-
-      const preview = previewRows?.[0]?.song ?? null;
+      // プレビュー画像はリストタイプに応じて先頭アイテムから取得
+      let preview = null;
+      if (list.list_type === "anime") {
+        const { data: previewRows } = await supabase
+          .from("list_anime")
+          .select("anime:anime!anime_id ( image_url )")
+          .eq("list_id", list.id)
+          .order("position", { ascending: true })
+          .limit(1);
+        preview = previewRows?.[0]?.anime ?? null;
+      } else {
+        const { data: previewRows } = await supabase
+          .from("list_songs")
+          .select("song:songs!song_id ( image_url, song_type )")
+          .eq("list_id", list.id)
+          .order("position", { ascending: true })
+          .limit(1);
+        preview = previewRows?.[0]?.song ?? null;
+      }
 
       const { count: likeCount } = await supabase
         .from("list_likes")
@@ -148,7 +159,7 @@ export async function updateListDescription(listId, description) {
 export async function getPublicListDetail(listId) {
   const { data, error } = await supabase
     .from("lists")
-    .select("id, name, description, user_id, is_public")
+    .select("id, name, description, user_id, is_public, list_type")
     .eq("id", listId)
     .eq("is_public", true)
     .maybeSingle();
@@ -167,7 +178,7 @@ export async function getPublicListDetail(listId) {
 export async function getPublicListsByUser(userId) {
   const { data, error } = await supabase
     .from("lists")
-    .select("id, name, position")
+    .select("id, name, position, list_type")
     .eq("user_id", userId)
     .eq("is_public", true)
     .order("position", { ascending: true });
@@ -177,17 +188,27 @@ export async function getPublicListsByUser(userId) {
     return [];
   }
 
-  // 各リストの先頭曲サムネイルを取得
+  // 各リストの先頭アイテムのサムネイルを取得（曲/アニメで参照先を切替）
   return Promise.all(
     (data ?? []).map(async (list) => {
-      const { data: previewRows } = await supabase
-        .from("list_songs")
-        .select("song:songs!song_id ( image_url, song_type )")
-        .eq("list_id", list.id)
-        .order("position", { ascending: true })
-        .limit(1);
-
-      const preview = previewRows?.[0]?.song ?? null;
+      let preview = null;
+      if (list.list_type === "anime") {
+        const { data: previewRows } = await supabase
+          .from("list_anime")
+          .select("anime:anime!anime_id ( image_url )")
+          .eq("list_id", list.id)
+          .order("position", { ascending: true })
+          .limit(1);
+        preview = previewRows?.[0]?.anime ?? null;
+      } else {
+        const { data: previewRows } = await supabase
+          .from("list_songs")
+          .select("song:songs!song_id ( image_url, song_type )")
+          .eq("list_id", list.id)
+          .order("position", { ascending: true })
+          .limit(1);
+        preview = previewRows?.[0]?.song ?? null;
+      }
 
       const { count: likeCount } = await supabase
         .from("list_likes")

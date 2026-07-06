@@ -1,6 +1,6 @@
 import { getTemplate } from "./templates";
-import { EMOTION_LABELS } from "../i18n";
-import { songTitle } from "../displayText";
+import { EMOTION_LABELS, SEASON_LABELS, valueLabel } from "../i18n";
+import { songTitle, animeTitle } from "../displayText";
 
 /* =========================================================
    ランキング画像の canvas 描画本体
@@ -59,14 +59,16 @@ function roundRectPath(ctx, x, y, w, h, r) {
  * @param {HTMLCanvasElement} canvas
  * @param {{
  *   listName: string,
- *   songs: Array,
+ *   songs: Array,               // 曲 or アニメの配列（itemTypeで解釈を切替）
  *   templateKey: string,
  *   lang: "ja"|"en",
- *   mode?: "ranking"|"list"  // ranking=順位数字あり / list=順位なしの一覧
+ *   mode?: "ranking"|"list",    // ranking=順位数字あり / list=順位なしの一覧
+ *   itemType?: "song"|"anime"   // 行のタイトル/サブテキストの取り出し方
  * }} opts
  */
-export async function drawRankingImage(canvas, { listName, songs, templateKey, lang = "ja", mode = "ranking" }) {
+export async function drawRankingImage(canvas, { listName, songs, templateKey, lang = "ja", mode = "ranking", itemType = "song" }) {
   const isRanking = mode !== "list";
+  const isAnime = itemType === "anime";
   const tpl = getTemplate(templateKey);
   const ctx = canvas.getContext("2d");
   canvas.width = CANVAS_W;
@@ -163,18 +165,27 @@ export async function drawRankingImage(canvas, { listName, songs, templateKey, l
       ctx.fillRect(cx, cy, coverSize, coverSize);
       ctx.font = "400 30px 'Noto Sans JP', sans-serif";
       ctx.fillStyle = "rgba(255,255,255,0.35)";
-      ctx.fillText("♪", cx + coverSize / 2 - 10, cy + coverSize / 2 + 11);
+      ctx.fillText(isAnime ? "📺" : "♪", cx + coverSize / 2 - (isAnime ? 16 : 10), cy + coverSize / 2 + 11);
     }
     ctx.restore();
 
-    // 曲名 / アーティスト・作品名
+    // タイトル / サブテキスト（曲: 曲名+アーティスト・作品 / アニメ: 作品名+年・シーズン）
     const textX = cx + coverSize + 26;
     const textMax = CANVAS_W - PAD - textX;
+    const mainText = isAnime
+      ? animeTitle(song, lang)
+      : (songTitle(song, lang) || song.title || "");
+    const subParts = isAnime
+      ? [
+          song.release_year ? (lang === "en" ? String(song.release_year) : `${song.release_year}年`) : null,
+          valueLabel(SEASON_LABELS, song.release_season, lang) || null
+        ].filter(Boolean)
+      : [song.artist, song.anime_title || song.game_title].filter(Boolean);
+
     ctx.font = "700 34px 'Noto Sans JP', sans-serif";
     ctx.fillStyle = "#FFFFFF";
-    ctx.fillText(ellipsize(ctx, songTitle(song, lang) || song.title || "", textMax), textX, y + 40);
+    ctx.fillText(ellipsize(ctx, mainText, textMax), textX, y + 40);
 
-    const subParts = [song.artist, song.anime_title || song.game_title].filter(Boolean);
     ctx.font = "400 26px 'Noto Sans JP', sans-serif";
     ctx.fillStyle = "rgba(255,255,255,0.55)";
     ctx.fillText(ellipsize(ctx, subParts.join(" ・ "), textMax), textX, y + 76);
@@ -184,9 +195,10 @@ export async function drawRankingImage(canvas, { listName, songs, templateKey, l
   if (songs.length > MAX_ROWS) {
     ctx.font = "500 28px 'Noto Sans JP', sans-serif";
     ctx.fillStyle = "rgba(255,255,255,0.45)";
+    const rest = songs.length - MAX_ROWS;
     const moreText = lang === "en"
-      ? `+${songs.length - MAX_ROWS} more songs`
-      : `ほか ${songs.length - MAX_ROWS} 曲`;
+      ? `+${rest} more ${isAnime ? "anime" : "songs"}`
+      : `ほか ${rest} ${isAnime ? "作品" : "曲"}`;
     ctx.fillText(moreText, PAD, rowTop + MAX_ROWS * rowH + 20);
   }
 

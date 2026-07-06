@@ -3,10 +3,11 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 
 import { getPublicListDetail, getListLikeStatus, toggleListLike } from "../../lib/queries/lists";
 import { getListSongs } from "../../lib/queries/listSongs";
+import { getListAnime } from "../../lib/queries/listAnime";
 import { getPublicProfile } from "../../lib/queries/users";
 import { useLanguage } from "../../contexts/LanguageContext";
-import { valueLabel, EMOTION_LABELS, ENCOUNTER_LABELS } from "../../lib/i18n";
-import { songTitle } from "../../lib/displayText";
+import { valueLabel, EMOTION_LABELS, ENCOUNTER_LABELS, ANIME_TAG_LABELS, SEASON_LABELS } from "../../lib/i18n";
+import { songTitle, animeTitle } from "../../lib/displayText";
 
 import pageStyles from "../DetailPage.module.css";
 import styles from "./PublicListPage.module.css";
@@ -31,13 +32,15 @@ export default function PublicListPage() {
 
       setListInfo(list);
 
-      const [songsData, likeStatus, authorData] = await Promise.all([
-        getListSongs(id),
+      // リストタイプで取得先を切替（song→list_songs / anime→list_anime）
+      const fetchItems = list.list_type === "anime" ? getListAnime(id) : getListSongs(id);
+      const [itemsData, likeStatus, authorData] = await Promise.all([
+        fetchItems,
         getListLikeStatus(id),
         getPublicProfile(list.user_id),
       ]);
 
-      setSongs(songsData);
+      setSongs(itemsData);
       setLikeCount(likeStatus.count);
       setLiked(likeStatus.liked);
       setAuthor(authorData);
@@ -60,6 +63,8 @@ export default function PublicListPage() {
 
   if (loading) return <div className={pageStyles.loading}>{t("common.loading")}</div>;
   if (!listInfo)  return <div className={pageStyles.loading}>{t("public.listPrivate")}</div>;
+
+  const isAnimeList = listInfo.list_type === "anime";
 
   return (
     <div className={pageStyles.outer}>
@@ -92,7 +97,7 @@ export default function PublicListPage() {
           {liked ? "❤️" : "🤍"} {likeCount}
         </button>
         <a
-          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`🎵 ${listInfo.name}（${songs.length}曲）\n#SONICLIST`)}&url=${encodeURIComponent(window.location.href)}`}
+          href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${isAnimeList ? "📺" : "🎵"} ${listInfo.name}（${songs.length}${isAnimeList ? "作品" : "曲"}）\n#SONICLIST`)}&url=${encodeURIComponent(window.location.href)}`}
           target="_blank"
           rel="noreferrer"
           className={styles.xShareBtn}
@@ -102,10 +107,47 @@ export default function PublicListPage() {
         </div>
       </div>
 
-      {/* 曲一覧（読み取り専用） */}
+      {/* アイテム一覧（読み取り専用。曲/アニメで表示を切替） */}
       <div className={styles.songList}>
         {songs.length === 0 ? (
           <p className={styles.empty}>{t("public.noSongs")}</p>
+        ) : isAnimeList ? (
+          songs.map((item) => {
+            const meta = [
+              item.release_year
+                ? t("search.year.suffix", { year: item.release_year })
+                : null,
+              valueLabel(SEASON_LABELS, item.release_season, lang) || null
+            ].filter(Boolean).join(" ・ ");
+            return (
+              <div
+                key={item.id}
+                className={styles.songRow}
+                onClick={() => navigate(`/anime/${item.anime_id}`)}
+              >
+                <div className={styles.thumb}>
+                  {item.image_url
+                    ? <img src={item.image_url} alt={animeTitle(item, lang)} />
+                    : <div className={styles.noImage}>NO IMAGE</div>
+                  }
+                </div>
+                <div className={styles.songInfo}>
+                  <div className={styles.songTitle}>{animeTitle(item, lang)}</div>
+                  {meta && <div className={styles.songMeta}>{meta}</div>}
+                  {item.memo && (
+                    <div className={styles.memo}>💬 {item.memo}</div>
+                  )}
+                  {item.anime_tags?.length > 0 && (
+                    <div className={styles.tagRow}>
+                      {item.anime_tags.map((tag) => (
+                        <span key={tag} className={styles.emotionTag}>{valueLabel(ANIME_TAG_LABELS, tag, lang)}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })
         ) : (
           songs.map((song) => (
             <div

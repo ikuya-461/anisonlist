@@ -47,13 +47,14 @@ const SONG_TYPES = [
   "ボカロ曲", "オリジナル曲", "なし", "不明"
 ];
 
-export default function SearchSong({ onAdd, heading }) {
+export default function SearchSong({ onAdd, onAddAnime, heading }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { lang, t } = useLanguage();
   const resolvedHeading = heading ?? t("search.heading.addToList");
 
-  const [tab, setTab] = useState(searchParams.get("tab") || "song");
+  // アニメリスト編集時（onAddAnimeあり）はアニメ検索に固定
+  const [tab, setTab] = useState(onAddAnime ? "anime" : (searchParams.get("tab") || "song"));
 
   const [keyword, setKeyword] = useState(searchParams.get("keyword") || "");
   const [artist, setArtist] = useState(searchParams.get("artist") || "");
@@ -351,18 +352,20 @@ export default function SearchSong({ onAdd, heading }) {
     <div className={styles.container}>
       <h3 className={styles.heading}>{resolvedHeading}</h3>
 
-      {/* タブ切り替え */}
-      <div className={styles.tabs}>
-        {TABS.map((tabItem) => (
-          <button
-            key={tabItem.key}
-            className={`${styles.tabBtn} ${tab === tabItem.key ? styles.activeTab : ""}`}
-            onClick={() => switchTab(tabItem.key)}
-          >
-            {t(tabItem.labelKey)}
-          </button>
-        ))}
-      </div>
+      {/* タブ切り替え（アニメリスト編集時はアニメ固定なので非表示） */}
+      {!onAddAnime && (
+        <div className={styles.tabs}>
+          {TABS.map((tabItem) => (
+            <button
+              key={tabItem.key}
+              className={`${styles.tabBtn} ${tab === tabItem.key ? styles.activeTab : ""}`}
+              onClick={() => switchTab(tabItem.key)}
+            >
+              {t(tabItem.labelKey)}
+            </button>
+          ))}
+        </div>
+      )}
 
       <ErrorMessage>{errorMessage}</ErrorMessage>
 
@@ -532,7 +535,9 @@ export default function SearchSong({ onAdd, heading }) {
               key={a.id}
               type="anime"
               data={a}
-              onClick={(id) => onAdd
+              onClick={(id) => onAddAnime
+                ? onAddAnime(a)
+                : onAdd
                 ? openPicker("anime", id, animeTitle(a, lang))
                 : navigate(`/anime/${id}`)
               }
