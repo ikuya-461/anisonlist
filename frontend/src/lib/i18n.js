@@ -162,8 +162,8 @@ export const TR = {
     "ranking.title": "シェア画像",
     "ranking.templateLabel": "テンプレート（この気分で選ぶ）",
     "ranking.modeLabel": "形式",
-    "ranking.mode.ranking": "🏆 ランキング",
-    "ranking.mode.list": "🎵 リスト",
+    "ranking.mode.ranking": "ランキング",
+    "ranking.mode.list": "リスト",
     "ranking.download": "画像を保存",
     "ranking.share": "SNSでシェア",
     "ranking.generating": "生成中...",
@@ -356,8 +356,8 @@ export const TR = {
     "ranking.title": "Share image",
     "ranking.templateLabel": "Template (pick your mood)",
     "ranking.modeLabel": "Format",
-    "ranking.mode.ranking": "🏆 Ranking",
-    "ranking.mode.list": "🎵 List",
+    "ranking.mode.ranking": "Ranking",
+    "ranking.mode.list": "List",
     "ranking.download": "Save image",
     "ranking.share": "Share to SNS",
     "ranking.generating": "Generating...",
@@ -453,6 +453,21 @@ export const EMOTION_LABELS = {
   work_bgm:      { ja: "🥱 作業用",     en: "🥱 Focus BGM" },
   chuunibyou:    { ja: "💀 厨二病",     en: "💀 Chuunibyou" },
   lyrics_insane: { ja: "🤯 歌詞がヤバい", en: "🤯 Wild lyrics" }
+};
+
+/* シェア画像テンプレート用ラベル（アニメリスト版）
+   - キー構成は EMOTION_LABELS / RANKING_TEMPLATES と同一（配色・装飾は共通のまま文言だけ差し替え）
+   - list_anime.anime_tags で使う ANIME_TAG_LABELS とは別物（そちらは各作品に付けるタグ） */
+export const ANIME_SHARE_TEMPLATE_LABELS = {
+  god:           { ja: "✨ 神アニメ",     en: "✨ Masterpiece" },
+  cry:           { ja: "😭 泣ける",       en: "😭 Tearjerker" },
+  hype:          { ja: "🔥 神回連発",     en: "🔥 Non-stop hype" },
+  nostalgic:     { ja: "🕰️ エモい",       en: "🕰️ Nostalgic" },
+  life_changing: { ja: "💊 人生変わった", en: "💊 Life-changing" },
+  night_listen:  { ja: "🌙 一気見不可避", en: "🌙 Binge inevitable" },
+  work_bgm:      { ja: "🥱 ながら見",     en: "🥱 Background watch" },
+  chuunibyou:    { ja: "💀 厨二病",       en: "💀 Chuunibyou" },
+  lyrics_insane: { ja: "🤯 OP・EDが神",   en: "🤯 Amazing OP/ED" }
 };
 
 /* アニメリスト用タグ（曲の感情タグとは別語彙） */

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { RANKING_TEMPLATES } from "../../lib/rankingImage/templates";
 import { drawRankingImage } from "../../lib/rankingImage/drawRankingImage";
-import { EMOTION_LABELS } from "../../lib/i18n";
+import { EMOTION_LABELS, ANIME_SHARE_TEMPLATE_LABELS } from "../../lib/i18n";
 import { useLanguage } from "../../contexts/LanguageContext";
 import styles from "./RankingImageModal.module.css";
 
@@ -12,6 +12,8 @@ import styles from "./RankingImageModal.module.css";
    ========================================================= */
 export default function RankingImageModal({ listName, songs, itemType = "song", onClose }) {
   const { lang, t } = useLanguage();
+  const isAnime = itemType === "anime";
+  const templateLabels = isAnime ? ANIME_SHARE_TEMPLATE_LABELS : EMOTION_LABELS;
   const canvasRef = useRef(null);
   const [templateKey, setTemplateKey] = useState(RANKING_TEMPLATES[0].key);
   const [mode, setMode] = useState("ranking"); // ranking=順位あり / list=順位なし
@@ -60,7 +62,7 @@ export default function RankingImageModal({ listName, songs, itemType = "song", 
       await navigator.share({
         files: [file],
         title: listName,
-        text: `🎵 ${listName} #SONICLIST`
+        text: `${isAnime ? "📺" : "🎵"} ${listName} #SONICLIST`
       });
     } catch (err) {
       // ユーザーキャンセルは正常系
@@ -85,7 +87,7 @@ export default function RankingImageModal({ listName, songs, itemType = "song", 
               className={`${styles.modeBtn} ${mode === m ? styles.modeActive : ""}`}
               onClick={() => setMode(m)}
             >
-              {t(`ranking.mode.${m}`)}
+              {m === "ranking" ? "🏆" : isAnime ? "📺" : "🎵"} {t(`ranking.mode.${m}`)}
             </button>
           ))}
         </div>
@@ -100,7 +102,7 @@ export default function RankingImageModal({ listName, songs, itemType = "song", 
               style={{ "--tpl-accent": tpl.accent, "--tpl-bg": tpl.bgTop }}
               onClick={() => setTemplateKey(tpl.key)}
             >
-              {EMOTION_LABELS[tpl.key]?.[lang] ?? tpl.key}
+              {templateLabels[tpl.key]?.[lang] ?? tpl.key}
             </button>
           ))}
         </div>

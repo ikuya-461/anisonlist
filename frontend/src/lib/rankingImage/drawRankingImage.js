@@ -1,5 +1,5 @@
 import { getTemplate } from "./templates";
-import { EMOTION_LABELS, SEASON_LABELS, valueLabel } from "../i18n";
+import { EMOTION_LABELS, ANIME_SHARE_TEMPLATE_LABELS, SEASON_LABELS, valueLabel } from "../i18n";
 import { songTitle, animeTitle } from "../displayText";
 
 /* =========================================================
@@ -91,10 +91,12 @@ export async function drawRankingImage(canvas, { listName, songs, templateKey, l
   const PAD = 64;
 
   /* ---------- ヘッダー ---------- */
-  const emotionLabel = EMOTION_LABELS[tpl.key]?.[lang] ?? EMOTION_LABELS[tpl.key]?.ja ?? "";
+  // テンプレートラベル（曲/アニメで語彙を切替。配色・装飾は共通）
+  const templateLabels = isAnime ? ANIME_SHARE_TEMPLATE_LABELS : EMOTION_LABELS;
+  const emotionLabel = templateLabels[tpl.key]?.[lang] ?? templateLabels[tpl.key]?.ja ?? "";
   ctx.textBaseline = "alphabetic";
 
-  // 感情ラベル（ピル）
+  // テンプレートラベル（ピル）
   ctx.font = "500 34px 'Noto Sans JP', sans-serif";
   const pillTextW = ctx.measureText(emotionLabel).width;
   const pillH = 60;
