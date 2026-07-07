@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { getMyLists, toggleListPublic } from "../../lib/queries/lists";
 import { getMyProfile, updateMyProfile, toggleProfilePublic, deleteMyAccount } from "../../lib/queries/users";
+import { uploadAvatar } from "../../lib/avatarUpload";
 import styles from "./MyPage.module.css";
 
 import ListGallery from "../../components/list/ListGallery";
@@ -30,6 +31,9 @@ export default function MyPage({ updateLoginState }) {
   const [editName, setEditName] = useState("");
   const [editBio, setEditBio] = useState("");
   const [editIcon, setEditIcon] = useState("");
+  const [uploadingIcon, setUploadingIcon] = useState(false);
+  const [iconError, setIconError] = useState("");
+  const fileInputRef = useRef(null);
 
   // アカウント削除（ストア審査要件）
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
@@ -62,6 +66,24 @@ export default function MyPage({ updateLoginState }) {
 
     load();
   }, [navigate]);
+
+  // アイコン画像を選択→即アップロード（公開URLをeditIconにセット、保存は別途「保存」で確定）
+  const handleIconFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // 同じファイルを選び直せるようにリセット
+    if (!file) return;
+
+    setIconError("");
+    setUploadingIcon(true);
+    const url = await uploadAvatar(file);
+    setUploadingIcon(false);
+
+    if (!url) {
+      setIconError(t("mypage.iconUploadFailed"));
+      return;
+    }
+    setEditIcon(url);
+  };
 
   // ④ プロフィール更新
   const saveProfile = async () => {
@@ -159,11 +181,31 @@ export default function MyPage({ updateLoginState }) {
               className={styles.textarea}
             />
 
-            <input
-              value={editIcon}
-              onChange={(e) => setEditIcon(e.target.value)}
-              className={styles.input}
-            />
+            <div className={styles.iconEditRow}>
+              {editIcon ? (
+                <img src={editIcon} alt="icon" className={styles.iconPreview} />
+              ) : (
+                <span className={styles.iconPreview} role="img" aria-label="icon">👤</span>
+              )}
+              <div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleIconFileChange}
+                  className={styles.iconFileInput}
+                />
+                <button
+                  type="button"
+                  className={styles.iconUploadBtn}
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingIcon}
+                >
+                  {uploadingIcon ? t("common.saving") : t("mypage.chooseIcon")}
+                </button>
+                {iconError && <p className={styles.iconError}>{iconError}</p>}
+              </div>
+            </div>
 
             <div className={styles.btnRow}>
               <button onClick={saveProfile} className={styles.saveBtn}>
