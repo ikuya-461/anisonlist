@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabaseClient";
 import { useLanguage } from "../../contexts/LanguageContext";
+import Turnstile from "../../components/auth/Turnstile";
 
 export default function Login({ updateLoginState }) {
   const navigate = useNavigate();
@@ -10,6 +11,8 @@ export default function Login({ updateLoginState }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const turnstileRef = useRef(null);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -18,10 +21,14 @@ export default function Login({ updateLoginState }) {
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
+      ...(captchaToken ? { options: { captchaToken } } : {}),
     });
 
     if (error) {
       setErrorMsg(t("auth.err.invalidCredentials"));
+      // CAPTCHAトークンは単回使用なので取り直す
+      turnstileRef.current?.reset();
+      setCaptchaToken("");
       return;
     }
 
@@ -55,6 +62,8 @@ export default function Login({ updateLoginState }) {
         />
 
         {errorMsg && <p style={styles.error}>{errorMsg}</p>}
+
+        <Turnstile ref={turnstileRef} onVerify={setCaptchaToken} />
 
         <button type="submit" style={styles.button}>
           {t("auth.btn.login")}

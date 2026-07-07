@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { createUserProfile } from "../../lib/queries/users";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../contexts/LanguageContext";
+import Turnstile from "../../components/auth/Turnstile";
 import styles from "./LoginRegister.module.css";
 
 export default function Register() {
@@ -19,6 +20,8 @@ export default function Register() {
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const turnstileRef = useRef(null);
 
   const currentYear = new Date().getFullYear();
 
@@ -66,11 +69,15 @@ export default function Register() {
     const { error } = await supabase.auth.signUp({
       email,
       password,
+      ...(captchaToken ? { options: { captchaToken } } : {}),
     });
 
     if (error) {
       console.error("登録失敗:", error);
       setErrorMessage(error.message);
+      // CAPTCHAトークンは単回使用なので取り直す
+      turnstileRef.current?.reset();
+      setCaptchaToken("");
       return;
     }
 
@@ -181,6 +188,8 @@ export default function Register() {
           </div>
         </div>
       )}
+
+      <Turnstile ref={turnstileRef} onVerify={setCaptchaToken} />
 
       <button className={styles.button} onClick={handleSignUp}>
         {t("auth.btn.signup")}

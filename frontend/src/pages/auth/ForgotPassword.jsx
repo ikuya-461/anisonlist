@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../contexts/LanguageContext";
+import Turnstile from "../../components/auth/Turnstile";
 import styles from "./LoginRegister.module.css";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const turnstileRef = useRef(null);
   const navigate = useNavigate();
   const { t } = useLanguage();
 
@@ -18,11 +21,17 @@ export default function ForgotPassword() {
       return;
     }
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    const { error } = await supabase.auth.resetPasswordForEmail(
+      email,
+      captchaToken ? { captchaToken } : undefined
+    );
 
     if (error) {
       console.error("送信エラー:", error);
       setMessage(t("auth.err.emailInvalid"));
+      // CAPTCHAトークンは単回使用なので取り直す
+      turnstileRef.current?.reset();
+      setCaptchaToken("");
       return;
     }
 
