@@ -6,6 +6,7 @@ import { SONG_TYPE_COLORS } from "../../lib/constants";
 import { supabase } from "../../lib/supabaseClient";
 import { ensureSongImage } from "../../lib/imageCache/songImageCache";
 import { DetailSkeleton } from "../../components/ui/Skeleton";
+import AdSlot from "../../components/ads/AdSlot";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { songTitle } from "../../lib/displayText";
 import { valueLabel, SONG_TYPE_LABELS } from "../../lib/i18n";
@@ -272,6 +273,9 @@ export default function SongDetail() {
           </div>
         </div>
       </div>
+
+      {/* ページ末尾に1枠（将来の「関連曲」の前） */}
+      <AdSlot placement="song_detail" />
     </div>
   );
 }

@@ -1,0 +1,68 @@
+/* 電光掲示板フレーム本体 */
+.frame {
+  position: relative;
+  height: 100%;
+  border-radius: 10px;
+  border: 1px solid rgba(1, 253, 254, 0.35);
+  background:
+    linear-gradient(135deg, rgba(1, 253, 254, 0.06), rgba(105, 37, 206, 0.10)),
+    var(--color-card);
+  box-shadow: 0 0 8px rgba(1, 253, 254, 0.15), inset 0 0 18px rgba(1, 253, 254, 0.05);
+  overflow: hidden;
+  cursor: pointer;
+  animation: adPulse 3.2s ease-in-out infinite;
+}
+
+/* 縁のネオンが脈打つ */
+@keyframes adPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(1, 253, 254, 0.15), inset 0 0 18px rgba(1, 253, 254, 0.05); }
+  50%      { box-shadow: 0 0 18px rgba(1, 253, 254, 0.40), inset 0 0 22px rgba(1, 253, 254, 0.10); }
+}
+
+/* 走査線（電光掲示板の質感） */
+.scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(1, 253, 254, 0.05) 3px,
+    rgba(0, 0, 0, 0) 4px
+  );
+  mix-blend-mode: screen;
+}
+
+/* 「広告 / PR」ラベル（黄色のネオン） */
+.label {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  z-index: 2;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-bg);
+  background: var(--yellow);
+  padding: 2px 6px;
+  border-radius: 3px;
+  box-shadow: 0 0 8px rgba(255, 239, 0, 0.6);
+}
+
+.body {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  box-sizing: border-box;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frame { animation: none; }
+}

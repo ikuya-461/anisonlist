@@ -5,6 +5,7 @@ import { ensureSongImages } from "../../lib/imageCache/songImageCache";
 import { useDetailPage } from "../../hooks/useDetailPage";
 import SongList from "../../components/list/SongList";
 import { DetailSkeleton } from "../../components/ui/Skeleton";
+import AdSlot from "../../components/ads/AdSlot";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { animeTitle } from "../../lib/displayText";
 import { valueLabel, ANIME_TYPE_LABELS, SEASON_LABELS } from "../../lib/i18n";
@@ -94,6 +95,9 @@ export default function AnimeDetail() {
           </>
         )}
       </div>
+
+      {/* 作品情報の後・曲セクションの前に1枠 */}
+      <AdSlot placement="anime_detail" />
 
       {/* 曲一覧 */}
       <h2 className={pageStyles.sectionTitle}>{t("detail.section.animeSongs")}</h2>

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, Fragment } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
 import { searchSongs } from "../../lib/queries/songs";
@@ -16,6 +16,7 @@ import Input from "../ui/Input";
 import Button from "../ui/Button";
 import ErrorMessage from "../ui/ErrorMessage";
 import { SongListSkeleton, MediaGridSkeleton } from "../ui/Skeleton";
+import InFeedAd from "../ads/InFeedAd";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { valueLabel, SONG_TYPE_LABELS, SEASON_LABELS, CATEGORY_LABELS } from "../../lib/i18n";
 import { animeTitle, gameTitle, artistName } from "../../lib/displayText";
@@ -52,6 +53,11 @@ export default function SearchSong({ onAdd, onAddAnime, heading }) {
   const navigate = useNavigate();
   const { lang, t } = useLanguage();
   const resolvedHeading = heading ?? t("search.heading.addToList");
+
+  // リストへの追加フロー（onAdd / onAddAnime）ではなく、純粋な検索閲覧のときだけ
+  // インフィード広告を差し込む（追加操作の邪魔をしない）
+  const showInFeedAds = !onAdd && !onAddAnime;
+  const inFeedAd = (i) => <InFeedAd placement="search_infeed" index={i} total={results.length} />;
 
   // アニメリスト編集時（onAddAnimeあり）はアニメ検索に固定
   const [tab, setTab] = useState(onAddAnime ? "anime" : (searchParams.get("tab") || "song"));
@@ -501,6 +507,7 @@ export default function SearchSong({ onAdd, onAddAnime, heading }) {
           sortable={false}
           onAdd={onAdd}
           onClickSong={(id) => navigate(`/songs/${id}`)}
+          interleave={showInFeedAds ? inFeedAd : undefined}
         />
       )}
 
@@ -530,52 +537,58 @@ export default function SearchSong({ onAdd, onAddAnime, heading }) {
 
       {!loading && hasSearched && !pickerMedia && tab === "anime" && (
         <div className={gridStyles.grid}>
-          {results.map((a) => (
-            <MediaCard
-              key={a.id}
-              type="anime"
-              data={a}
-              // アニメリスト編集時：カード本体＝詳細閲覧、「＋」ボタン＝リスト追加
-              onAdd={onAddAnime ? (anime) => onAddAnime(anime) : undefined}
-              onClick={(id) => onAddAnime
-                ? navigate(`/anime/${id}`)
-                : onAdd
-                ? openPicker("anime", id, animeTitle(a, lang))
-                : navigate(`/anime/${id}`)
-              }
-            />
+          {results.map((a, i) => (
+            <Fragment key={a.id}>
+              <MediaCard
+                type="anime"
+                data={a}
+                // アニメリスト編集時：カード本体＝詳細閲覧、「＋」ボタン＝リスト追加
+                onAdd={onAddAnime ? (anime) => onAddAnime(anime) : undefined}
+                onClick={(id) => onAddAnime
+                  ? navigate(`/anime/${id}`)
+                  : onAdd
+                  ? openPicker("anime", id, animeTitle(a, lang))
+                  : navigate(`/anime/${id}`)
+                }
+              />
+              {showInFeedAds && inFeedAd(i)}
+            </Fragment>
           ))}
         </div>
       )}
 
       {!loading && hasSearched && !pickerMedia && tab === "game" && (
         <div className={gridStyles.grid}>
-          {results.map((g) => (
-            <MediaCard
-              key={g.id}
-              type="game"
-              data={g}
-              onClick={(id) => onAdd
-                ? openPicker("game", id, gameTitle(g, lang))
-                : navigate(`/game/${id}`)
-              }
-            />
+          {results.map((g, i) => (
+            <Fragment key={g.id}>
+              <MediaCard
+                type="game"
+                data={g}
+                onClick={(id) => onAdd
+                  ? openPicker("game", id, gameTitle(g, lang))
+                  : navigate(`/game/${id}`)
+                }
+              />
+              {showInFeedAds && inFeedAd(i)}
+            </Fragment>
           ))}
         </div>
       )}
 
       {!loading && hasSearched && !pickerMedia && tab === "artist" && (
         <div className={gridStyles.grid}>
-          {results.map((a) => (
-            <MediaCard
-              key={a.id}
-              type="artist"
-              data={a}
-              onClick={(id) => onAdd
-                ? openPicker("artist", id, artistName(a, lang))
-                : navigate(`/artist/${id}`)
-              }
-            />
+          {results.map((a, i) => (
+            <Fragment key={a.id}>
+              <MediaCard
+                type="artist"
+                data={a}
+                onClick={(id) => onAdd
+                  ? openPicker("artist", id, artistName(a, lang))
+                  : navigate(`/artist/${id}`)
+                }
+              />
+              {showInFeedAds && inFeedAd(i)}
+            </Fragment>
           ))}
         </div>
       )}

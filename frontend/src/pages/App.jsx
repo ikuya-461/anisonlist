@@ -5,6 +5,7 @@ import { supabase } from "../lib/supabaseClient";
 import Header from "../components/ui/Header";
 import Layout from "./Layout";
 import { LanguageProvider } from "../contexts/LanguageContext";
+import { AdProvider } from "../contexts/AdContext";
 import { DetailSkeleton } from "../components/ui/Skeleton";
 
 // Home はランディングページなので即時バンドル、それ以外はルート単位で遅延読み込み
@@ -49,6 +50,7 @@ function App() {
 
   return (
     <LanguageProvider>
+    <AdProvider>
     <BrowserRouter>
       <Header isLoggedIn={isLoggedIn} updateLoginState={updateLoginState} />
 
@@ -81,6 +83,7 @@ function App() {
         </Suspense>
       </Layout>
     </BrowserRouter>
+    </AdProvider>
     </LanguageProvider>
   );
 }

@@ -24,6 +24,11 @@ export const TR = {
     "home.getStarted": "無料で始める",
     "home.login": "ログイン",
 
+    /* 広告 */
+    "ad.label": "広告",
+    "ad.placeholderText": "SONICLIST — 広告スペース",
+    "ad.placeholderHint": "ここに広告が表示されます",
+
     /* 検索 */
     "search.heading.addToList": "ADD TO LIST",
     "search.tab.song": "曲",
@@ -228,6 +233,10 @@ export const TR = {
     "home.ctaText": "Sign up to create and\nshare your playlists",
     "home.getStarted": "Get started free",
     "home.login": "Log in",
+
+    "ad.label": "Sponsored",
+    "ad.placeholderText": "SONICLIST — AD SPACE",
+    "ad.placeholderHint": "Your ad could be here",
 
     "search.heading.addToList": "ADD TO LIST",
     "search.tab.song": "Songs",

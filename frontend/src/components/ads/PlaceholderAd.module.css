@@ -1,0 +1,51 @@
+/* LED 電光掲示板ふうの流れるテキスト */
+.marqueeWrap {
+  width: 100%;
+  overflow: hidden;
+}
+
+.marquee {
+  display: inline-flex;
+  gap: 48px;
+  white-space: nowrap;
+  animation: adMarquee 12s linear infinite;
+}
+
+.marquee span {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: clamp(14px, 4vw, 22px);
+  letter-spacing: 3px;
+  color: var(--cyan);
+  text-shadow: 0 0 6px rgba(1, 253, 254, 0.8), 0 0 14px rgba(1, 253, 254, 0.5);
+}
+
+@keyframes adMarquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.meta {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.tag {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 11px;
+  color: var(--purple-light);
+  text-shadow: 0 0 8px rgba(170, 85, 255, 0.6);
+}
+
+.hint {
+  font-size: 11px;
+  color: var(--text-sub);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee { animation: none; }
+}

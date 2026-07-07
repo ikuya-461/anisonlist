@@ -12,6 +12,7 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Fragment } from "react";
 
 import ListPageSongCard from "./ListPageSongCard";
 import SongCard from "../cards/SongCard";
@@ -56,6 +57,7 @@ export default function SongList({
   onDeleted,
   onChangeOrder,
   onClickSong,
+  interleave,
 }) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -104,16 +106,19 @@ export default function SongList({
     );
   }
 
-  /* 並び替えなし（SearchSong / SearchSongPublic 用） */
+  /* 並び替えなし（SearchSong / SearchSongPublic 用）
+     interleave(index) が要素を返せば、そのカードの直後に差し込む（インフィード広告用） */
   return (
     <div className={styles.grid}>
-      {songs.map((song) => (
-        <SongCard
-          key={song.song_id}
-          song={song}
-          onAdd={onAdd}
-          onClick={() => onClickSong?.(song.song_id)}
-        />
+      {songs.map((song, index) => (
+        <Fragment key={song.song_id}>
+          <SongCard
+            song={song}
+            onAdd={onAdd}
+            onClick={() => onClickSong?.(song.song_id)}
+          />
+          {interleave?.(index)}
+        </Fragment>
       ))}
     </div>
   );

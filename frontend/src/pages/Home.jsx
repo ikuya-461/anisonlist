@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import SearchSong from "../components/search/SearchSong";
+import AdSlot from "../components/ads/AdSlot";
 import { useLanguage } from "../contexts/LanguageContext";
 import styles from "./Home.module.css";
 
@@ -36,6 +37,9 @@ export default function Home({ isLoggedIn }) {
       )}
 
       <SearchSong heading="ANISON SEARCH" />
+
+      {/* コンテンツの下に1枠だけ（スクロールで見えてから表示） */}
+      <AdSlot placement="home_feed" />
     </div>
   );
 }
