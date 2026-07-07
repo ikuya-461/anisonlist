@@ -61,7 +61,8 @@ const SECTIONS_JA = [
   {
     h: "8. お問い合わせ",
     body: [
-      "本ポリシーに関するお問い合わせは、本サービスの運営者までご連絡ください。"
+      "本ポリシーおよび本サービスに関するお問い合わせは、以下の連絡先までお願いいたします。",
+      "メール：akasophia461@gmail.com"
     ]
   }
 ];
@@ -120,7 +121,8 @@ const SECTIONS_EN = [
   {
     h: "8. Contact",
     body: [
-      "For questions about this policy, please contact the operator of the Service."
+      "For questions about this policy or the Service, please contact us at:",
+      "Email: akasophia461@gmail.com"
     ]
   }
 ];
