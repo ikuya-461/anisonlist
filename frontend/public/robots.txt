@@ -1,3 +1,38 @@
-# https://www.robotstxt.org/robotstxt.html
+# SONICLIST #1 — robots.txt
+# 方針: 検索エンジン(Googlebot等)にはコンテンツをインデックスさせたい。
+#       一方で AI学習クローラや大量データ収集ボットは断る。
+# 注意: robots.txt は「行儀の良いボット」にしか効かない（悪質スクレイパーは無視する）。
+
+# --- 一般の検索エンジン: 全体を許可 ---
 User-agent: *
-Disallow:
+Allow: /
+# 内部の画像プロキシ関数はクロール不要（SEO価値なし・帯域の無駄）
+Disallow: /.netlify/functions/
+
+# --- AI学習・大量収集クローラは拒否（検索インデックスには影響しない） ---
+User-agent: GPTBot
+Disallow: /
+
+User-agent: OAI-SearchBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /

@@ -21,3 +21,16 @@
   for = "/static/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# セキュリティヘッダー（全パス）＝静的サイト版の helmet
+#   - クリックジャッキング防止・MIMEスニッフ防止・リファラ制限・不要機能の無効化・HTTPS強制
+#   - CSP(Content-Security-Policy)は外部CDN/YouTube/将来の広告SDKの許可リスト設計が要るため、
+#     広告接続時にまとめて導入する（今入れると表示が壊れやすいので保留）
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), camera=(), microphone=(), interest-cohort=()"
+    Strict-Transport-Security = "max-age=31536000"
