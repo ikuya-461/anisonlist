@@ -51,6 +51,8 @@ export default function ForgotPassword() {
         onChange={(e) => setEmail(e.target.value)}
       />
 
+      <Turnstile ref={turnstileRef} onVerify={setCaptchaToken} />
+
       <button className={styles.button} onClick={handleSend}>
         {t("auth.btn.sendEmail")}
       </button>
