@@ -186,6 +186,7 @@ export default function ListPage() {
           listName={listInfo?.name}
           songs={shareItems}
           itemType={isAnimeList ? "anime" : "song"}
+          publicUrl={listInfo?.is_public ? `${window.location.origin}/public/${listId}` : null}
           onClose={() => setShowRanking(false)}
         />
       )}

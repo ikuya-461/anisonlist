@@ -10,7 +10,7 @@ import styles from "./RankingImageModal.module.css";
    - 感情テンプレート9種から手動選択 → canvasプレビュー
    - ダウンロード / Web Share API（対応環境のみ）でSNSへ
    ========================================================= */
-export default function RankingImageModal({ listName, songs, itemType = "song", onClose }) {
+export default function RankingImageModal({ listName, songs, itemType = "song", publicUrl, onClose }) {
   const { lang, t } = useLanguage();
   const isAnime = itemType === "anime";
   const templateLabels = isAnime ? ANIME_SHARE_TEMPLATE_LABELS : EMOTION_LABELS;
@@ -62,7 +62,9 @@ export default function RankingImageModal({ listName, songs, itemType = "song", 
       await navigator.share({
         files: [file],
         title: listName,
-        text: `${isAnime ? "📺" : "🎵"} ${listName} #SONICLIST`
+        text: `${isAnime ? "📺" : "🎵"} ${listName} #SONICLIST`,
+        // 非公開リストはURLを付けない（意図せず中身を配布してしまうのを防ぐ）
+        ...(publicUrl ? { url: publicUrl } : {})
       });
     } catch (err) {
       // ユーザーキャンセルは正常系
