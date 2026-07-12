@@ -46,7 +46,7 @@ export const AD_CONFIG = {
   premium: { hideAllAds: true }, // プレミアム会員は広告を全非表示
   placements: {
     home_feed:      { enabled: true, format: "native", maxAds: 1, afterScroll: true, adsenseSlot: "1984406755" },
-    search_infeed:  { enabled: true, format: "infeed", everyNItems: 5, adsenseSlot: null },
+    search_infeed:  { enabled: true, format: "infeed", everyNItems: 5, adsenseSlot: "6207135488", adsenseLayoutKey: "-fb+5w+4e-db+86" },
     song_detail:    { enabled: true, format: "native", maxAds: 1, adsenseSlot: "1984406755" },
     anime_detail:   { enabled: true, format: "native", maxAds: 1, adsenseSlot: "1984406755" },
     // ランキングページは未実装。設定だけ用意し、ページ実装時に自動で点灯する

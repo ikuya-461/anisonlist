@@ -18,7 +18,7 @@ const adsenseProvider = {
     const slot = place && place.adsenseSlot;
     if (!slot) return null;
 
-    return <AdsenseAd client={ADSENSE_CLIENT} slot={slot} />;
+    return <AdsenseAd client={ADSENSE_CLIENT} slot={slot} layoutKey={place.adsenseLayoutKey} />;
   },
 };
 
