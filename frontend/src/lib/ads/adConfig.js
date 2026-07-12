@@ -30,23 +30,27 @@ export const AD_CATEGORIES = [
   "figure", "game", "live", "event", "audio", "earphone", "headphone",
 ];
 
+// Google AdSense のパブリッシャーID（公開情報）
+export const ADSENSE_CLIENT = "ca-pub-2799507261826956";
+
 // プレースメント（広告枠）の定義
 //   format: "native" | "infeed" | "banner"
 //   afterScroll: スクロールで枠が見えてから初表示（スクロール開始直後には出さない）
 //   everyNItems: インフィードで N 件ごとに1枠差し込む
 //   maxAds: そのページ/枠で出す最大数
+//   adsenseSlot: AdSenseで発行した広告ユニットID（未発行のプレースメントは null のまま＝描画しない）
 export const AD_CONFIG = {
   enabled: resolveAdsEnabled(),
   provider: envProvider || "placeholder", // "placeholder" | "adsense" | "admob"
   categories: AD_CATEGORIES,
   premium: { hideAllAds: true }, // プレミアム会員は広告を全非表示
   placements: {
-    home_feed:      { enabled: true, format: "native", maxAds: 1, afterScroll: true },
-    search_infeed:  { enabled: true, format: "infeed", everyNItems: 5 },
-    song_detail:    { enabled: true, format: "native", maxAds: 1 },
-    anime_detail:   { enabled: true, format: "native", maxAds: 1 },
+    home_feed:      { enabled: true, format: "native", maxAds: 1, afterScroll: true, adsenseSlot: "1984406755" },
+    search_infeed:  { enabled: true, format: "infeed", everyNItems: 5, adsenseSlot: null },
+    song_detail:    { enabled: true, format: "native", maxAds: 1, adsenseSlot: "1984406755" },
+    anime_detail:   { enabled: true, format: "native", maxAds: 1, adsenseSlot: "1984406755" },
     // ランキングページは未実装。設定だけ用意し、ページ実装時に自動で点灯する
-    ranking_infeed: { enabled: true, format: "infeed", everyNItems: 4 },
+    ranking_infeed: { enabled: true, format: "infeed", everyNItems: 4, adsenseSlot: null },
   },
 };
 

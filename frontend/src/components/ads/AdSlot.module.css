@@ -1,7 +1,10 @@
-/* 広告枠の外側コンテナ。format ごとに高さを固定して CLS を防ぐ */
+/* 広告枠の外側コンテナ。format ごとに高さを固定して CLS を防ぐ
+   overflow:hidden は、AdSenseのレスポンシブ広告が返す実際の高さが
+   枠の想定と微妙にずれても外にはみ出さないための保険 */
 .slot {
   width: 100%;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 /* ネイティブ（ホーム／詳細ページ）: 縦長カード相当 */
