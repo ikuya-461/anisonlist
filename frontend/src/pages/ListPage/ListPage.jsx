@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
 import { getListDetail } from "../../lib/queries/lists";
@@ -14,6 +14,8 @@ import {
   removeAnimeFromList,
   reorderListAnime
 } from "../../lib/queries/listAnime";
+import { ensureSongImages } from "../../lib/imageCache/songImageCache";
+import { ensureAnimeImages } from "../../lib/imageCache/animeImageCache";
 
 import ListHeader from "../../components/list/ListHeader";
 import ListSelect from "../../components/list/ListSelect";
@@ -88,6 +90,63 @@ export default function ListPage() {
     if (listInfo.list_type === "anime") fetchListAnime();
     else fetchListSongs();
   }, [listInfo, fetchListAnime, fetchListSongs]);
+
+  // 画像が未キャッシュの曲/アニメをバックグラウンドで補完する
+  // （リスト表示はブロックしない。listId+タイプが変わるたびに1回だけ実行）
+  const fetchedImagesForRef = useRef(null);
+  useEffect(() => {
+    if (itemsLoading || !listInfo) return;
+    const key = `${listId}:${listInfo.list_type}`;
+    if (fetchedImagesForRef.current === key) return;
+    fetchedImagesForRef.current = key;
+    let cancelled = false;
+
+    if (isAnimeList) {
+      if (!animeItems.some((a) => !a.image_url)) return;
+      const toFetch = animeItems.map((a) => ({
+        id: a.anime_id,
+        title_jp: a.title_jp,
+        title_en: a.title_en,
+        title_romaji: a.title_romaji,
+        image_url: a.image_url,
+      }));
+      ensureAnimeImages(toFetch).then((withImages) => {
+        if (cancelled) return;
+        setAnimeItems((prev) =>
+          prev.map((a) => {
+            const found = withImages.find((w) => w.id === a.anime_id);
+            return found
+              ? {
+                  ...a,
+                  image_url: found.image_url ?? a.image_url,
+                  title_en: found.title_en ?? a.title_en,
+                  title_romaji: found.title_romaji ?? a.title_romaji,
+                }
+              : a;
+          })
+        );
+      });
+    } else {
+      if (!songs.some((s) => !s.image_url)) return;
+      const toFetch = songs.map((s) => ({
+        song_id: s.song_id,
+        song_title: s.title,
+        artist: s.artist,
+        image_url: s.image_url,
+      }));
+      ensureSongImages(toFetch).then((withImages) => {
+        if (cancelled) return;
+        setSongs((prev) =>
+          prev.map((s) => {
+            const found = withImages.find((w) => w.song_id === s.song_id);
+            return found && found.image_url ? { ...s, image_url: found.image_url } : s;
+          })
+        );
+      });
+    }
+
+    return () => { cancelled = true; };
+  }, [listId, listInfo, itemsLoading, isAnimeList, songs, animeItems]);
 
   /* -------------------------------------------------------
      ★ 曲追加（SearchSong の ＋ボタン → モーダルを開く）

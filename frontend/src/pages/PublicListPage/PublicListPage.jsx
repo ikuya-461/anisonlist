@@ -5,6 +5,8 @@ import { getPublicListDetail, getListLikeStatus, toggleListLike } from "../../li
 import { getListSongs } from "../../lib/queries/listSongs";
 import { getListAnime } from "../../lib/queries/listAnime";
 import { getPublicProfile } from "../../lib/queries/users";
+import { ensureSongImages } from "../../lib/imageCache/songImageCache";
+import { ensureAnimeImages } from "../../lib/imageCache/animeImageCache";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { valueLabel, EMOTION_LABELS, ENCOUNTER_LABELS, ANIME_TAG_LABELS, SEASON_LABELS } from "../../lib/i18n";
 import { songTitle, animeTitle } from "../../lib/displayText";
@@ -26,6 +28,8 @@ export default function PublicListPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     const load = async () => {
       const list = await getPublicListDetail(id);
       if (!list) { setLoading(false); return; }
@@ -33,21 +37,63 @@ export default function PublicListPage() {
       setListInfo(list);
 
       // リストタイプで取得先を切替（song→list_songs / anime→list_anime）
-      const fetchItems = list.list_type === "anime" ? getListAnime(id) : getListSongs(id);
+      const isAnime = list.list_type === "anime";
+      const fetchItems = isAnime ? getListAnime(id) : getListSongs(id);
       const [itemsData, likeStatus, authorData] = await Promise.all([
         fetchItems,
         getListLikeStatus(id),
         getPublicProfile(list.user_id),
       ]);
 
+      if (cancelled) return;
       setSongs(itemsData);
       setLikeCount(likeStatus.count);
       setLiked(likeStatus.liked);
       setAuthor(authorData);
       setLoading(false);
+
+      // 画像が未キャッシュの曲/アニメをバックグラウンドで補完する（表示はブロックしない）
+      if (isAnime) {
+        if (itemsData.some((a) => !a.image_url)) {
+          const toFetch = itemsData.map((a) => ({
+            id: a.anime_id,
+            title_jp: a.title_jp,
+            title_en: a.title_en,
+            title_romaji: a.title_romaji,
+            image_url: a.image_url,
+          }));
+          ensureAnimeImages(toFetch).then((withImages) => {
+            if (cancelled) return;
+            setSongs((prev) =>
+              prev.map((a) => {
+                const found = withImages.find((w) => w.id === a.anime_id);
+                return found
+                  ? {
+                      ...a,
+                      image_url: found.image_url ?? a.image_url,
+                      title_en: found.title_en ?? a.title_en,
+                      title_romaji: found.title_romaji ?? a.title_romaji,
+                    }
+                  : a;
+              })
+            );
+          });
+        }
+      } else if (itemsData.some((s) => !s.image_url)) {
+        ensureSongImages(itemsData).then((withImages) => {
+          if (cancelled) return;
+          setSongs((prev) =>
+            prev.map((s) => {
+              const found = withImages.find((w) => w.song_id === s.song_id);
+              return found && found.image_url ? { ...s, image_url: found.image_url } : s;
+            })
+          );
+        });
+      }
     };
 
     load();
+    return () => { cancelled = true; };
   }, [id]);
 
   const handleLike = async () => {
