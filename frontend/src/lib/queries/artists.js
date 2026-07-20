@@ -11,27 +11,27 @@ const ARTIST_SONGS_PAGE_SIZE = 30;
 export async function searchArtists({ keyword: rawKeyword = "", page = 1 } = {}) {
   const keyword = normalizeText(rawKeyword);
 
-  const { from, to } = calcRange(page);
+  const limit = calcRange(1).to + 1; // = PAGE_SIZE
+  const { from } = calcRange(page);
 
-  let query = supabase
-    .from("artists")
-    .select("id, name, name_en, role, image_url, created_at", { count: "exact" })
-    .order("id", { ascending: true })
-    .range(from, to);
-
-  if (keyword) query = query.ilike("name", `%${keyword}%`);
-
-  const { data, error, count } = await query;
+  // 曖昧検索(誤字許容)+関連度順ソートはRPC側で実施（search_songsと同じ方式）
+  const { data, error } = await supabase.rpc("search_artists", {
+    p_keyword: keyword,
+    p_limit: limit,
+    p_offset: from,
+  });
 
   if (error) {
     console.error("searchArtists error:", error);
     return { artists: [], total: 0, page: Number(page), totalPages: 1 };
   }
 
+  const count = data?.[0]?.total_count ?? 0;
+
   // 画像取得は呼び出し側でバックグラウンド実行させ、結果表示をブロックしない
   return {
     artists: data ?? [],
-    total: count ?? 0,
+    total: count,
     page: Number(page),
     totalPages: calcTotalPages(count),
   };

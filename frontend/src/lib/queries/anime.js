@@ -9,34 +9,29 @@ import { calcRange, calcTotalPages } from "../utils/pagination";
 export async function searchAnime({ keyword: rawKeyword = "", year = "", season = "", page = 1 } = {}) {
   const keyword = normalizeText(rawKeyword);
 
-  const { from, to } = calcRange(page);
+  const limit = calcRange(1).to + 1; // = PAGE_SIZE
+  const { from } = calcRange(page);
 
-  let query = supabase
-    .from("anime")
-    .select("id, title_jp, title_en, title_romaji, release_year, release_season, type, image_url, created_at", {
-      count: "exact"
-    })
-    .order("release_year", { ascending: false })
-    .order("title_jp", { ascending: true })
-    .range(from, to);
-
-  if (keyword) {
-    query = query.or(`title_jp.ilike.%${keyword}%,title_en.ilike.%${keyword}%`);
-  }
-  if (year) query = query.eq("release_year", Number(year));
-  if (season) query = query.eq("release_season", season);
-
-  const { data, error, count } = await query;
+  // 曖昧検索(誤字許容)+関連度順ソートはRPC側で実施（search_songsと同じ方式）
+  const { data, error } = await supabase.rpc("search_anime", {
+    p_keyword: keyword,
+    p_year: year ? Number(year) : 0,
+    p_season: season || "",
+    p_limit: limit,
+    p_offset: from,
+  });
 
   if (error) {
     console.error("searchAnime error:", error);
     return { anime: [], total: 0, page: Number(page), totalPages: 1 };
   }
 
+  const count = data?.[0]?.total_count ?? 0;
+
   // 画像・英題の取得は呼び出し側でバックグラウンド実行させ、結果表示をブロックしない
   return {
     anime: data ?? [],
-    total: count ?? 0,
+    total: count,
     page: Number(page),
     totalPages: calcTotalPages(count),
   };
