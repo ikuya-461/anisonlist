@@ -1,4 +1,5 @@
 import { supabase } from "../supabaseClient";
+import { normalizeText } from "./normalize";
 import { ANILIST_API } from "../constants";
 
 /* -------------------------------------------------------
@@ -6,13 +7,66 @@ import { ANILIST_API } from "../constants";
    （Jikanは504頻発・日本語検索に弱いため AniList に移行）
    - 日本語(native)/ローマ字(romaji)/英語どのタイトルでも検索可
    - 画像と同時に英語タイトル・ローマ字も取得してDBにキャッシュする
+   - 複数候補を取得し、タイトル類似度でスコアリング（songImageCache等と同じ方式）
 ------------------------------------------------------- */
 const ANILIST_QUERY = `query ($s: String) {
-  Media(search: $s, type: ANIME) {
-    title { english romaji }
-    coverImage { large extraLarge }
+  Page(perPage: 5) {
+    media(search: $s, type: ANIME) {
+      title { english romaji native }
+      coverImage { large extraLarge }
+    }
   }
 }`;
+
+// 採用に必要な最低スコア（songImageCache/gameImageCacheと同じ閾値）
+const MATCH_THRESHOLD = 0.72;
+
+// 文字バイグラムの Dice 係数（0〜1）で文字列類似度を測る
+function similarity(a, b) {
+  if (!a || !b) return 0;
+  if (a === b) return 1;
+  if (a.length < 2 || b.length < 2) return a === b ? 1 : 0;
+  const big = (s) => {
+    const set = new Set();
+    for (let i = 0; i < s.length - 1; i++) set.add(s.slice(i, i + 2));
+    return set;
+  };
+  const A = big(a);
+  const B = big(b);
+  let inter = 0;
+  for (const x of A) if (B.has(x)) inter++;
+  return (2 * inter) / (A.size + B.size);
+}
+
+// 候補の native/romaji/english のうち最も近いものでスコアリング
+function pickBestMatch(queryTitle, results) {
+  const qt = normalizeText(queryTitle);
+
+  let best = null;
+  let bestScore = 0;
+
+  for (const r of results) {
+    if (!r.coverImage?.large && !r.coverImage?.extraLarge) continue;
+
+    const candidates = [r.title?.native, r.title?.romaji, r.title?.english]
+      .filter(Boolean)
+      .map(normalizeText);
+
+    let score = 0;
+    for (const c of candidates) {
+      if (c === qt) { score = 1; break; }
+      if (c.includes(qt) || qt.includes(c)) score = Math.max(score, 0.85);
+      else score = Math.max(score, similarity(qt, c));
+    }
+
+    if (score > bestScore) {
+      bestScore = score;
+      best = r;
+    }
+  }
+
+  return bestScore >= MATCH_THRESHOLD ? best : null;
+}
 
 /**
  * AniList から画像＋英題/ローマ字をまとめて取得
@@ -27,13 +81,14 @@ export async function fetchAnimeMeta(title) {
       body: JSON.stringify({ query: ANILIST_QUERY, variables: { s: title } })
     });
     const data = await res.json();
-    const media = data?.data?.Media;
-    if (!media) return null;
-    const cover = media.coverImage;
+    const results = data?.data?.Page?.media ?? [];
+    const match = pickBestMatch(title, results);
+    if (!match) return null;
+    const cover = match.coverImage;
     return {
       cover: cover?.extraLarge || cover?.large || null,
-      title_en: media.title?.english || null,
-      title_romaji: media.title?.romaji || null
+      title_en: match.title?.english || null,
+      title_romaji: match.title?.romaji || null
     };
   } catch (err) {
     console.error("animeImageCache(AniList) error:", err);
