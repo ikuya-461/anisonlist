@@ -14,6 +14,7 @@ const ANILIST_QUERY = `query ($s: String) {
     media(search: $s, type: ANIME) {
       title { english romaji native }
       coverImage { large extraLarge }
+      popularity
     }
   }
 }`;
@@ -39,11 +40,17 @@ function similarity(a, b) {
 }
 
 // 候補の native/romaji/english のうち最も近いものでスコアリング
+// 部分一致(0.85)は原作/続編/スピンオフ間で同点になりやすいため、
+// スコアが同点の場合は popularity（人気度）が高い方を優先する
+// （さもないとAniListの検索結果の並び順＝人気順ではない順で先勝ちしてしまい、
+//   「ラブライブ!」で検索してスピンオフ「スーパースター!!」の画像が
+//   付く、といった誤マッチが起きる）
 function pickBestMatch(queryTitle, results) {
   const qt = normalizeText(queryTitle);
 
   let best = null;
   let bestScore = 0;
+  let bestPopularity = -1;
 
   for (const r of results) {
     if (!r.coverImage?.large && !r.coverImage?.extraLarge) continue;
@@ -59,8 +66,10 @@ function pickBestMatch(queryTitle, results) {
       else score = Math.max(score, similarity(qt, c));
     }
 
-    if (score > bestScore) {
+    const popularity = r.popularity ?? 0;
+    if (score > bestScore || (score === bestScore && popularity > bestPopularity)) {
       bestScore = score;
+      bestPopularity = popularity;
       best = r;
     }
   }
