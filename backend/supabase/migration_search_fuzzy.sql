@@ -26,6 +26,11 @@
 --     `%`追加でさらに悪化する）。char_length(p_keyword) >= 3 のガードで
 --     短いキーワードは従来通りILIKEのみに留め、この劣化を防ぐ
 --     （3文字以上は数msで高速）。
+--
+-- 2026-10-17 修正:
+--   初版（2026-07-21）で作品名の式から games の coalesce が抜け、
+--   ゲーム曲の作品名が空で返っていた。migration_search_games.sql と
+--   同じく「アニメ名、無ければゲーム名」に戻した。
 -- =========================================================
 
 create or replace function public.search_songs(
@@ -96,7 +101,10 @@ as $$
     b.category,
     b.image_url,
     (select a.name from public.artists a where a.id = b.artist_id)       as artist_name,
-    (select an.title_jp from public.anime an where an.id = b.anime_id)   as anime_title,
+    coalesce(
+      (select an.title_jp from public.anime an where an.id = b.anime_id),
+      (select g.title_jp  from public.games g where g.id = b.game_id)
+    )                                                                    as anime_title,
     (select string_agg(a.name, ', ' order by a.name)
        from public.song_artists sa join public.artists a on a.id = sa.artist_id
       where sa.song_id = b.id and sa.role = 'vocalist')                  as vocalists,
