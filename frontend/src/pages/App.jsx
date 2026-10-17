@@ -17,6 +17,7 @@ const Register = lazy(() => import("./auth/Register"));
 const MyPage = lazy(() => import("./Mypage/MyPage"));
 const ListPage = lazy(() => import("./ListPage/ListPage"));
 const ForgotPassword = lazy(() => import("./auth/ForgotPassword"));
+const ResetPassword = lazy(() => import("./auth/ResetPassword"));
 const AnimeDetail = lazy(() => import("./AnimeDetail/AnimeDetail"));
 const GameDetail = lazy(() => import("./GameDetail/GameDetail"));
 const ArtistDetail = lazy(() => import("./ArtistDetail/ArtistDetail"));
@@ -69,6 +70,7 @@ function App() {
             />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
             <Route
               path="/mypage"

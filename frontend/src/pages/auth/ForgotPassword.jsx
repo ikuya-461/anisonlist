@@ -3,6 +3,7 @@ import { supabase } from "../../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "../../contexts/LanguageContext";
 import Turnstile from "../../components/auth/Turnstile";
+import { RESET_PASSWORD_PATH } from "../../lib/passwordReset";
 import styles from "./LoginRegister.module.css";
 
 export default function ForgotPassword() {
@@ -21,10 +22,11 @@ export default function ForgotPassword() {
       return;
     }
 
-    const { error } = await supabase.auth.resetPasswordForEmail(
-      email,
-      captchaToken ? { captchaToken } : undefined
-    );
+    // メールのリンク先＝新しいパスワードの設定画面
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}${RESET_PASSWORD_PATH}`,
+      ...(captchaToken ? { captchaToken } : {}),
+    });
 
     if (error) {
       console.error("送信エラー:", error);
