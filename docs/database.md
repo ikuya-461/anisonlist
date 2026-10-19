@@ -77,7 +77,7 @@ Supabase（PostgreSQL）を使用する。アプリはフロントエンドか�
 | `search_artists(p_keyword, p_limit, p_offset)` | invoker | アーティスト検索（曖昧検索 + 関連度順） |
 | `reorder_list_songs(p_list_id, p_orders)` | SECURITY DEFINER | 曲リストの並び替え（一意制約を壊さず一括更新） |
 | `reorder_list_anime(p_list_id, p_orders)` | SECURITY DEFINER | アニメリストの並び替え |
-| `delete_my_account()` | SECURITY DEFINER | 本人のいいね・リスト・アカウントを削除（ストア審査要件）。**Storage のアイコン画像は消えない** |
+| `delete_my_account()` | SECURITY DEFINER | 本人のいいね・リスト・アカウントを削除（ストア審査要件）。Storage のアイコン画像は SQL から消せない（Supabase の `protect_objects_delete` トリガー）ため、呼び出し前にアプリ側で Storage API から削除する |
 
 検索 RPC の設計判断は [api.md](api.md#2-検索-rpc-の設計) を参照。
 

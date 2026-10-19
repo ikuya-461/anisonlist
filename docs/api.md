@@ -21,7 +21,7 @@ SONICLIST には自前の API サーバーが無い。フロントエンドが�
 | `lists.js` | `createList`, `getMyLists`, `renameList`, `deleteList`（**未使用**）, `toggleListPublic`, `toggleListLike`, `getPublicListDetail`, `getPublicListsByUser` |
 | `listSongs.js` | `getListSongs`, `addSongToList`, `reorderListSongs`（RPC）, `removeSongFromList` |
 | `listAnime.js` | `getListAnime`, `addAnimeToList`, `reorderListAnime`（RPC）, `removeAnimeFromList` |
-| `users.js` | `getMyProfile`, `updateMyProfile`, `getPublicProfile`, `toggleProfilePublic`, `deleteMyAccount`（RPC） |
+| `users.js` | `getMyProfile`, `updateMyProfile`, `getPublicProfile`, `toggleProfilePublic`, `deleteMyAccount`（Storage のアイコン削除 → RPC） |
 
 ページングは 1 ページ 10 件（`PAGE_SIZE`）。
 

@@ -113,7 +113,7 @@ frontend/src/
 |---|---|
 | 画面側の認可 | `/list/:id` にログイン・所有者の判定が無い。他人の公開リストを開くと編集 UI がそのまま出る（書き込みは RLS で失敗する）。非公開リストを開くとスケルトンのまま止まる |
 | クエリ層の例外 | リスト削除（`DeleteListButton`）とマイページでのリストの並び替えが Supabase を直接呼んでいる。`lists.js` の `deleteList` は未使用 |
-| 自動テスト | 広告まわり 10 件（`lib/ads/__tests__`）とパスワード再設定の入力チェック 10 件（`lib/__tests__`）のみ。`@testing-library/*` は入っているが使われていない |
+| 自動テスト | 広告まわり 10 件（`lib/ads/__tests__`）・パスワード再設定の入力チェック 10 件（`lib/__tests__`）・アカウント削除 5 件（`lib/queries/__tests__`）のみ。`@testing-library/*` は入っているが使われていない |
 | 依存関係 | 未使用：`aws-amplify`・`pg`・`@dnd-kit/modifiers`・`web-vitals`。逆に `@dnd-kit/utilities` は使っているのに `package.json` に無い（他パッケージの依存として偶然入っている） |
 | 未使用の定数 | `JIKAN_API_BASE`・`JIKAN_REQUEST_INTERVAL_MS`（Jikan は廃止済み） |
 | 失敗結果の再試行 | 画像が見つからなかった結果を保存しないため、同じ曲を表示するたびに外部 API を呼ぶ |
