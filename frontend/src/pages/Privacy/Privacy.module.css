@@ -50,3 +50,8 @@
   color: var(--text-sub);
   margin: 0 0 4px;
 }
+
+.link {
+  color: var(--cyan);
+  word-break: break-all;
+}
