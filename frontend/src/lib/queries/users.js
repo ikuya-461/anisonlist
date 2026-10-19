@@ -126,6 +126,28 @@ export async function toggleProfilePublic(currentValue) {
    - 成功したらセッションも破棄する
 ------------------------------------------------------- */
 export async function deleteMyAccount() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return false;
+
+  // アイコン画像（avatars/{user_id}/）を先に消す。Storage の実体は SQL から
+  // 削除できない（Supabase が禁止）ため RPC では消えない。消せなければ
+  // 画像だけが残らないよう、アカウント削除も行わない
+  const avatars = supabase.storage.from("avatars");
+  const { data: files, error: listError } = await avatars.list(user.id);
+  if (listError) {
+    console.error("deleteMyAccount avatar list error:", listError);
+    return false;
+  }
+  if (files.length > 0) {
+    const { error: removeError } = await avatars.remove(
+      files.map((f) => `${user.id}/${f.name}`)
+    );
+    if (removeError) {
+      console.error("deleteMyAccount avatar remove error:", removeError);
+      return false;
+    }
+  }
+
   const { error } = await supabase.rpc("delete_my_account");
 
   if (error) {
