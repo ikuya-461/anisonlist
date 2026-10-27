@@ -5,6 +5,7 @@
 .heading {
   font-family: 'Orbitron', sans-serif;
   font-size: 14px;
+  margin-top: 1em; /* h3 時代の既定余白を維持（h2 の既定は 0.83em） */
   letter-spacing: 2px;
   text-transform: uppercase;
   margin-bottom: 14px;

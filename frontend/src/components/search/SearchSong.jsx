@@ -356,7 +356,7 @@ export default function SearchSong({ onAdd, onAddAnime, heading }) {
 
   return (
     <div className={styles.container}>
-      <h3 className={styles.heading}>{resolvedHeading}</h3>
+      <h2 className={styles.heading}>{resolvedHeading}</h2>
 
       {/* タブ切り替え（アニメリスト編集時はアニメ固定なので非表示） */}
       {!onAddAnime && (

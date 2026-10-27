@@ -7,6 +7,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#080810" />
 
+    <!-- Webフォント（Orbitron / Noto Sans JP）
+         - 以前は index.css の @import で読んでおり、「HTML→CSS→フォントCSS→フォント」の
+           順番待ちで初回表示が約5秒止まっていた（PageSpeed 2026-10-27）
+         - 接続を先に張り（preconnect）、フォントCSSは表示を止めない形で読む
+           （media="print" で取得し、読み込み後に all へ切り替え）。届くまでは代替フォントで表示 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" media="print" onload="this.media='all'"
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Noto+Sans+JP:wght@400;700&display=swap" />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Noto+Sans+JP:wght@400;700&display=swap" />
+    </noscript>
+
     <!-- Google AdSense（サイト所有権確認 + 広告配信の土台） -->
     <meta name="google-adsense-account" content="ca-pub-2799507261826956" />
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2799507261826956"

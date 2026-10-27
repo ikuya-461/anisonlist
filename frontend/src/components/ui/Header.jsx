@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Header.module.css";
-import logoHeader from "../../assets/logo-header.png";
+// 表示は 90x36（CSS で高さ 36px）。高解像度端末向けに約3倍の 300x120 を WebP で用意
+import logoHeader from "../../assets/logo-header.webp";
 import { useLanguage } from "../../contexts/LanguageContext";
 
 export default function Header({ isLoggedIn, updateLoginState }) {
@@ -18,7 +19,7 @@ export default function Header({ isLoggedIn, updateLoginState }) {
   return (
     <header className={styles.header}>
       <Link to="/" className={styles.logoLink}>
-        <img src={logoHeader} alt="SONICLIST #1" className={styles.logoImg} />
+        <img src={logoHeader} alt="SONICLIST #1" className={styles.logoImg} width={90} height={36} />
       </Link>
 
       <div className={styles.actions}>
