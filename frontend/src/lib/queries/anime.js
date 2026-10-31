@@ -40,7 +40,8 @@ export async function searchAnime({ keyword: rawKeyword = "", year = "", season 
 /* -------------------------------------------------------
    ② アニメ画像取得（キャッシュ対応）
 ------------------------------------------------------- */
-export async function getAnimeImage(title) {
+export async function getAnimeImage(anime) {
+  const title = anime?.title_jp;
   if (!title) return null;
 
   const { data: cached } = await supabase
@@ -56,7 +57,7 @@ export async function getAnimeImage(title) {
   }
 
   // AniList から画像＋英題/ローマ字をまとめて取得（Jikanは504頻発・日本語に弱いため）
-  const meta = await fetchAnimeMeta(title);
+  const meta = await fetchAnimeMeta(anime);
   if (!meta) return cached?.image_url ?? null;
 
   const patch = {};

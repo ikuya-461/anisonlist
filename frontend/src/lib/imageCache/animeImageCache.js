@@ -1,104 +1,47 @@
 import { supabase } from "../supabaseClient";
-import { normalizeText } from "./normalize";
 import { ANILIST_API } from "../constants";
+import { buildAnimeQueries, pickBestAnime, ANILIST_MEDIA_QUERY } from "./animeMatch.js";
 
 /* -------------------------------------------------------
    AniList でアニメのカバー画像＋英題/ローマ字を検索する共通ヘルパー
    （Jikanは504頻発・日本語検索に弱いため AniList に移行）
-   - 日本語(native)/ローマ字(romaji)/英語どのタイトルでも検索可
+   - 判定は animeMatch.js（測定ツールと共通）。発売年が分かれば年の差で続編・リメイクを弾き、
+     分からなければ題名の完全一致だけを採用する
+   - 候補が無ければ、副題・期数を落とした題名、英題の順で探し直す
    - 画像と同時に英語タイトル・ローマ字も取得してDBにキャッシュする
-   - 複数候補を取得し、タイトル類似度でスコアリング（songImageCache等と同じ方式）
 ------------------------------------------------------- */
-const ANILIST_QUERY = `query ($s: String) {
-  Page(perPage: 5) {
-    media(search: $s, type: ANIME) {
-      title { english romaji native }
-      coverImage { large extraLarge }
-      popularity
-    }
-  }
-}`;
+// アプリが 1 作品に送る検索の上限（3 つ目の英題は測定で 1 件も増えなかったため一括取得だけで使う）
+const APP_MAX_QUERIES = 2;
 
-// 採用に必要な最低スコア（songImageCache/gameImageCacheと同じ閾値）
-const MATCH_THRESHOLD = 0.72;
-
-// 文字バイグラムの Dice 係数（0〜1）で文字列類似度を測る
-function similarity(a, b) {
-  if (!a || !b) return 0;
-  if (a === b) return 1;
-  if (a.length < 2 || b.length < 2) return a === b ? 1 : 0;
-  const big = (s) => {
-    const set = new Set();
-    for (let i = 0; i < s.length - 1; i++) set.add(s.slice(i, i + 2));
-    return set;
-  };
-  const A = big(a);
-  const B = big(b);
-  let inter = 0;
-  for (const x of A) if (B.has(x)) inter++;
-  return (2 * inter) / (A.size + B.size);
-}
-
-// 候補の native/romaji/english のうち最も近いものでスコアリング
-// 部分一致(0.85)は原作/続編/スピンオフ間で同点になりやすいため、
-// スコアが同点の場合は popularity（人気度）が高い方を優先する
-// （さもないとAniListの検索結果の並び順＝人気順ではない順で先勝ちしてしまい、
-//   「ラブライブ!」で検索してスピンオフ「スーパースター!!」の画像が
-//   付く、といった誤マッチが起きる）
-function pickBestMatch(queryTitle, results) {
-  const qt = normalizeText(queryTitle);
-
-  let best = null;
-  let bestScore = 0;
-  let bestPopularity = -1;
-
-  for (const r of results) {
-    if (!r.coverImage?.large && !r.coverImage?.extraLarge) continue;
-
-    const candidates = [r.title?.native, r.title?.romaji, r.title?.english]
-      .filter(Boolean)
-      .map(normalizeText);
-
-    let score = 0;
-    for (const c of candidates) {
-      if (c === qt) { score = 1; break; }
-      if (c.includes(qt) || qt.includes(c)) score = Math.max(score, 0.85);
-      else score = Math.max(score, similarity(qt, c));
-    }
-
-    const popularity = r.popularity ?? 0;
-    if (score > bestScore || (score === bestScore && popularity > bestPopularity)) {
-      bestScore = score;
-      bestPopularity = popularity;
-      best = r;
-    }
-  }
-
-  return bestScore >= MATCH_THRESHOLD ? best : null;
+async function searchAniList(term) {
+  const res = await fetch(ANILIST_API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({ query: ANILIST_MEDIA_QUERY, variables: { s: term } })
+  });
+  const data = await res.json();
+  return data?.data?.Page?.media ?? [];
 }
 
 /**
  * AniList から画像＋英題/ローマ字をまとめて取得
+ * @param {{ title_jp?: string, title_en?: string, release_year?: number }} anime
  * @returns {{ cover: string|null, title_en: string|null, title_romaji: string|null } | null}
  */
-export async function fetchAnimeMeta(title) {
-  if (!title) return null;
+export async function fetchAnimeMeta(anime) {
+  if (!anime?.title_jp && !anime?.title_en) return null;
   try {
-    const res = await fetch(ANILIST_API, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify({ query: ANILIST_QUERY, variables: { s: title } })
-    });
-    const data = await res.json();
-    const results = data?.data?.Page?.media ?? [];
-    const match = pickBestMatch(title, results);
-    if (!match) return null;
-    const cover = match.coverImage;
-    return {
-      cover: cover?.extraLarge || cover?.large || null,
-      title_en: match.title?.english || null,
-      title_romaji: match.title?.romaji || null
-    };
+    for (const term of buildAnimeQueries(anime).slice(0, APP_MAX_QUERIES)) {
+      const match = pickBestAnime(anime, await searchAniList(term));
+      if (!match) continue;
+      const cover = match.coverImage;
+      return {
+        cover: cover?.extraLarge || cover?.large || null,
+        title_en: match.title?.english || null,
+        title_romaji: match.title?.romaji || null
+      };
+    }
+    return null;
   } catch (err) {
     console.error("animeImageCache(AniList) error:", err);
     return null;
@@ -106,8 +49,8 @@ export async function fetchAnimeMeta(title) {
 }
 
 /* 後方互換：カバー画像だけ欲しい呼び出し向け */
-export async function fetchAnimeCover(title) {
-  const meta = await fetchAnimeMeta(title);
+export async function fetchAnimeCover(anime) {
+  const meta = await fetchAnimeMeta(anime);
   return meta?.cover ?? null;
 }
 
@@ -123,7 +66,7 @@ export async function ensureAnimeMeta(anime) {
   if (!needImage && !needEn && !needRomaji) return {};
   if (!anime.title_jp && !anime.title_en) return {};
 
-  const meta = await fetchAnimeMeta(anime.title_jp || anime.title_en);
+  const meta = await fetchAnimeMeta(anime);
   if (!meta) return {};
 
   const patch = {};

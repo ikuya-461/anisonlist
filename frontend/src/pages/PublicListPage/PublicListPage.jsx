@@ -60,6 +60,7 @@ export default function PublicListPage() {
             title_jp: a.title_jp,
             title_en: a.title_en,
             title_romaji: a.title_romaji,
+            release_year: a.release_year,
             image_url: a.image_url,
           }));
           ensureAnimeImages(toFetch).then((withImages) => {

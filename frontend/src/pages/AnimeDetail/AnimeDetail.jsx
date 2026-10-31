@@ -35,7 +35,7 @@ export default function AnimeDetail() {
     let cancelled = false;
 
     if (!data.anime.image_url) {
-      getAnimeImage(data.anime.title_jp).then((image_url) => {
+      getAnimeImage(data.anime).then((image_url) => {
         if (cancelled || !image_url) return;
         setData((prev) => (prev ? { ...prev, anime: { ...prev.anime, image_url } } : prev));
       });
