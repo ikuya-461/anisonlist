@@ -70,9 +70,10 @@ async function search(key) {
   return null; // 3 回失敗：この件は「取得失敗」として残し、次回の実行で再試行する
 }
 
-// 画像の同一性：iTunes はホスト（is1〜is5）とサイズを除いたパス、AniList はファイル名で比べる
+// 画像の同一性：iTunes はホスト（is1〜is5）とサイズを除いたパス、AniList はファイル名の作品番号で比べる
+// （AniList は表紙を差し替えるとファイル名の後半が変わる。古い URL も表示できる）
 const songImageKey = (url) => url && new URL(url).pathname.replace(/\/\d+x\d+bb\.(jpg|png)$/, "");
-const animeImageKey = (url) => url && url.split("/").pop();
+const animeImageKey = (url) => url && url.split("/").pop().replace(/^[a-z]*(\d+)[-.].*$/, "$1");
 
 const songArtwork = (r) => r.artworkUrl100.replace("100x100", "600x600");
 const animeCover = (m) => m.coverImage.extraLarge || m.coverImage.large;

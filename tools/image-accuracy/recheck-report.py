@@ -42,6 +42,10 @@ def img(url):
     return f'<img src="{esc(url)}" loading="lazy" alt="">' if url else '<div class="noimg">NO IMAGE</div>'
 
 
+REC = {"replace": "差し替え", "delete": "削除", "keep": "そのまま"}
+decisions = json.loads((DIR / "decisions.json").read_text()) if (DIR / "decisions.json").exists() else {}
+rec_count = Counter(f"{k.split(':')[0]}:{v[0]}" for k, v in decisions.items())
+
 sections = []
 summary = []
 for kind, name in [("songs", "曲"), ("anime", "アニメ作品")]:
@@ -51,7 +55,8 @@ for kind, name in [("songs", "曲"), ("anime", "アニメ作品")]:
     rows = [json.loads(l) for l in p.read_text().splitlines() if l]
     counts = Counter(r["status"] for r in rows)
     summary.append(f"<li>{name} {len(rows)} 件：そのまま {counts['keep']}・"
-                   + "・".join(f"{LABELS[s][0]} {counts[s]}" for s in LABELS) + "</li>")
+                   + "・".join(f"{LABELS[s][0]} {counts[s]}" for s in LABELS)
+                   + f"<br><b>推奨</b>：差し替え {rec_count[kind + ':replace']}・削除 {rec_count[kind + ':delete']}・そのまま {rec_count[kind + ':keep']}</li>")
     for status, (title, note) in LABELS.items():
         hits = [r for r in rows if r["status"] == status]
         if not hits:
@@ -60,14 +65,16 @@ for kind, name in [("songs", "曲"), ("anime", "アニメ作品")]:
         for r in hits:
             it = r["item"]
             after = (r.get("best") or {}).get("image") if status in ("replace", "unknown_new") else None
+            rec, why = decisions.get(f"{kind}:{it['id']}", ["", ""])
             trs.append(
                 f"<tr><td class='id'>{kind}:{it['id']}</td><td>{describe(kind, it)}</td>"
+                f"<td><b class='rec {rec}'>{REC.get(rec, '')}</b><br><small>{esc(why)}</small></td>"
                 f"<td>{img(it['image_url'])}{cand(kind, r.get('current'))}</td>"
                 f"<td>{img(after)}{cand(kind, r.get('best')) if after else ''}</td></tr>"
             )
         sections.append(
             f"<h2>{name}：{title}（{len(hits)} 件）</h2><p>{note}</p>"
-            f"<table><thead><tr><th>id</th><th>DB の登録内容</th><th>今の画像</th><th>新しい画像</th></tr></thead>"
+            f"<table><thead><tr><th>id</th><th>DB の登録内容</th><th>推奨（目視）</th><th>今の画像</th><th>新しい画像</th></tr></thead>"
             f"<tbody>{''.join(trs)}</tbody></table>"
         )
 
@@ -83,6 +90,7 @@ table {{ border-collapse:collapse; width:100%; margin-bottom:32px; }}
 th, td {{ border-bottom:1px solid var(--line); padding:8px; text-align:left; vertical-align:top; }}
 td.id {{ font-family:ui-monospace,monospace; white-space:nowrap; }}
 img, .noimg {{ width:120px; height:120px; object-fit:cover; display:block; margin-bottom:4px; border-radius:4px; }}
+.rec {{ white-space:nowrap; }} .rec.replace {{ color:#1a73e8; }} .rec.delete {{ color:#d93025; }} .rec.keep {{ color:var(--muted); }}
 .noimg {{ background:var(--chip); color:var(--muted); display:flex; align-items:center; justify-content:center; font-size:12px; }}
 @media (max-width:640px) {{ img, .noimg {{ width:72px; height:72px; }} th, td {{ padding:4px; font-size:13px; }} }}
 </style></head><body>
