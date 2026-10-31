@@ -1,0 +1,3 @@
+# 測定の生データ（iTunes・AniList の応答など）と目視用の一覧は作り直せるのでコミットしない
+results/
+review-*.json
