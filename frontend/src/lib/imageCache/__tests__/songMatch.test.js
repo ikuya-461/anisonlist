@@ -59,6 +59,8 @@ describe("artistMatches：表記差は一致、別人は不一致", () => {
     ["96猫", "EIKO starring 96猫"],
     ["叶", "叶"],
     ["叶", "叶, 葛葉"],
+    ["Star★Shiμʼne!!!", "Star★Shiμ'ne!!!"],
+    ["Tommy heavenly^6", "Tommy heavenly6"],
   ])("一致：%s / %s", (a, b) => {
     expect(artistMatches(a, b)).toBe(true);
   });
@@ -140,6 +142,12 @@ describe("pickBestSong：採用する 1 件を選ぶ", () => {
     const song = { song_title: "i(REMIX-B)", artist: "長谷川明子" };
     const other = track("relations (M@STER VERSION)", "星井美希 (CV.長谷川明子) & 如月千早 (CV.今井麻美)");
     expect(pickBestSong(song, [other])).toBeNull();
+  });
+
+  test("曲名の ♥ などの記号の有無は同じ曲とみなす", () => {
+    const song = { song_title: "ラブ♥ライス", artist: "茶太" };
+    const hit = track("ラブ ライス", "茶太");
+    expect(pickBestSong(song, [hit])).toBe(hit);
   });
 
   test("画像の無い候補は使わない", () => {

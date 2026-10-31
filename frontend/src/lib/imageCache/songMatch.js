@@ -17,7 +17,7 @@ export function normForMatch(str) {
     .replace(/[([{（【「].*?[)\]}）】」]/g, "") // 括弧書き（Instrumental 等）を除去
     .replace(/\s*[-–—]\s.*$/, "")              // 「 - 〇〇 ver.」等の後置を除去
     .replace(/(?:feat|ft)\.?.*$/i, "")          // feat. 以降を除去
-    .replace(/[!！?？。、,.\-_/~〜・:：'"’”]/g, "")
+    .replace(/[!！?？。、,.\-_/~〜・:：'"’”ʼ♥♡★☆♪]/g, "")
     .replace(/\s+/g, "")
     .trim();
 }
@@ -41,7 +41,7 @@ export function similarity(a, b) {
 
 // 空白と記号を落とした比較キー（「小倉 唯」と「小倉唯」、「’」と「'」を同じにする）
 export function looseKey(str) {
-  return normalizeText(str).replace(/[\s'’‘"“”`・･.。,、!！?？\-–—_/~〜:：;*★☆♪♡&＆+]/g, "");
+  return normalizeText(str).replace(/[\s'’‘ʼ"“”`・･.。,、!！?？\-–—_/~〜:：;*★☆♪♡♥&＆+^]/g, "");
 }
 
 // 歌手名を人名単位のキーに分ける（連名・「キャラ名 (CV. 声優名)」の両方を拾う）
