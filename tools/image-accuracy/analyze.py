@@ -13,8 +13,6 @@ from collections import defaultdict
 from pathlib import Path
 
 DIR = Path(__file__).parent
-label = sys.argv[1] if len(sys.argv) > 1 else "current"
-judgments = json.loads(Path(sys.argv[2]).read_text()) if len(sys.argv) > 2 else {}
 
 
 def norm(s):
@@ -45,42 +43,50 @@ def auto_judge(kind, rec):
     return "ok" if norm(a.get("native")) == norm(it["title_jp"]) and year_ok else None
 
 
-review = []
-stats = defaultdict(lambda: defaultdict(int))
-for kind in ["songs", "anime"]:
-    p = DIR / "results" / f"{label}-{kind}.jsonl"
-    if not p.exists():
-        continue
-    for line in p.read_text().splitlines():
-        rec = json.loads(line)
-        it = rec["item"]
-        cat = it.get("category", "anime_work") if kind == "songs" else "anime_work"
-        st = stats[cat]
-        st["total"] += 1
-        if rec.get("error"):
-            st["error"] += 1
-            continue
-        if not rec.get("adopted"):
-            st["none"] += 1
-            continue
-        st["adopted"] += 1
-        key = f"{kind}:{rec['id']}"
-        j = judgments.get(key) or auto_judge(kind, rec)
-        if j is None:
-            st["unjudged"] += 1
-            review.append({"key": key, "category": cat, "item": it, "adopted": rec["adopted"]})
-        else:
-            st[j] += 1
+def main():
+    label = sys.argv[1] if len(sys.argv) > 1 else "current"
+    judgments = json.loads(Path(sys.argv[2]).read_text()) if len(sys.argv) > 2 else {}
 
-(DIR / f"review-{label}.json").write_text(json.dumps(review, ensure_ascii=False, indent=1))
+    review = []
+    stats = defaultdict(lambda: defaultdict(int))
+    for kind in ["songs", "anime"]:
+        p = DIR / "results" / f"{label}-{kind}.jsonl"
+        if not p.exists():
+            continue
+        for line in p.read_text().splitlines():
+            rec = json.loads(line)
+            it = rec["item"]
+            cat = it.get("category", "anime_work") if kind == "songs" else "anime_work"
+            st = stats[cat]
+            st["total"] += 1
+            if rec.get("error"):
+                st["error"] += 1
+                continue
+            if not rec.get("adopted"):
+                st["none"] += 1
+                continue
+            st["adopted"] += 1
+            key = f"{kind}:{rec['id']}"
+            j = judgments.get(key) or auto_judge(kind, rec)
+            if j is None:
+                st["unjudged"] += 1
+                review.append({"key": key, "category": cat, "item": it, "adopted": rec["adopted"]})
+            else:
+                st[j] += 1
 
-print(f"| カテゴリ | 抽出 | 付いた | 付く率 | 正しい | 誤り | 保留 | 未判定 | 誤り率 | APIエラー |")
-print("|---|---|---|---|---|---|---|---|---|---|")
-for cat, st in stats.items():
-    adopted = st["adopted"]
-    judged = st["ok"] + st["ng"]
-    print(
-        f"| {cat} | {st['total']} | {adopted} | {adopted / st['total']:.1%} | {st['ok']} | {st['ng']} | {st['hold']} "
-        f"| {st['unjudged']} | {(st['ng'] / judged if judged else 0):.1%} | {st['error']} |"
-    )
-print(f"\n目視が必要: {len(review)} 件 → review-{label}.json")
+    (DIR / f"review-{label}.json").write_text(json.dumps(review, ensure_ascii=False, indent=1))
+
+    print(f"| カテゴリ | 抽出 | 付いた | 付く率 | 正しい | 誤り | 保留 | 未判定 | 誤り率 | APIエラー |")
+    print("|---|---|---|---|---|---|---|---|---|---|")
+    for cat, st in stats.items():
+        adopted = st["adopted"]
+        judged = st["ok"] + st["ng"]
+        print(
+            f"| {cat} | {st['total']} | {adopted} | {adopted / st['total']:.1%} | {st['ok']} | {st['ng']} | {st['hold']} "
+            f"| {st['unjudged']} | {(st['ng'] / judged if judged else 0):.1%} | {st['error']} |"
+        )
+    print(f"\n目視が必要: {len(review)} 件 → review-{label}.json")
+
+
+if __name__ == "__main__":
+    main()
