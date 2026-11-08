@@ -9,14 +9,15 @@ export const MAX_QUERIES = 2;
 // iTunes の回数制限が続いたときに一括登録全体を止めるための例外（IP がブロックされるのを避ける）
 export class RateLimitError extends Error {}
 
-// 問い合わせの間隔を空け、回数制限（403・429）や一時エラーは待って再試行する。
+// 問い合わせの間隔を空け、回数制限（403・429）や一時エラー（404・通信エラー）は 10 分待って再試行する。
+// 約 1 時間（maxAttempts 回）失敗が続いたときだけ止める。数時間無人で回すため、一時的な不調では止めない。
 // 同じ URL の結果は覚えておき、2 回問い合わせない（OP/ED 違いなど同じ曲名・歌手の曲が多いため）
-export function createItunesSearch({ fetchFn = fetch, sleep, intervalMs = 3200, backoffMs = 60000, cacheSize = 5000 }) {
+export function createItunesSearch({ fetchFn = fetch, sleep, intervalMs = 3200, retryWaitMs = 600000, maxAttempts = 7, cacheSize = 5000 }) {
   const cache = new Map();
   return async function search(url) {
     if (cache.has(url)) return cache.get(url);
     let lastError;
-    for (let attempt = 0; attempt < 3; attempt++) {
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
       let res;
       try {
         res = await fetchFn(url);
@@ -31,10 +32,13 @@ export function createItunesSearch({ fetchFn = fetch, sleep, intervalMs = 3200, 
         cache.set(url, results);
         return results;
       }
-      lastError ??= new Error(`iTunes ${res?.status}`);
-      await sleep(backoffMs * (attempt + 1));
+      if (res) lastError = new Error(`iTunes ${res.status}`);
+      if (attempt < maxAttempts - 1) {
+        console.log(`${new Date().toLocaleString("ja-JP")} iTunes への問い合わせに失敗（${lastError?.message}）。${retryWaitMs / 60000} 分待って再試行（${attempt + 1}/${maxAttempts}）`);
+        await sleep(retryWaitMs);
+      }
     }
-    throw new RateLimitError(`iTunes への問い合わせが 3 回続けて失敗した: ${lastError?.message}`);
+    throw new RateLimitError(`iTunes への問い合わせが ${maxAttempts} 回続けて失敗した: ${lastError?.message}`);
   };
 }
 

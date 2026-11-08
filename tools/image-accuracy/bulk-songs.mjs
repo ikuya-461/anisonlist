@@ -8,7 +8,7 @@
 //     見つかった曲：image_url・image_source='batch'・image_checked_at を書く
 //     見つからなかった曲：image_checked_at だけ書く（次回から探し直さない）
 //     1 曲ごとに書くので、止めても続きから再開できる。書いた内容は bulk/applied.jsonl にも残す
-//   iTunes の回数制限が 3 回続いたら、その時点で止まる（IP のブロックを避けるため）
+//   iTunes の失敗（回数制限・404・通信エラー）は 10 分おきに再試行し、約 1 時間続いたら止まる（IP のブロックを避けるため）
 
 import fs from "node:fs";
 import path from "node:path";

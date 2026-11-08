@@ -32,18 +32,36 @@ test("findArtwork：歌手違いしか無ければ画像を付けない", async 
 const ok = (results) => ({ ok: true, status: 200, json: async () => ({ results }) });
 const ng = (status) => ({ ok: false, status, json: async () => ({}) });
 
-test("createItunesSearch：回数制限なら待って再試行する", async () => {
+test("createItunesSearch：回数制限なら 10 分待って再試行する", async () => {
   const waits = [];
   const fetchFn = async () => (fetchFn.n = (fetchFn.n ?? 0) + 1) === 1 ? ng(429) : ok([track("a", "b")]);
-  const search = createItunesSearch({ fetchFn, sleep: async (ms) => waits.push(ms), intervalMs: 3200, backoffMs: 60000 });
+  const search = createItunesSearch({ fetchFn, sleep: async (ms) => waits.push(ms), intervalMs: 3200 });
   const results = await search("https://itunes.apple.com/search?term=x");
   assert.equal(results.length, 1);
-  assert.ok(waits.includes(60000));
+  assert.ok(waits.includes(600000));
 });
 
-test("createItunesSearch：3 回続けて失敗したら RateLimitError で止める", async () => {
-  const search = createItunesSearch({ fetchFn: async () => ng(403), sleep: async () => {}, intervalMs: 0, backoffMs: 0 });
+test("createItunesSearch：一時的な失敗（404 や通信エラー）が 6 回続いても、その後成功すれば止めない", async () => {
+  let n = 0;
+  const fetchFn = async () => {
+    n++;
+    if (n <= 3) return ng(404);
+    if (n <= 6) throw new Error("ECONNRESET");
+    return ok([track("a", "b")]);
+  };
+  const search = createItunesSearch({ fetchFn, sleep: async () => {}, intervalMs: 0 });
+  const results = await search("https://itunes.apple.com/search?term=x");
+  assert.equal(results.length, 1);
+  assert.equal(n, 7);
+});
+
+test("createItunesSearch：約 1 時間（7 回）失敗が続いたら RateLimitError で止める", async () => {
+  let n = 0;
+  const waits = [];
+  const search = createItunesSearch({ fetchFn: async () => { n++; return ng(403); }, sleep: async (ms) => waits.push(ms), intervalMs: 0 });
   await assert.rejects(search("https://itunes.apple.com/search?term=x"), RateLimitError);
+  assert.equal(n, 7);
+  assert.equal(waits.filter((ms) => ms === 600000).length, 6);
 });
 
 test("createItunesSearch：同じ URL は 2 回問い合わせない", async () => {
