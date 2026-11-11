@@ -15,6 +15,7 @@ import {
   reorderListAnime
 } from "../../lib/queries/listAnime";
 import { ensureSongImages } from "../../lib/imageCache/songImageCache";
+import { songDisplayImage } from "../../lib/imageCache/songDisplayImage";
 import { ensureAnimeImages } from "../../lib/imageCache/animeImageCache";
 
 import ListHeader from "../../components/list/ListHeader";
@@ -65,6 +66,7 @@ export default function ListPage() {
       anime_title: row.anime_title,
       type: row.song_type,
       image_url: row.image_url,
+      anime_image_url: row.anime_image_url,
       position: row.position,
       memo: row.memo,
       emotion_tags: row.emotion_tags,
@@ -223,7 +225,8 @@ export default function ListPage() {
     );
   };
 
-  const shareItems = isAnimeList ? animeItems : songs;
+  // 共有画像も、曲の画像が無ければ作品の表紙を代わりに使う
+  const shareItems = isAnimeList ? animeItems : songs.map((s) => ({ ...s, image_url: songDisplayImage(s) }));
 
   return (
     <div className={styles.outer}>

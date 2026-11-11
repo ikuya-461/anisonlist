@@ -19,7 +19,7 @@ export async function getListSongs(listId) {
         song_type,
         image_url,
         artist:artists!artist_id ( name ),
-        anime:anime!anime_id ( title_jp )
+        anime:anime!anime_id ( title_jp, image_url )
       )
     `)
     .eq("list_id", listId)
@@ -39,6 +39,8 @@ export async function getListSongs(listId) {
     image_url: row.song?.image_url ?? null,
     artist: row.song?.artist?.name ?? null,
     anime_title: row.song?.anime?.title_jp ?? null,
+    // 曲の画像が無いときに代わりに出す作品の表紙（songDisplayImage）
+    anime_image_url: row.song?.anime?.image_url ?? null,
     memo: row.memo ?? null,
     emotion_tags: row.emotion_tags ?? [],
     encounter_type: row.encounter_type ?? null

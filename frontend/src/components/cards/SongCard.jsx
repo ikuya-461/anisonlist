@@ -3,6 +3,7 @@ import styles from "./MediaCard.module.css";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { valueLabel, SONG_TYPE_LABELS } from "../../lib/i18n";
 import { songTitle } from "../../lib/displayText";
+import { songDisplayImage } from "../../lib/imageCache/songDisplayImage";
 
 export default function SongCard({ song, onAdd, onClick }) {
   const [added, setAdded] = useState(false);
@@ -14,9 +15,9 @@ export default function SongCard({ song, onAdd, onClick }) {
     >
       {/* 画像 */}
       <div className={styles.imageWrapper}>
-        {song.image_url ? (
+        {songDisplayImage(song) ? (
           <img
-            src={song.image_url}
+            src={songDisplayImage(song)}
             alt={song.song_title || song.title}
             className={styles.image}
           />

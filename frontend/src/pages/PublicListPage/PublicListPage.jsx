@@ -10,6 +10,7 @@ import { ensureAnimeImages } from "../../lib/imageCache/animeImageCache";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { valueLabel, EMOTION_LABELS, ENCOUNTER_LABELS, ANIME_TAG_LABELS, SEASON_LABELS } from "../../lib/i18n";
 import { songTitle, animeTitle } from "../../lib/displayText";
+import { songDisplayImage } from "../../lib/imageCache/songDisplayImage";
 
 import pageStyles from "../DetailPage.module.css";
 import styles from "./PublicListPage.module.css";
@@ -203,8 +204,8 @@ export default function PublicListPage() {
               onClick={() => navigate(`/songs/${song.song_id}`)}
             >
               <div className={styles.thumb}>
-                {song.image_url
-                  ? <img src={song.image_url} alt={songTitle(song, lang)} />
+                {songDisplayImage(song)
+                  ? <img src={songDisplayImage(song)} alt={songTitle(song, lang)} />
                   : <div className={styles.noImage}>NO IMAGE</div>
                 }
               </div>

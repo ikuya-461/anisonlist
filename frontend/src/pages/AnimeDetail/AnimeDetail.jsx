@@ -111,6 +111,7 @@ export default function AnimeDetail() {
           type: s.song_type,
           sequence: s.sequence,
           image_url: s.image_url,
+          anime_image_url: anime.image_url,
           artist: s.artist,
           anime_title: mainTitle
         }))}

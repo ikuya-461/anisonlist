@@ -131,6 +131,7 @@ export default function ArtistDetail() {
           song_title: s.song_title,
           type: s.song_type,
           image_url: s.image_url,
+          anime_image_url: s.anime_image_url,
           artist: s.artist,
           anime_title: s.anime_title
         }))}

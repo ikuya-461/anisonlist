@@ -2,6 +2,7 @@ import styles from "./ListPageSongCard.module.css";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { valueLabel, EMOTION_LABELS, ENCOUNTER_LABELS, SONG_TYPE_LABELS } from "../../lib/i18n";
 import { songTitle } from "../../lib/displayText";
+import { songDisplayImage } from "../../lib/imageCache/songDisplayImage";
 
 export default function ListPageSongCard({
   song,
@@ -26,8 +27,8 @@ export default function ListPageSongCard({
 
       {/* 画像 */}
       <div className={styles.imageWrapper}>
-        {song.image_url ? (
-          <img src={song.image_url} alt="" className={styles.image} />
+        {songDisplayImage(song) ? (
+          <img src={songDisplayImage(song)} alt="" className={styles.image} />
         ) : (
           <div className={styles.noImage}>NO IMAGE</div>
         )}

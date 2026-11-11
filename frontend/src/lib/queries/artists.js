@@ -71,7 +71,7 @@ export async function getArtistDetail(id, page = 1) {
     song_type,
     category,
     image_url,
-    anime:anime!anime_id ( title_jp ),
+    anime:anime!anime_id ( title_jp, image_url ),
     artist:artists!artist_id ( name )
   `;
 
@@ -115,6 +115,8 @@ export async function getArtistDetail(id, page = 1) {
     song_type: row.song_type,
     image_url: row.image_url,
     anime_title: row.anime?.title_jp ?? null,
+    // 曲の画像が無いときに代わりに出す作品の表紙（songDisplayImage）
+    anime_image_url: row.anime?.image_url ?? null,
     // ボカロ曲はボーカル名が別ひも付けのため、表示・画像検索ともこのアーティスト名を使う
     artist: row.category === "vocaloid" ? artist.name : (row.artist?.name ?? null)
   }));

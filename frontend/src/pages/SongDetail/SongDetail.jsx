@@ -9,6 +9,7 @@ import { DetailSkeleton } from "../../components/ui/Skeleton";
 import AdSlot from "../../components/ads/AdSlot";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { songTitle } from "../../lib/displayText";
+import { songDisplayImage } from "../../lib/imageCache/songDisplayImage";
 import { valueLabel, SONG_TYPE_LABELS } from "../../lib/i18n";
 import pageStyles from "../DetailPage.module.css";
 import styles from "./SongDetail.module.css";
@@ -137,7 +138,7 @@ export default function SongDetail() {
 
       {/* 画像（fallback あり） */}
       <img
-        src={song.image_url || "/noimage.png"}
+        src={songDisplayImage(song) || "/noimage.png"}
         alt="anime"
         className={styles.image}
       />

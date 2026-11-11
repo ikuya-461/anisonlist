@@ -95,7 +95,7 @@ export async function getSongDetail(id) {
       composer_id,
       arranger_id,
       created_at,
-      anime:anime!anime_id ( title_jp, release_date ),
+      anime:anime!anime_id ( title_jp, release_date, image_url ),
       game:games!game_id ( title_jp ),
       artist:artists!artist_id ( name ),
       lyricist:artists!lyricist_id ( name ),
@@ -124,6 +124,8 @@ export async function getSongDetail(id) {
   const result = {
     ...data,
     anime_title: data.anime?.title_jp ?? null,
+    // 曲の画像が無いときに代わりに出す作品の表紙（songDisplayImage）
+    anime_image_url: data.anime?.image_url ?? null,
     game_title: data.game?.title_jp ?? null,
     // 曲自身の release_date を優先（ボカロ曲）、無ければ紐づくアニメの公開日
     release_date: data.release_date ?? data.anime?.release_date ?? null,
