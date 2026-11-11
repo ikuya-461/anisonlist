@@ -2,7 +2,7 @@
 // 判定はアプリと共通（songMatch.js）。DB 接続は backend/.env と backend/certs/supabase-ca.pem を使う。
 //
 // 使い方:
-//   node tools/image-accuracy/bulk-songs.mjs dry-run [カテゴリごとの件数=100]
+//   node tools/image-accuracy/bulk-songs.mjs dry-run [カテゴリごとの件数=100] [--category vocaloid]
 //     DB は変えない。カテゴリごとに曲を選んで探し、結果を bulk/dryrun.jsonl に書く（止めても続きから）
 //   caffeinate -i node tools/image-accuracy/bulk-songs.mjs apply [--category anime,game,Vtuber] [--limit 件数]
 //     見つかった曲：image_url・image_source='batch'・image_checked_at を書く
@@ -33,11 +33,11 @@ const search = createItunesSearch({ sleep });
 // 対象は測定で誤り 0% を確かめた 3 カテゴリ（ボカロは未測定のため対象外）
 const CATEGORIES = ["anime", "game", "Vtuber"];
 
-// 歌手名は抜き取りサンプルと同じ作り方（歌手が無ければボーカルを連結）
+// 歌手が無い曲（ボカロ）は、プロデューサーを先に連結する。iTunes の歌手名はプロデューサーのことが多く、検索も先頭の名前で行うため
 const SONG_COLUMNS = `s.id, s.category, s.song_title,
-  coalesce(a.name, (select string_agg(ar.name, ', ' order by ar.name)
+  coalesce(a.name, (select string_agg(ar.name, ', ' order by sa.role = 'vocalist', ar.name)
     from song_artists sa join artists ar on ar.id = sa.artist_id
-    where sa.song_id = s.id and sa.role = 'vocalist')) as artist`;
+    where sa.song_id = s.id and sa.role in ('producer', 'vocalist'))) as artist`;
 
 const args = process.argv.slice(2);
 const mode = args[0];
@@ -46,7 +46,7 @@ const opt = (name) => { const i = args.indexOf(`--${name}`); return i === -1 ? n
 let stopping = false;
 process.on("SIGINT", () => { stopping = true; console.log("止めます（処理中の 1 曲を終えてから）"); });
 
-async function dryRun(perCategory) {
+async function dryRun(perCategory, categories) {
   const outPath = path.join(OUT, "dryrun.jsonl");
   const done = new Set(
     fs.existsSync(outPath) ? fs.readFileSync(outPath, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l).id) : []
@@ -58,7 +58,7 @@ async function dryRun(perCategory) {
        from songs s left join artists a on a.id = s.artist_id
        where s.category = any($1) and s.image_url is null and s.image_checked_at is null
      ) x where rn <= $2 order by category, rn`,
-    [CATEGORIES, perCategory]
+    [categories, perCategory]
   );
   console.log(`試し実行: ${rows.length} 曲（保存済み ${rows.filter((r) => done.has(r.id)).length}）`);
   let n = 0;
@@ -112,7 +112,7 @@ async function apply(categories, limit) {
 }
 
 try {
-  if (mode === "dry-run") await dryRun(Number(args[1] ?? 100));
+  if (mode === "dry-run") await dryRun(Number(args[1] ?? 100), (opt("category") ?? CATEGORIES.join(",")).split(","));
   else if (mode === "apply") await apply((opt("category") ?? CATEGORIES.join(",")).split(","), Number(opt("limit") ?? Infinity));
   else console.log("使い方: node tools/image-accuracy/bulk-songs.mjs dry-run [件数] | apply [--category …] [--limit …]");
 } catch (e) {
