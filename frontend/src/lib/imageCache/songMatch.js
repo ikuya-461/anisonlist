@@ -113,8 +113,11 @@ function titleScore(qts, trackName) {
 // 正規化済みの 2 つの題名の近さ（完全一致 1、部分一致 0.85、それ以外は Dice 係数）
 export function compareKeys(qt, rt) {
   if (rt && rt === qt) return 1;
-  // 部分一致は 3 文字以上に限る（「i」が「relations」に含まれる、のような取り違えを防ぐ）
-  if (Math.min(qt.length, rt.length) >= 3 && (rt.includes(qt) || qt.includes(rt))) return 0.85;
+  const [short, long] = qt.length <= rt.length ? [qt, rt] : [rt, qt];
+  // 部分一致は 3 文字以上に限る（「i」が「relations」に含まれる、のような取り違えを防ぐ）。
+  // さらに頭か末尾の一致に限る。正しい部分一致は版の付記（後ろ）か作品名（前）の違いで、
+  // 途中に含まれるだけなのは別の曲だった（「UNDER」と「I’m Under Your Spell」）
+  if (short.length >= 3 && (long.startsWith(short) || long.endsWith(short))) return 0.85;
   return similarity(qt, rt);
 }
 

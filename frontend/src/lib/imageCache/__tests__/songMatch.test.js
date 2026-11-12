@@ -144,6 +144,25 @@ describe("pickBestSong：採用する 1 件を選ぶ", () => {
     expect(pickBestSong(song, [other])).toBeNull();
   });
 
+  // 2026-11-11 のボカロ試し実行で唯一の誤り
+  test("曲名が別の曲名の途中に含まれるだけなら同じ曲とみなさない", () => {
+    const song = { song_title: "UNDER", artist: "Spacelectro, 初音ミク" };
+    const other = track("I’m Under Your Spell", "SPACELECTRO", "I’m Under Your Spell - Single");
+    expect(pickBestSong(song, [other])).toBeNull();
+  });
+
+  test("曲名の頭が一致する別表記（版の付記つき）は同じ曲とみなす", () => {
+    const song = { song_title: "空を見上げて", artist: "小寺可南子" };
+    const hit = track("空を見上げて /小寺可南子", "小寺可南子");
+    expect(pickBestSong(song, [hit])).toBe(hit);
+  });
+
+  test("曲名の末尾が一致する別表記（作品名の前置き）は同じ曲とみなす", () => {
+    const song = { song_title: "不思議色ハピネス", artist: "太田貴子" };
+    const hit = track("マジカルエミ～不思議色ハピネス", "太田貴子");
+    expect(pickBestSong(song, [hit])).toBe(hit);
+  });
+
   test("曲名の ♥ などの記号の有無は同じ曲とみなす", () => {
     const song = { song_title: "ラブ♥ライス", artist: "茶太" };
     const hit = track("ラブ ライス", "茶太");
